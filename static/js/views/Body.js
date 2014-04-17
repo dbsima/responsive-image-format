@@ -1,5 +1,5 @@
-define(['marionette', 'vent', 'templates', 'views/Sidebar', 'views/UploadFile'],
-       function (Marionette, vent, templates, Sidebar, UploadFile) {
+define(['marionette', 'vent', 'templates', 'views/Sidebar', 'views/UploadFile', 'views/File', 'views/FilesCollection'],
+       function (Marionette, vent, templates, Sidebar, UploadFile, File, FilesCollection) {
         "use strict";
 
         return Marionette.Layout.extend({
@@ -15,6 +15,8 @@ define(['marionette', 'vent', 'templates', 'views/Sidebar', 'views/UploadFile'],
                 header : '#header',
                 main    : '#main',
                 uploadFile : '#uploadFile',
+                file: '#file',
+                filesCollection: '#filesCollection',
                 breadcrumbs: '#breadcrumbs'
             },
 
@@ -29,6 +31,7 @@ define(['marionette', 'vent', 'templates', 'views/Sidebar', 'views/UploadFile'],
             onRender : function () {
                 this.sidebar.show(new Sidebar({ groups : this.options.groups }));
                 this.uploadFile.show(new UploadFile());
+                this.filesCollection.show(new FilesCollection());
             }
         });
     });

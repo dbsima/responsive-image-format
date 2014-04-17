@@ -3,8 +3,8 @@ define(["jquery", "backbone"],
         "use strict";
         return Backbone.Model.extend({
             defaults: {
-                fileName: "",
-                user: ""
+                filename: "",
+                user_email: ""
             },
             urlRoot: '/files'
         });
