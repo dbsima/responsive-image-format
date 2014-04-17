@@ -6,7 +6,6 @@ Requirements
 * rethinkdb
 * python
 * python-flask
-* 
 
 Installation (Mac OS X)
 ----------------------
@@ -16,7 +15,7 @@ brew update && brew install rethinkdb
 ```
 Clone & install Python drivers (2.x)
 ```shell
-git@git.corp.adobe.com:sdragos/responsive-image-format.git
+git clone git@git.corp.adobe.com:sdragos/responsive-image-format.git
 sudo pip install Flask
 sudo pip install rethinkdb
 ```
@@ -28,6 +27,7 @@ rethinkdb
 ```
 Create database and tables
 ```shell
+cd responsive-image-format
 python server.py --setup
 ```
 Run app
@@ -36,4 +36,5 @@ Create database and tables
 python server.py
 ```
 Then open a browser: http://localhost:6003/
-You can now visit localhost:8080 to see the RethinkDB web admin.
+
+You can now visit http://localhost:8080/ to see the RethinkDB web admin.
