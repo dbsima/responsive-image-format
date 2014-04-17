@@ -7,7 +7,8 @@ require.config({
     jquery     : 'lib/jquery.min',
     bootstrap  : 'lib/bootstrap.min',
     tpl        : 'lib/tpl',
-    prettify   : 'lib/prettify.min'
+    prettify   : 'lib/prettify.min',
+    wreqr      : 'lib/backbone.wreqr'            
   },
 
   shim : {
@@ -24,6 +25,10 @@ require.config({
     marionette : {
       exports : 'Backbone.Marionette',
       deps : ['backbone']
+    },
+    wreqr : {
+        exports : 'Backbone.Wreqr',
+        deps : ['backbone']
     },
     prettify: {
       deps : ['jquery','bootstrap']

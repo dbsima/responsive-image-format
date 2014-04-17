@@ -1,5 +1,5 @@
-define(['marionette'],function(Marionette){
-  "use strict";
+define(['wreqr', 'marionette'], function (Wreqr, Marionette) {
+    "use strict";
   
-  return new Marionette.EventAggregator();
+    return Wreqr.EventAggregator();
 });
