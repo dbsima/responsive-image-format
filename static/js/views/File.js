@@ -6,7 +6,13 @@ define(['marionette', 'vent', 'templates'], function (Marionette, vent, template
     return Marionette.ItemView.extend({
         template : templates.file,
         
-        tagName: 'div',
+        tagName: 'li',
+        
+        initialize: function () {
+            console.log("item view");
+            this.listenTo(this.model, "change", this.render);
+            this.listenTo(this.model, 'destroy', this.remove);
+        },
 
         events : {
             'click #btnEditFile' : 'editFile',
@@ -18,7 +24,8 @@ define(['marionette', 'vent', 'templates'], function (Marionette, vent, template
         },
         
         deleteFile: function () {
-            // Let us extract the value from the textbox now 
+            // 
+            this.model.destroy();
         }
     });
 });

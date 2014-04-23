@@ -1,24 +1,13 @@
 /*global define*/
 
-define(['marionette', 'vent', 'templates'], function (Marionette, vent, templates) {
+define(['marionette', 'vent', 'templates', 'views/file'], function (Marionette, vent, templates, FileView) {
     "use strict";
 
-    return Marionette.ItemView.extend({
-        template : templates.file,
-        
-        tagName: 'div',
-
-        events : {
-            'click #btnEditFile' : 'editFile',
-            'click #btnDeleteFile' : 'deleteFile'
-        },
-
-        editFile: function () {
-            // Let us extract the value from the textbox now 
-        },
-        
-        deleteFile: function () {
-            // Let us extract the value from the textbox now 
+    return Marionette.CollectionView.extend({
+        itemView: FileView,
+        tagName: 'ul',
+        initialize: function () {
+            console.log("collection view");
         }
     });
 });

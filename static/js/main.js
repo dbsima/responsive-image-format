@@ -39,7 +39,7 @@ require.config({
 });
 
 require(['app','backbone','routers/index','controllers/index'],
-function (app,Backbone,Router,Controller){
+function (app, Backbone, Router, Controller){
   "use strict";
   app.start();
   
@@ -47,5 +47,5 @@ function (app,Backbone,Router,Controller){
     controller : Controller
   });
 
-  Backbone.history.start();
+  Backbone.history.start({pushState: true });
 });

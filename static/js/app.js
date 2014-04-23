@@ -1,10 +1,10 @@
-define(['marionette', 'templates', 'vent', 'views/Header', 'views/Body', 'views/Footer'],
-       function (Marionette, templates, vent, Header, Body, Footer) {
+define(['marionette', 'backbone', 'templates', 'vent', 'views/Header', 'views/Body', 'views/Footer'],
+       function (Marionette, Backbone, templates, vent, Header, Body, Footer) {
         "use strict";
 
         window.app = new Marionette.Application();
 
-        app.options = {};
+        app.options = {region: '#body'};
 
         app.addRegions({
             header : '#header',
@@ -12,18 +12,14 @@ define(['marionette', 'templates', 'vent', 'views/Header', 'views/Body', 'views/
             sidebar: '#sidebar',
             main   : '#main',
             footer : '#footer',
-            uploadFile: 'uploadFile',
-            file: 'file'
+            //uploadFile: 'uploadFile',
+            //file: 'file'
         });
 
         app.addInitializer(function () {
-            app.header.show(new Header(app.options));
-            app.body.show(new Body(app.options));
-            app.footer.show(new Footer(app.options));
         });
-
+           
+        console.log("testing from app.js");
+        
         return app;
-
     });
-
-

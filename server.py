@@ -19,7 +19,7 @@ MY_DB = 'mydb'
 
 # Where will the uploaded files be stored
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(APP_ROOT, 'uploads')
+UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/uploads')
 # Set of allowed file extensions
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
@@ -242,6 +242,11 @@ def get_file(filename):
     file = r.table('files').get(filename).run(g.rdb_conn)
     return json.dumps(file)
 
+#### Retrieving a single file
+@app.route("/uploads/<path:path>")
+def get_image(path):
+    return app.send_static_file(os.path.join('uploads', path))
+
 #### Deleting an user
 
 # To delete an user item we'll call a
@@ -267,7 +272,7 @@ def show_users():
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Run the Flask todo app')
+    parser = argparse.ArgumentParser(description='Run the Flask nrif app')
     parser.add_argument('--setup', dest='run_setup', action='store_true')
 
     args = parser.parse_args()

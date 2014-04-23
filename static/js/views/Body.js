@@ -11,27 +11,31 @@ define(['marionette', 'vent', 'templates', 'views/Sidebar', 'views/UploadFile', 
             className: 'row-fluid',
 
             regions : {
-                sidebar : '#sidebar',
-                header : '#header',
-                main    : '#main',
-                uploadFile : '#uploadFile',
-                file: '#file',
-                filesCollection: '#filesCollection',
-                breadcrumbs: '#breadcrumbs'
+                sidebar         : '#sidebar',
+                header          : '#header',
+                main            : '#main',
+                uploadFile      : '#uploadFile',
+                filesCollection : '#filesCollection',
+                breadcrumbs     : '#breadcrumbs'
             },
 
             ui : {},
 
             events : {},
 
-            initialize : function () {
-
+            initialize : function (options) {
+                this.options = options;
+                console.log("here in body I have " + this.options);
             },
 
             onRender : function () {
                 this.sidebar.show(new Sidebar({ groups : this.options.groups }));
                 this.uploadFile.show(new UploadFile());
-                this.filesCollection.show(new FilesCollection());
+                //this.filesCollection.show(this.options);
+            },
+            
+            onShow: function() {
+                //this.filesCollection.show(this.options);
             }
         });
     });

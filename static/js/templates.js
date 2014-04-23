@@ -7,8 +7,7 @@ define(function (require) {
         sidebar                : require('tpl!templates/sidebar.tmpl'),
         footer                 : require('tpl!templates/footer.tmpl'),
         uploadFile             : require('tpl!templates/uploadFile.tmpl'),
-        file                   : require('tpl!templates/file.tmpl'),
-        filesCollection        : require('tpl!templates/filesCollection.tmpl')
+        file                   : require('tpl!templates/file.tmpl')
     };
 });
 
