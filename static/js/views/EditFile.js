@@ -22,7 +22,7 @@ define(['marionette', 'vent', 'templates'],
 
             initialize : function (options) {
                 this.options = options;
-                console.log("here in body I have " + this.options);
+                console.log("here in editFileView I have " + this.options);
             },
 
             onRender : function () {
@@ -32,7 +32,7 @@ define(['marionette', 'vent', 'templates'],
                 this.layers.show(this.options.layers);
             },
             
-            onShow: function() {
+            onShow: function () {
                 //this.filesCollection.show(this.options);
             }
         });

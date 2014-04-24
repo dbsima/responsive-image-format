@@ -9,7 +9,7 @@ define(['marionette', 'vent', 'templates'], function (Marionette, vent, template
         tagName: 'li',
         
         initialize: function () {
-            console.log("item view");
+            console.log("file item view");
             this.listenTo(this.model, "change", this.render);
             this.listenTo(this.model, 'destroy', this.remove);
         },

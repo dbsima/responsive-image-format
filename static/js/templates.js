@@ -11,6 +11,8 @@ define(function (require) {
         editFile    : require('tpl!templates/editFile.tmpl'),
         operations  : require('tpl!templates/operations.tmpl'),
         image       : require('tpl!templates/image.tmpl'),
+        imageOps   : require('tpl!templates/imageOps.tmpl'),
+        imageContainer   : require('tpl!templates/imageContainer.tmpl'),
         layers      : require('tpl!templates/layers.tmpl')
     };
 });
