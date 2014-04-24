@@ -1,5 +1,10 @@
-<a target="_blank" href="http://api.jquery.com/"><%= filename %>
-    <img src="../uploads/<%= filename %>" alt="Smiley face" height="100" width="100">
+<a target="" href="/edit/<%= filename %>"><%= filename %>
+    <img src="../uploads/<%= filename %>" alt="<%= filename %>" height="100" width="100">
 </a>
-<input type="submit" id="btnEditFile" value="edit">
-<input type="submit" id="btnDeleteFile" value="delete">
+
+<div class="btn-group btn-group-justified">
+    <a class="btn btn-default" role="button" id="btnEditFile">Edit</a>
+    
+    <input type="submit" class="btn btn-success" id="btnDeleteFile" value="delete">
+</div>
+

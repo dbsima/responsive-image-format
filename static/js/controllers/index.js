@@ -1,4 +1,4 @@
-define(['app', 'vent', 'models/FilesCollection', 'views/FilesCollection', 'views/Body', 'views/Header', 'views/Footer'], function (app, vent, FilesCollectionModel, FilesCollectionView, BodyView, Header, Footer) {
+define(['app', 'vent', 'models/FilesCollection', 'views/FilesCollection', 'views/Body', 'views/Header', 'views/Footer', 'views/UploadFile', 'views/EditFile', 'views/Operations', 'views/Image', 'views/Layers'], function (app, vent, FilesCollectionModel, FilesCollectionView, BodyView, Header, Footer, UploadFile, EditFileView, OperationsView, ImageView, LayersView) {
     "use strict";
 
     return {
@@ -8,20 +8,26 @@ define(['app', 'vent', 'models/FilesCollection', 'views/FilesCollection', 'views
         },
         
         listFiles: function () {
+            app.header.show(new Header(app.options));
+            
             this.collection = new FilesCollectionModel();
             console.log("listFiles");
             var self = this;
             this.collection.fetch({
                 success: function (files) {
-                    app.header.show(new Header(app.options));
-                    
                     var filesView = new FilesCollectionView({ collection: self.collection });
                     
-                    app.body.show(new BodyView(filesView));
-                    
-                    app.footer.show(new Footer(app.options));
+                    app.body.show(new BodyView({uploadFile: new UploadFile(), filesView: filesView}));
                 }
             });
+            app.footer.show(new Footer(app.options));
+        },
+        
+        editFile: function (path) {
+            console.log(path);
+            app.header.show(new Header(app.options));
+            app.body.show(new EditFileView({operations: new OperationsView(), image: new ImageView(), layers: new LayersView()}));
+            app.footer.show(new Footer(app.options));
         },
         
         setFilter : function (param) {

@@ -11,9 +11,7 @@ define(['marionette', 'backbone', 'templates', 'vent', 'views/Header', 'views/Bo
             body   : '#body',
             sidebar: '#sidebar',
             main   : '#main',
-            footer : '#footer',
-            //uploadFile: 'uploadFile',
-            //file: 'file'
+            footer : '#footer'
         });
 
         app.addInitializer(function () {

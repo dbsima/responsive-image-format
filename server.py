@@ -247,6 +247,16 @@ def get_file(filename):
 def get_image(path):
     return app.send_static_file(os.path.join('uploads', path))
 
+@app.route("/edit")
+def edit():
+    return render_template('explore.html')
+
+#### Retrieving a single file
+@app.route("/edit/<path:path>")
+def get_image_to_editor(path):
+    return render_template('explore.html')
+    #return app.send_static_file(os.path.join('uploads', path))
+
 #### Deleting an user
 
 # To delete an user item we'll call a
@@ -257,11 +267,11 @@ def delete_user(user_id):
     return jsonify(r.table('users').get(user_id).delete().run(g.rdb_conn))
 
 #### Deleting a file
-@app.route("/files/<string:file_id>", methods=['DELETE'])
-def delete_file(file_id):
-    return jsonify(r.table('files').get(file_id).delete().run(g.rdb_conn))
+@app.route("/files/<string:filename>", methods=['DELETE'])
+def delete_file(filename):
+    return jsonify(r.table('files').get(filename).delete().run(g.rdb_conn))
 
-
+""""
 @app.route("/explore")
 def show_files():
     return render_template('files.html')
@@ -269,7 +279,7 @@ def show_files():
 @app.route("/show_users")
 def show_users():
     return render_template('users.html')
-
+"""
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run the Flask nrif app')
