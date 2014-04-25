@@ -16,3 +16,6 @@ nosetests.xml
 
 # Vim
 *.swp
+
+rethinkdb_data
+uploads
