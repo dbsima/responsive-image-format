@@ -1,6 +1,6 @@
 /*global define*/
 
-define(['marionette', 'vent', 'templates'], function (Marionette, vent, templates) {
+define(['jquery', 'marionette', 'backbone', 'vent', 'templates'], function ($, Marionette, Backbone, vent, templates) {
     "use strict";
 
     return Marionette.ItemView.extend({
@@ -9,23 +9,35 @@ define(['marionette', 'vent', 'templates'], function (Marionette, vent, template
         tagName: 'li',
         
         initialize: function () {
-            console.log("file item view");
-            this.listenTo(this.model, "change", this.render);
-            this.listenTo(this.model, 'destroy', this.remove);
+            //console.log("file item view");
+            //this.listenTo(this.model, "change", this.render);
+            //this.listenTo(this.model, 'destroy', this.remove);
         },
 
         events : {
-            'click #btnEditFile' : 'editFile',
             'click #btnDeleteFile' : 'deleteFile'
-        },
-
-        editFile: function () {
-            // Let us extract the value from the textbox now 
         },
         
         deleteFile: function () {
-            // 
-            this.model.destroy();
+            var imgID = $(event.target).data('id');
+            console.log("deleteFile " + imgID);
+            
+            $.ajax({
+                type: "DELETE",
+                url: "/explore/" + imgID,
+                dataType: "text",
+                success: function (response) {
+                    //Backbone.trigger("refresh");
+                    console.log("success DELETE on /explore/:imgID");
+                },
+                error: function (response) {
+                    console.log("error DELETE on /explore/:imgID");
+                }
+            });
+            
+            // Remove model from collection 
+            // (TODO: it's a hack; if the model has more than one collection it wont work)
+            this.model.collection.remove(this.model);
         }
     });
 });

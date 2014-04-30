@@ -8,15 +8,13 @@ define(["jquery", "backbone"],
             
             defaults: {
                 id: "",
-                filename: "",
-                type: "",
-                user_email: ""
+                layers: {}
             },
             
             url: function () {
                 var path = this.get("path");
                 //console.log(path);
-                return "/explore/" + path;
+                return "/assets/" + path;
             }
         });
     });

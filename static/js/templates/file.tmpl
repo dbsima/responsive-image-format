@@ -1,10 +1,9 @@
-<a target="" href="/edit/<%= filename %>"><%= filename %>
-    <img src="../uploads/<%= filename %>" alt="<%= filename %>" height="100" width="100">
+<a target="" href="/edit/<%= id %><%= type %>">
+    <img src="../uploads/<%= id %><%= type %>" alt="<%= filename %><%= type %>" height="100" width="100">
 </a>
 
 <div class="btn-group btn-group-justified">
-    <a class="btn btn-default" role="button" id="btnEditFile">Edit</a>
-    
-    <input type="submit" class="btn btn-success" id="btnDeleteFile" value="delete">
+    <a class="btn btn-default" id="btnEditFile" data-id="<%= id %><%= type %>"  href="/edit/<%= id %><%= type %>" role="button">Edit</a>
+    <a class="btn btn-default" id="btnDeleteFile" data-id="<%= id %><%= type %>" role="button">Delete</a>
 </div>
 

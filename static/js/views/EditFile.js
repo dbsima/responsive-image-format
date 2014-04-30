@@ -22,11 +22,10 @@ define(['marionette', 'vent', 'templates'],
 
             initialize : function (options) {
                 this.options = options;
-                console.log("here in editFileView I have " + this.options);
+                //console.log("here in editFileView I have " + this.options);
             },
 
             onRender : function () {
-                //this.sidebar.show(new Sidebar({ groups : this.options.groups }));
                 this.operations.show(this.options.operations);
                 this.image.show(this.options.image);
                 this.layers.show(this.options.layers);

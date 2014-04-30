@@ -11,10 +11,9 @@ define(['app',
         'views/Image',
         'views/Layers',
         'models/File',
-        'views/ImageOps',
-        'views/ImageContainer'
+        'models/Layer'
        ],
-       function (app, vent, FilesCollectionModel, FilesCollectionView, BodyView, Header, Footer, UploadFile, EditFileView, OperationsView, ImageView, LayersView, FileModel, ImageOpsView, ImageContainerView) {
+       function (app, vent, FilesCollectionModel, FilesCollectionView, BodyView, Header, Footer, UploadFile, EditFileView, OperationsView, ImageView, LayersView, FileModel, LayerModel) {
         "use strict";
 
         return {
@@ -26,7 +25,7 @@ define(['app',
                 app.header.show(new Header(app.options));
 
                 this.collection = new FilesCollectionModel();
-                //console.log("listFiles");
+                
                 var self = this;
                 this.collection.fetch({
                     success: function (files) {
@@ -39,19 +38,28 @@ define(['app',
             },
 
             editFile: function (path) {
-                console.log("path in controller" + path);
+                //console.log("path in controller" + path);
                 app.header.show(new Header(app.options));
 
                 this.model = new FileModel({path: path});
+                var layerModel = new LayerModel();
                 var self = this;
                 this.model.fetch({
                     success: function (file) {
                         //var fileMOdelTest = this.fileModel;
-                        app.body.show(new EditFileView({operations: new OperationsView(), image: new ImageView({imageOps: new ImageOpsView(), imageContainer: new ImageContainerView({model: self.model, path: path})}), layers: new LayersView()}));
+                        app.body.show(new EditFileView({operations: new OperationsView({model: layerModel}), image: new ImageView({model: self.model, path: path}), layers: new LayersView()}));
                     }
                 });
 
                 app.footer.show(new Footer(app.options));
+            },
+            
+            selectDisplay: function (path) {
+            },
+            
+            renderAsset: function (path) {
             }
+            
+            
         };
     });

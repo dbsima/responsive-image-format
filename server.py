@@ -6,6 +6,11 @@ import argparse
 import json
 import os
 
+import string
+import random
+
+import shutil
+
 import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError, RqlDriverError
 
@@ -35,7 +40,9 @@ def dbSetup():
     try:
         r.db_create(MY_DB).run(connection)
         r.db(MY_DB).table_create('users', primary_key='email').run(connection)
-        r.db(MY_DB).table_create('files', primary_key='filename').run(connection)
+        r.db(MY_DB).table_create('files').run(connection)
+        r.db(MY_DB).table_create('assets').run(connection)
+        r.db(MY_DB).table_create('layers').run(connection)
         print 'Database setup completed. Now run the app without --setup.'
     except RqlRuntimeError:
         print 'App database already exists. Run the app without --setup.'
@@ -90,11 +97,16 @@ INDEX ---------------------------------------------------------------
 def api_root():
     return render_template('index.html')
 
-# 
+# check if a file has extention in ALLOWED_EXTENSIONS
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+# generate random string (default: of length 6 from abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)
+def id_generator(size=6, chars=string.ascii_letters + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))    
+ 
+# 
 @app.route('/explore', methods=['GET', 'POST'])
 def explore():
     if not session.get('logged_in'):
@@ -108,16 +120,30 @@ def explore():
         file = request.files['file']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            new_filename = session_email + "_" + filename
-            
-            result = r.table('files').get(new_filename).run(g.rdb_conn)
-            if json.dumps(result) == 'null':
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], new_filename))
-                inserted = r.table('files').insert({'filename': new_filename, 'user_email': session_email}).run(g.rdb_conn) 
-            else:
-                flash('There is a file with the same name!')
+            fileName, fileExtension = os.path.splitext(filename)
+
+            inserted = r.table('files').insert({'filename': fileName, 'type': fileExtension, 'user_email': session_email}).run(g.rdb_conn) 
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], inserted['generated_keys'][0] + fileExtension))
             
     return render_template('explore.html', email=session_email)
+
+
+#### Retrieving a single file
+@app.route("/explore/<string:file_id>", methods=['GET'])
+def get_file2(file_id):
+    file = r.table('files').get(file_id).run(g.rdb_conn)
+    return json.dumps(file)
+"""
+
+"""
+@app.route('/explore/<string:file_id>', methods=['DELETE'])
+def delete_file(file_id):
+    if request.method == 'DELETE':
+        fileName, fileExtension = os.path.splitext(file_id)
+        r.table('files').get(fileName).delete().run(g.rdb_conn)
+    
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], file_id))
+    return render_template('explore.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -192,6 +218,18 @@ def get_files():
     selection = list(r.table('files').run(g.rdb_conn))
     return json.dumps(selection)
 
+#### Listing existing layers
+@app.route("/layers", methods=['GET'])
+def get_layers():
+    selection = list(r.table('layers').run(g.rdb_conn))
+    return json.dumps(selection)
+
+#### Listing existing assets
+@app.route("/assets", methods=['GET'])
+def get_assets():
+    selection = list(r.table('assets').run(g.rdb_conn))
+    return json.dumps(selection)
+
 #### Creating an user
 
 # We will create a new user in response to a POST request to `/users`
@@ -237,9 +275,15 @@ def get_user(user_id):
     return json.dumps(user)
 
 #### Retrieving a single file
-@app.route("/files/<string:filename>", methods=['GET'])
-def get_file(filename):
-    file = r.table('files').get(filename).run(g.rdb_conn)
+@app.route("/files/<string:file_id>", methods=['GET'])
+def get_file(file_id):
+    file = r.table('files').get(file_id).run(g.rdb_conn)
+    return json.dumps(file)
+
+#### Retrieving a single file
+@app.route("/assets/<string:asset_id>", methods=['GET'])
+def get_asset(asset_id):
+    file = r.table('assets').get(asset_id).run(g.rdb_conn)
     return json.dumps(file)
 
 #### Retrieving a single file
@@ -254,6 +298,17 @@ def edit():
 #### Retrieving a single file
 @app.route("/edit/<path:path>")
 def get_image_to_editor(path):
+    
+    layerName, layerExtension = os.path.splitext(path)
+    
+    insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
+    insertedAsset = r.table('assets').insert({'layers': {'id': insertedLayer['generated_keys'][0]}}).run(g.rdb_conn)
+    
+    src_filename = os.path.join(app.config['UPLOAD_FOLDER'], path)
+    dst_filename = os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension)
+    
+    shutil.copy(src_filename, dst_filename)
+    
     return render_template('explore.html')
     #return app.send_static_file(os.path.join('uploads', path))
 
@@ -266,20 +321,6 @@ def get_image_to_editor(path):
 def delete_user(user_id):
     return jsonify(r.table('users').get(user_id).delete().run(g.rdb_conn))
 
-#### Deleting a file
-@app.route("/files/<string:filename>", methods=['DELETE'])
-def delete_file(filename):
-    return jsonify(r.table('files').get(filename).delete().run(g.rdb_conn))
-
-""""
-@app.route("/explore")
-def show_files():
-    return render_template('files.html')
-
-@app.route("/show_users")
-def show_users():
-    return render_template('users.html')
-"""
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run the Flask nrif app')
