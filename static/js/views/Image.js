@@ -1,4 +1,4 @@
-define(['app', 'marionette', 'vent', 'templates', 'kinetic'], function (App, Marionette, vent, templates, Kinetic) {
+define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/Layer'], function ($, App, Marionette, vent, templates, Kinetic, LayerModel) {
     "use strict";
 
     return Marionette.Layout.extend({
@@ -6,10 +6,41 @@ define(['app', 'marionette', 'vent', 'templates', 'kinetic'], function (App, Mar
 
         initialize: function (options) {
             this.options = options;
-            //console.log("adsada" + options.path);
-            //this.listenTo(this.model, "change", this.render);   
+            //console.log(this.model.toJSON());
+            
+            var asset = this.model.toJSON();
+            this.layers = asset["layers"];
+            
+            this.sources = {};
+            
+            var i;
+            for (i = 0; i < this.layers.length; i = i + 1) {
+                console.log(this.layers[i]["id"]);
+                
+                var layerModel = new LayerModel({path: this.layers[i]["id"]});
+
+                var self = this;
+                self.i = i;
+                layerModel.fetch({
+                    async: false,
+                    success: function (layer) {
+                        
+                        //console.log("layers -|" + layer.get("name") + "|" + self.layers[self.i]["id"]);    
+
+                        self.sources['' + self.layers[self.i]["index"]] = {
+                            id: "" + self.layers[self.i]["id"]+ "",
+                            path: "../uploads/" + layer.get("name") + layer.get("type")
+                        };
+                        
+                        self.sources['' + 1] = {
+                            id: "59df9e20-a3b5-4402-aaa4-b09f891006e8",
+                            path: "../uploads/" + layer.get("name") + layer.get("type")
+                        };
+                    }
+                });
+            }   
         },
-        
+
         events : {
             'click #btnApply' : 'applyOperation',
             'click #btnSelect' : 'selectDisplay',
@@ -75,9 +106,9 @@ define(['app', 'marionette', 'vent', 'templates', 'kinetic'], function (App, Mar
                         
                         topLeft.y(anchorY);
 
-                        middleLeft.y((topLeft.y() + bottomLeft.y())/2);
+                        middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
                         
-                        middleRight.y((topRight.y() + bottomRight.y())/2);
+                        middleRight.y((topRight.y() + bottomRight.y()) / 2);
                         break;
                     
                     case 'topRight':
@@ -253,42 +284,51 @@ define(['app', 'marionette', 'vent', 'templates', 'kinetic'], function (App, Mar
             }
             
             function loadImages(sources, callback) {
+                console.log(sources);
                 var images = {};
                 var loadedImages = 0;
                 var numImages = 0;
-                for(var src in sources) {
-                    numImages++;
-                }
-                for(var src in sources) {
-                    images[src] = new Image();
-                    images[src].onload = function() {
-                        if(++loadedImages >= numImages) {
-                            callback(images);
-                        }
-                        // send initial width and size
-                        App.vent.trigger("showInitialLayerSize", {
-                            "initialLayerWidth": this.width,
-                            "initialLayerHeight" : this.height
-                        });
-                    };
-                    images[src].src = sources[src];  
-                }
+                
+                _.each(sources, function( val, key ) {
+                    if (val) {
+                        numImages++;
+                    }
+                });
+                //console.log("here1");
+            
+                _.each(sources, function( val, key ) {
+                    if (val) {
+                        console.log(key);
+                        var id = key;
+                        
+                        images[id] = new Image();
+                        images[id].onload = function() {
+                            if(++loadedImages >= numImages) {
+                                callback(images);
+                            }
+                            // send initial width and size
+                            App.vent.trigger("showInitialLayerSize", {
+                                "initialLayerWidth": this.width,
+                                "initialLayerHeight" : this.height
+                            });
+                        };
+                        images[id].src = val["path"];
+                    }
+                });
             }
             
             function initStage(images) {
+                console.log(images);
+                
                 var stage = new Kinetic.Stage({
                     container: 'container',
-                    width: images.darthVader.width,
-                    height: images.darthVader.height
+                    width: images[0].width,
+                    height: images[0].height
                 });
                 
-                var darthVaderGroup = new Kinetic.Group({
-                    x: 0,
-                    y: 0,
-                    draggable: true
-                });
                 
                 var layer = new Kinetic.Layer();
+                
                 var bg = new Kinetic.Rect({
                     width: stage.getWidth(),
                     height: stage.getHeight(),
@@ -299,49 +339,51 @@ define(['app', 'marionette', 'vent', 'templates', 'kinetic'], function (App, Mar
 
                 layer.add(bg);
                 stage.add(layer);
-
-                var layer = new Kinetic.Layer();
-
-                /*
-                * go ahead and add the groups
-                * to the layer and the layer to the
-                * stage so that the groups have knowledge
-                * of its layer and stage
-                */
-                layer.add(darthVaderGroup);
-                stage.add(layer);
-
-                // darth vader
-                var darthVaderImg = new Kinetic.Image({
-                    x: 0,
-                    y: 0,
-                    image: images.darthVader,
-                    name: 'image'
-                });
                 
-                darthVaderGroup.add(darthVaderImg);
-                addAnchor(darthVaderGroup, 0, 0, 'topLeft');
-                addAnchor(darthVaderGroup, darthVaderImg.getWidth()/2, 0, 'topCenter');
-                addAnchor(darthVaderGroup, darthVaderImg.getWidth(), 0, 'topRight');
-                addAnchor(darthVaderGroup, darthVaderImg.getWidth(), darthVaderImg.getHeight()/2, 'middleRight');  
-                addAnchor(darthVaderGroup, darthVaderImg.getWidth(), darthVaderImg.getHeight(), 'bottomRight');
-                addAnchor(darthVaderGroup, darthVaderImg.getWidth()/2, darthVaderImg.getHeight(), 'bottomCenter');
-                addAnchor(darthVaderGroup, 0, darthVaderImg.getHeight(), 'bottomLeft');
-                addAnchor(darthVaderGroup, 0, darthVaderImg.getHeight()/2, 'middleLeft');
+                // 
+                _.each(images, function( val, key ) {
+                    if (val) {
+                        console.log(key);
+                        
+                        var group = new Kinetic.Group({
+                            x: 0,
+                            y: 0,
+                            draggable: true
+                        });
+                        
+                        var layer = new Kinetic.Layer();
+                        
+                        layer.add(group);
+                        stage.add(layer);
+                        
+                        var img = new Kinetic.Image({
+                            x: 0,
+                            y: 0,
+                            image: images[key],
+                            name: 'image'
+                        });
+                        
+                        group.add(img);
+                        addAnchor(group, 0, 0, 'topLeft');
+                        addAnchor(group, img.getWidth()/2, 0, 'topCenter');
+                        addAnchor(group, img.getWidth(), 0, 'topRight');
+                        addAnchor(group, img.getWidth(), img.getHeight()/2, 'middleRight');  
+                        addAnchor(group, img.getWidth(), img.getHeight(), 'bottomRight');
+                        addAnchor(group, img.getWidth()/2, img.getHeight(), 'bottomCenter');
+                        addAnchor(group, 0, img.getHeight(), 'bottomLeft');
+                        addAnchor(group, 0, img.getHeight()/2, 'middleLeft');
 
-                darthVaderGroup.on('dragstart', function() {
-                    this.moveToTop();
+                        group.on('dragstart', function() {
+                            this.moveToTop();
+                        });
+                        
+                    }
                 });
-                
+
                 stage.draw();
             }
-
-            var path = "../uploads/" + this.options.path;    
-            var sources = {
-                darthVader: path,
-                    
-            };
-            loadImages(sources, initStage);
+            
+            loadImages(this.sources, initStage);
         }
     });
 });

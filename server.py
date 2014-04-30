@@ -129,12 +129,35 @@ def explore():
 
 
 #### Retrieving a single file
-@app.route("/explore/<string:file_id>", methods=['GET'])
-def get_file2(file_id):
-    file = r.table('files').get(file_id).run(g.rdb_conn)
-    return json.dumps(file)
-"""
+@app.route("/explore/<string:path>", methods=['GET'])
+def createAsset(path):
+    layerName, layerExtension = os.path.splitext(path)
+    
+    insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
+    insertedAsset = r.table('assets').insert({'layers': [{'id': insertedLayer['generated_keys'][0], 'index': 0}]}).run(g.rdb_conn)
+    
+    src_filename = os.path.join(app.config['UPLOAD_FOLDER'], path)
+    dst_filename = os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension)
+    
+    shutil.copy(src_filename, dst_filename)
+    
+    return redirect('/edit/' + insertedAsset['generated_keys'][0])
+    
+    #asset = r.table('assets').get(insertedAsset['generated_keys'][0]).run(g.rdb_conn)
+    #return json.dumps(asset)
 
+#### Retrieving a single layer
+@app.route("/layers/<string:layer_id>", methods=['GET'])
+def get_layer(layer_id):
+    layer = r.table('layers').get(layer_id).run(g.rdb_conn)
+    return json.dumps(layer)
+
+#### get asset
+@app.route("/edit/<string:asset_id>")
+def editAsset(asset_id):
+    return render_template('explore.html')
+
+"""
 """
 @app.route('/explore/<string:file_id>', methods=['DELETE'])
 def delete_file(file_id):
@@ -295,22 +318,6 @@ def get_image(path):
 def edit():
     return render_template('explore.html')
 
-#### Retrieving a single file
-@app.route("/edit/<path:path>")
-def get_image_to_editor(path):
-    
-    layerName, layerExtension = os.path.splitext(path)
-    
-    insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
-    insertedAsset = r.table('assets').insert({'layers': {'id': insertedLayer['generated_keys'][0]}}).run(g.rdb_conn)
-    
-    src_filename = os.path.join(app.config['UPLOAD_FOLDER'], path)
-    dst_filename = os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension)
-    
-    shutil.copy(src_filename, dst_filename)
-    
-    return render_template('explore.html')
-    #return app.send_static_file(os.path.join('uploads', path))
 
 #### Deleting an user
 

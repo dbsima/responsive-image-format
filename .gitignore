@@ -17,6 +17,6 @@ nosetests.xml
 # Vim
 *.swp
 static/.DS_Store
-static/uploads
-rethinkdb_data
-uploads
+static/uploads/
+rethinkdb_data/
+uploads/

@@ -9,13 +9,19 @@ define(['jquery', 'marionette', 'backbone', 'vent', 'templates'], function ($, M
         tagName: 'li',
         
         initialize: function () {
-            //console.log("file item view");
             //this.listenTo(this.model, "change", this.render);
             //this.listenTo(this.model, 'destroy', this.remove);
         },
 
         events : {
+            'click #btnEditFile' : 'editFile',
             'click #btnDeleteFile' : 'deleteFile'
+        },
+
+        editFile: function () {
+            var imgID = $(event.target).data('id');
+            console.log("editFile " + imgID);s
+
         },
         
         deleteFile: function () {

@@ -1,4 +1,5 @@
 define(['app',
+        'backbone',
         'vent',
         'models/FilesCollection',
         'views/FilesCollection',
@@ -11,9 +12,10 @@ define(['app',
         'views/Image',
         'views/Layers',
         'models/File',
-        'models/Layer'
+        'models/Layer',
+        'models/Asset'
        ],
-       function (app, vent, FilesCollectionModel, FilesCollectionView, BodyView, Header, Footer, UploadFile, EditFileView, OperationsView, ImageView, LayersView, FileModel, LayerModel) {
+       function (app, Backbone, vent, FilesCollectionModel, FilesCollectionView, BodyView, Header, Footer, UploadFile, EditFileView, OperationsView, ImageView, LayersView, FileModel, LayerModel, AssetModel) {
         "use strict";
 
         return {
@@ -40,14 +42,22 @@ define(['app',
             editFile: function (path) {
                 //console.log("path in controller" + path);
                 app.header.show(new Header(app.options));
+                
+                //console.log("editFile " + path);
 
-                this.model = new FileModel({path: path});
+                
                 var layerModel = new LayerModel();
+                this.model = new AssetModel({path: path});
+                
                 var self = this;
                 this.model.fetch({
-                    success: function (file) {
+                    success: function (asset) {
+                        //console.log("layers -|" + self.model.get("id") + "|");
                         //var fileMOdelTest = this.fileModel;
                         app.body.show(new EditFileView({operations: new OperationsView({model: layerModel}), image: new ImageView({model: self.model, path: path}), layers: new LayersView()}));
+                        
+                        // redirect to /edit/asset_id
+                        //Backbone.history.navigate("/edit/" + "dsadad", {"trigger": false});
                     }
                 });
 
@@ -59,7 +69,6 @@ define(['app',
             
             renderAsset: function (path) {
             }
-            
             
         };
     });
