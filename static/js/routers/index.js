@@ -4,10 +4,14 @@ define(['marionette'], function (Marionette) {
     return Marionette.AppRouter.extend({
         
         appRoutes: {
+            ''              : 'index',
+            'register'      : 'register',
+            'login'         : 'login',
             'explore'       : 'listFiles',
             'edit'          : 'editFile',
             'edit/*path'    : 'editFile',
-            'select/*path'  : 'selectDisplay',
+            'select'        : 'selectDevice',
+            'select/*path'  : 'selectDevice',
             'render/*path'  : 'renderAsset'
         }
     });

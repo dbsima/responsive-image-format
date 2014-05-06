@@ -89,3 +89,30 @@
 2014-04-29T17:55:06.795684000 290458.448623s info: Applying data {"databases":{"a8db1a80-b7a9-4a12-95ee-01c8993fe2f8":null},"rdb_namespaces":{"3ddab3fa-3ecf-46e4-8656-7f01e5813058":null,"4f696d95-790a-4a68-9346-635357b928af":null,"55948d05-7d78-4fe6-a74e-164f287ce9fb":null,"c41a04c4-e2f8-44b4-81f3-7be8401147a1":null}}
 2014-04-29T17:56:01.546289000 290513.200465s info: Someone asked for the nonwhitelisted file /files, if this should be accessible add it to the whitelist.
 2014-04-29T17:56:03.431535000 290515.085756s info: Someone asked for the nonwhitelisted file /files, if this should be accessible add it to the whitelist.
+2014-04-30T20:06:17.887078000 340543.344068s info: Server got SIGINT from pid 2892, uid 501; shutting down...
+2014-04-30T20:06:17.887585000 340543.344574s info: Shutting down client connections...
+2014-04-30T20:06:17.887959000 340543.344948s info: All client connections closed.
+2014-04-30T20:06:17.887965000 340543.344954s info: Shutting down storage engine... (This may take a while if you had a lot of unflushed data in the writeback cache.)
+2014-04-30T20:06:17.937382000 340543.394371s info: Storage engine shut down.
+2014-04-30T20:07:46.822185000 0.414015s info: Running rethinkdb 1.12.2 (CLANG 5.1 (clang-503.0.38))...
+2014-04-30T20:07:46.826201000 0.418030s info: Running on Darwin 13.1.0 x86_64
+2014-04-30T20:07:46.826252000 0.418082s info: Using cache size of 6002 MB
+2014-04-30T20:07:46.826294000 0.418123s info: Loading data from directory /Users/sdragos/responsive-image-format/rethinkdb_data
+2014-04-30T20:07:46.838808000 0.430637s info: Listening for intracluster connections on port 29015
+2014-04-30T20:07:46.840657000 0.432486s info: Listening for client driver connections on port 28015
+2014-04-30T20:07:46.840826000 0.432656s info: Listening for administrative HTTP connections on port 8080
+2014-04-30T20:07:46.840828000 0.432657s info: Listening on addresses: 127.0.0.1, ::1
+2014-04-30T20:07:46.840840000 0.432669s info: To fully expose RethinkDB on the network, bind to all addresses
+2014-04-30T20:07:46.840841000 0.432670s info: by running rethinkdb with the `--bind all` command line option.
+2014-04-30T20:07:46.840868000 0.432697s info: Server ready
+2014-05-02T16:57:35.888410000 0.424213s info: Running rethinkdb 1.12.2 (CLANG 5.1 (clang-503.0.38))...
+2014-05-02T16:57:35.892884000 0.428688s info: Running on Darwin 13.1.0 x86_64
+2014-05-02T16:57:35.892932000 0.428735s info: Using cache size of 3370 MB
+2014-05-02T16:57:35.892961000 0.428763s info: Loading data from directory /Users/sdragos/responsive-image-format/rethinkdb_data
+2014-05-02T16:57:35.905481000 0.441284s info: Listening for intracluster connections on port 29015
+2014-05-02T16:57:35.907297000 0.443100s info: Listening for client driver connections on port 28015
+2014-05-02T16:57:35.907467000 0.443270s info: Listening for administrative HTTP connections on port 8080
+2014-05-02T16:57:35.907469000 0.443272s info: Listening on addresses: 127.0.0.1, ::1
+2014-05-02T16:57:35.907480000 0.443283s info: To fully expose RethinkDB on the network, bind to all addresses
+2014-05-02T16:57:35.907481000 0.443284s info: by running rethinkdb with the `--bind all` command line option.
+2014-05-02T16:57:35.907489000 0.443292s info: Server ready

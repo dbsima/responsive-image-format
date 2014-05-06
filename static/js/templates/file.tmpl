@@ -1,9 +1,13 @@
-<a target="" href="/edit/<%= id %><%= type %>">
+<a target="" href="#">
     <img src="../uploads/<%= id %><%= type %>" alt="<%= filename %><%= type %>" height="100" width="100">
 </a>
 
 <div class="btn-group btn-group-justified">
-    <a class="btn btn-default" id="btnEditFile" data-id="<%= id %><%= type %>"  href="/explore/<%= id %><%= type %>" role="button">Edit</a>
-    <a class="btn btn-default" id="btnDeleteFile" data-id="<%= id %><%= type %>" role="button">Delete</a>
+    <a class="btn btn-default" id="btnEditFile" data-id="<%= id %><%= type %>"  href="/explore/<%= id %><%= type %>" role="button">
+        <span class="icon-edit">
+    </a>
+    <a class="btn btn-default" id="btnDeleteFile" data-id="<%= id %><%= type %>" role="button">
+        <span class="icon-trash">
+    </a>
 </div>
 

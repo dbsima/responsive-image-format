@@ -9,8 +9,10 @@ require.config({
         tpl         :   'lib/tpl',
         prettify    :   'lib/prettify.min',
         wreqr       :   'lib/backbone.wreqr',
-        slider      :   'lib/bootstrap-slider',
-        kinetic     :   'lib/kinetic-v5.1.0'
+        kinetic     :   'lib/kinetic-v5.1.0',
+        cookie      :   'lib/jquery.cookie',
+        modernizr   :   'lib/modernizr.custom',
+        morphingdevice: 'lib/morphingdevice'
     },
 
     shim : {
@@ -34,9 +36,6 @@ require.config({
         },
         prettify: {
             deps : ['jquery', 'bootstrap']
-        },
-        slider: {
-            deps: ['jquery', 'bootstrap']
         }
     },
 

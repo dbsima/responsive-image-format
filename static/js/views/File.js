@@ -20,7 +20,7 @@ define(['jquery', 'marionette', 'backbone', 'vent', 'templates'], function ($, M
 
         editFile: function () {
             var imgID = $(event.target).data('id');
-            console.log("editFile " + imgID);s
+            console.log("editFile " + imgID);
 
         },
         

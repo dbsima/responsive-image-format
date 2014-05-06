@@ -48,6 +48,11 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         },
         
         applyOperation: function () {
+            console.log("apply");
+            
+
+
+            console.log(this.json);
             //console.log("apply");
             // Let us extract the value from the textbox now 
         },
@@ -190,6 +195,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 }
 
                 image.setPosition(topLeft.getPosition());
+                
+                //console.log(topLeft.getPosition());
 
                 var width = topRight.x() - topLeft.x();
                 var height = bottomLeft.y() - topLeft.y();
@@ -225,10 +232,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     update(this);
                     layer.draw();
                 });
+                
                 anchor.on('mousedown touchstart', function() {
                     group.setDraggable(false);
                     this.moveToTop();
                 });
+                
                 anchor.on('dragend', function() {
                     group.setDraggable(true);
                     layer.draw();
@@ -253,6 +262,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     this.setStrokeWidth(4);
                     layer.draw();
                 });
+                
                 anchor.on('mouseout', function() {
                     var layer = this.getLayer();
                     document.body.style.cursor = 'default';
@@ -281,6 +291,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 }
                 
                 group.add(anchor);
+                anchor.hide();
             }
             
             function loadImages(sources, callback) {
@@ -306,11 +317,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             if(++loadedImages >= numImages) {
                                 callback(images);
                             }
-                            // send initial width and size
-                            App.vent.trigger("showInitialLayerSize", {
-                                "initialLayerWidth": this.width,
-                                "initialLayerHeight" : this.height
-                            });
                         };
                         images[id].src = val["path"];
                     }
@@ -326,6 +332,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     height: images[0].height
                 });
                 
+                // send initial width and size
+                App.vent.trigger("showInitialLayerSize", {
+                    "initialLayerWidth": stage.getWidth(),
+                    "initialLayerHeight" : stage.getHeight()
+                });
+                
                 
                 var layer = new Kinetic.Layer();
                 
@@ -338,9 +350,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 });
 
                 layer.add(bg);
-                stage.add(layer);
                 
-                // 
+                layer.on('mousedown', function (e) {
+                    var node = e.target;
+                    select(node);
+                });
+                
+                // For each layer create group and add anchors
                 _.each(images, function( val, key ) {
                     if (val) {
                         console.log(key);
@@ -351,7 +367,18 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             draggable: true
                         });
                         
-                        var layer = new Kinetic.Layer();
+                        // update W & H in Operations -> Resize
+                        group.on('click',function(){
+                            var image = group.find('.image')[0];
+                            
+                            App.vent.trigger("showCurrentLayerSize", {
+                                "currentLayerWidth": image.getWidth(),
+                                "currentLayerHeight" : image.getHeight()
+                            });
+                            // console.log(image.getWidth() + " - " + image.getHeight());
+                        });
+                        
+                        //var layer = new Kinetic.Layer();
                         
                         layer.add(group);
                         stage.add(layer);
@@ -377,10 +404,64 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             this.moveToTop();
                         });
                         
+                        group.on('dragend',function(){
+                            console.log(group.getPosition());
+                            
+                            var json = stage.toJSON();
+
+                            console.log(json);
+                        });
+                        
                     }
                 });
+                
+                stage.add(layer);
+                //stage.draw();
+                
+                function select(node) {
+                    deselect();
+                    
+                    if (node.parent.nodeType = 'Kinetic.Group') {
+                        var i, children = node.parent.children;
+                        for (i = 1; i < children.length; i++) {
+                            if (children[i].getName() === 'topLeft' ||
+                                children[i].getName() === 'topCenter' ||
+                                children[i].getName() === 'topRight' ||
+                                children[i].getName() === 'middleRight' ||
+                                children[i].getName() === 'bottomRight' ||
+                                children[i].getName() === 'bottomCenter' ||
+                                children[i].getName() === 'bottomLeft' ||
+                                children[i].getName() === 'middleLeft') {
+                                children[i].show();
+                            }
+                        }
+                    }
+                }
 
-                stage.draw();
+                function deselect() {
+                    var children = layer.children;
+
+                    var i, j;
+                    for (i = 1; i < children.length; i++) {
+                        var grandChildren = children[i].children;
+
+                        if (grandChildren) {
+                            for (j = 1; j < grandChildren.length; j++) {
+                                if (grandChildren[j].getName() == 'topLeft' ||
+                                    grandChildren[j].getName() == 'topCenter' ||
+                                    grandChildren[j].getName() == 'topRight' ||
+                                    grandChildren[j].getName() == 'middleRight' ||
+                                    grandChildren[j].getName() == 'bottomRight' ||
+                                    grandChildren[j].getName() == 'bottomCenter' ||
+                                    grandChildren[j].getName() == 'bottomLeft' ||
+                                    grandChildren[j].getName() == 'middleLeft') {
+                                    grandChildren[j].hide();
+                                    layer.draw();
+                                }
+                            }
+                        }
+                    }
+                }
             }
             
             loadImages(this.sources, initStage);

@@ -1,5 +1,7 @@
-<button class="btn btn-default btn-xs" id="btnApply" type="button">Apply</button>
-<button class="btn btn-default btn-xs" id="btnSelect" type="button">Select</button>
-<button class="btn btn-default btn-xs" id="btnRender" type="button">Render</button>
+<div class="btn-group btn-group-justified">
+    <a class="btn btn-default" id="btnApply" data-id="<%= id %>" role="button">Apply</a>
+    <a class="btn btn-default" id="btnSelect" data-id="<%= id %>" href="/select/<%= id %>" role="button">Select</a>
+    <a class="btn btn-default" id="btnRender" data-id="<%= id %>" role="button">Render</a>
+</div>
 
 <div id="container"></div>

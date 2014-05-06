@@ -95,14 +95,15 @@ INDEX ---------------------------------------------------------------
 '''
 @app.route('/')
 def api_root():
-    return render_template('index.html')
+    return render_template('explore.html')
 
 # check if a file has extention in ALLOWED_EXTENSIONS
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-# generate random string (default: of length 6 from abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)
+# generate random string 
+# default: string of length 6 from abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
 def id_generator(size=6, chars=string.ascii_letters + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))    
  
@@ -157,6 +158,11 @@ def get_layer(layer_id):
 def editAsset(asset_id):
     return render_template('explore.html')
 
+#### Asset in Select Mode
+@app.route("/select/<string:asset_id>")
+def selectDevice(asset_id):
+    return render_template('explore.html')
+
 """
 """
 @app.route('/explore/<string:file_id>', methods=['DELETE'])
@@ -186,7 +192,7 @@ def login():
             else:
                 flash("wrong password")   
     
-    return render_template('login.html', error=error)
+    return render_template('explore.html', error=error)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -198,7 +204,7 @@ def register():
         
         if password != confirm_password:
             flash("Passwords do not match!")
-            return render_template('register.html', error=error)
+            return render_template('index.html', error=error)
         
         user = r.table('users').get(email).run(g.rdb_conn)
         
@@ -211,7 +217,7 @@ def register():
         else:
             flash("Email already exists!")
             
-    return render_template('register.html', error=error)
+    return render_template('explore.html', error=error)
 
 @app.route('/logout')
 def logout():
@@ -316,6 +322,10 @@ def get_image(path):
 
 @app.route("/edit")
 def edit():
+    return render_template('explore.html')
+
+@app.route("/select")
+def select():
     return render_template('explore.html')
 
 

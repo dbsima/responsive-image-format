@@ -1,4 +1,4 @@
-define(['marionette', 'vent', 'templates', 'views/UploadFile', 'views/File', 'views/FilesCollection'],
+define(['marionette', 'vent', 'templates', 'views/UploadFile', 'views/File', 'views/FilesCollection', 'views/SearchPanel'],
        function (Marionette, vent, templates, UploadFile, File, FilesCollection) {
         "use strict";
 
@@ -11,9 +11,9 @@ define(['marionette', 'vent', 'templates', 'views/UploadFile', 'views/File', 'vi
             className: 'row-fluid',
 
             regions : {
+                searchPanel     : '#searchPanel',
                 uploadFile      : '#uploadFile',
-                filesCollection : '#filesCollection',
-                breadcrumbs     : '#breadcrumbs'
+                filesCollection : '#filesCollection'
             },
 
             ui : {},
@@ -26,7 +26,7 @@ define(['marionette', 'vent', 'templates', 'views/UploadFile', 'views/File', 'vi
             },
 
             onRender : function () {
-                //this.sidebar.show(new Sidebar({ groups : this.options.groups }));
+                this.searchPanel.show(this.options.searchPanel);
                 this.uploadFile.show(this.options.uploadFile);
                 this.filesCollection.show(this.options.filesView);
             },
