@@ -35,6 +35,6 @@ Create database and tables
 ```shell
 python server.py
 ```
-Then open a browser: http://localhost:6003/
+Go to http://localhost:6003/ in a browser (tested on Safari 7 and Chrome 34), sign up and have fun. 
 
 You can now visit http://localhost:8080/ to see the RethinkDB web admin.
