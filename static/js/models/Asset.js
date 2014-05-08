@@ -8,12 +8,13 @@ define(["jquery", "backbone"],
             
             defaults: {
                 id: "",
-                layers: {}
+                timestamp: "",
+                layers: {},
+                resolutions: ""
             },
             
             url: function () {
                 var path = this.get("path");
-                //console.log(path);
                 return "/assets/" + path;
             },
             

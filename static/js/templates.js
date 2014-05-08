@@ -19,6 +19,9 @@ define(function (require) {
         selectDevice: require('tpl!templates/selectDevice.tmpl'),
         devices     : require('tpl!templates/devices.tmpl'),
         device      : require('tpl!templates/device.tmpl'),
+        renderAsset: require('tpl!templates/renderAsset.tmpl'),
+        //devices     : require('tpl!templates/devices.tmpl'),
+        display      : require('tpl!templates/display.tmpl'),
     };
 });
 

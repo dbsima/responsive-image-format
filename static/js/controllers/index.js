@@ -18,6 +18,8 @@ define(['app',
         'views/SelectDevice',
         'views/Devices',
         'views/Device',
+        'views/RenderAsset',
+        'views/Display',
         'models/User',
         'models/File',
         'models/Layer',
@@ -43,6 +45,8 @@ define(['app',
                   SelectDeviceView,
                   DevicesView,
                   DeviceView,
+                  RenderAssetView,
+                  DisplayView,
                   UserModel,
                   FileModel,
                   LayerModel,
@@ -59,7 +63,6 @@ define(['app',
             
             index: function () {
                 app.header.show(new IndexHeaderView(app.options));
-                
                 app.footer.show(new Footer(app.options));
                 
             },
@@ -76,7 +79,6 @@ define(['app',
                 app.body.show(new LoginView({
                     model: this.user_model
                 }));
-                
                 app.footer.show(new Footer(app.options));
             },
 
@@ -108,17 +110,12 @@ define(['app',
                     model: this.user_model
                 }));
                 
-                //console.log("editFile " + path);
-
-                
                 var layerModel = new LayerModel();
                 this.model = new AssetModel({path: path});
                 
                 var self = this;
                 this.model.fetch({
                     success: function (asset) {
-                        //console.log("layers -|" + self.model.get("id") + "|");
-                        //var fileMOdelTest = this.fileModel;
                         app.body.show(new EditFileView({
                             operations: new OperationsView({
                                 model: layerModel
@@ -129,9 +126,6 @@ define(['app',
                             }),
                             layers: new LayersView()
                         }));
-                        
-                        // redirect to /edit/asset_id
-                        //Backbone.history.navigate("/edit/" + "dsadad", {"trigger": false});
                     }
                 });
 
@@ -139,7 +133,6 @@ define(['app',
             },
             
             selectDevice: function (path) {
-                //console.log("path in controller" + path);
                 app.header.show(new Header({
                     model: this.user_model
                 }));
@@ -149,8 +142,6 @@ define(['app',
                 var self = this;
                 this.model.fetch({
                     success: function (asset) {
-                        //console.log("layers -|" + self.model.get("id") + "|");
-                        //var fileMOdelTest = this.fileModel;
                         app.body.show(new SelectDeviceView({
                             devices: new DevicesView({
                                 
@@ -160,17 +151,33 @@ define(['app',
                                 path: path
                             })
                         }));
-                        
-                        // redirect to /edit/asset_id
-                        //Backbone.history.navigate("/edit/" + "dsadad", {"trigger": false});
                     }
                 });
-
                 app.footer.show(new Footer(app.options));
             },
             
             renderAsset: function (path) {
+                app.header.show(new Header({
+                    model: this.user_model
+                }));
+                
+                this.model = new AssetModel({path: path});
+                
+                var self = this;
+                this.model.fetch({
+                    success: function (asset) {
+                        app.body.show(new RenderAssetView({
+                            devices: new DevicesView({
+                                
+                            }),
+                            display: new DisplayView({
+                                model: self.model,
+                                path: path
+                            })
+                        }));
+                    }
+                });
+                app.footer.show(new Footer(app.options));
             }
-            
         };
     });

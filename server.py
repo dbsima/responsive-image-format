@@ -11,6 +11,9 @@ import random
 
 import shutil
 
+import time
+
+
 import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError, RqlDriverError
 
@@ -26,7 +29,7 @@ MY_DB = 'mydb'
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/uploads')
 # Set of allowed file extensions
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'svg'])
 
 #### Setting up the app database
 
@@ -56,7 +59,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_object(__name__)
 app.config.update(dict(
-    SECRET_KEY='development key'
+    SECRET_KEY='development_key'
 ))
 
 #### Managing connections
@@ -90,24 +93,42 @@ def not_found(error=None):
     resp.status_code = 404
     return resp
 
-'''
-INDEX ---------------------------------------------------------------
-'''
-@app.route('/')
-def api_root():
-    return render_template('explore.html')
-
-# check if a file has extention in ALLOWED_EXTENSIONS
+"""
+Check if a file has extention in ALLOWED_EXTENSIONS
+"""
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-# generate random string 
-# default: string of length 6 from abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
-def id_generator(size=6, chars=string.ascii_letters + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))    
+"""
+Home
+"""
+@app.route('/')
+def api_root():
+    return render_template('explore.html')
+
  
-# 
+"""
+Edit Tab without asset
+"""
+@app.route("/edit")
+def edit():
+    return render_template('explore.html')
+
+"""
+Select Tab without asset
+"""
+@app.route("/select")
+def select():
+    return render_template('explore.html')
+
+"""
+Render Tab without asset
+"""
+@app.route("/render")
+def render():
+    return render_template('explore.html')  
+
 @app.route('/explore', methods=['GET', 'POST'])
 def explore():
     if not session.get('logged_in'):
@@ -135,7 +156,7 @@ def createAsset(path):
     layerName, layerExtension = os.path.splitext(path)
     
     insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
-    insertedAsset = r.table('assets').insert({'layers': [{'id': insertedLayer['generated_keys'][0], 'index': 0}]}).run(g.rdb_conn)
+    insertedAsset = r.table('assets').insert({'timestamp': "", 'resolutions': "", 'layers': [{'id': insertedLayer['generated_keys'][0], 'index': 0}]}).run(g.rdb_conn)
     
     src_filename = os.path.join(app.config['UPLOAD_FOLDER'], path)
     dst_filename = os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension)
@@ -143,9 +164,6 @@ def createAsset(path):
     shutil.copy(src_filename, dst_filename)
     
     return redirect('/edit/' + insertedAsset['generated_keys'][0])
-    
-    #asset = r.table('assets').get(insertedAsset['generated_keys'][0]).run(g.rdb_conn)
-    #return json.dumps(asset)
 
 #### Retrieving a single layer
 @app.route("/layers/<string:layer_id>", methods=['GET'])
@@ -158,9 +176,57 @@ def get_layer(layer_id):
 def editAsset(asset_id):
     return render_template('explore.html')
 
+@app.route("/assets/<string:asset_id>", methods=['POST'])
+def patchAsset(asset_id):
+    
+    if 'composed_image' in request.json:
+        # Get only the encoded data
+        _, b64data = request.json['composed_image'].split(',')
+
+        # Write data into a file named <asset_id>.png
+        composed_image = open(os.path.join(app.config['UPLOAD_FOLDER'], asset_id + ".png"), "wb")
+        composed_image.write(b64data.decode('base64'))
+        composed_image.close()
+
+        # Insert a timestamp in the asset (meaning something changed)
+        timestamp = time.time()
+        asset = r.table('assets').get(asset_id).update({'timestamp': timestamp}).run(g.rdb_conn)
+        
+        # Return updated asset as request response
+        return jsonify(asset)
+    
+    if 'image_resolution' in request.json:
+        data_url = request.json['image_resolution']
+        display_w = str(request.json['display_width'])
+        display_h = str(request.json['display_height'])
+        
+        file_name = asset_id + "_" + display_w + "x" + display_h
+        path_to_file = os.path.join(app.config['UPLOAD_FOLDER'], file_name + ".png")
+
+        # Get only the encoded data
+        _, b64data = data_url.split(',')
+
+        # Write data into a file named <asset_id>_<display_w>x<display_h>.png
+        composed_image = open(path_to_file, "wb")
+        composed_image.write(b64data.decode('base64'))
+        composed_image.close()
+
+        # Insert a timestamp in the asset (meaning something changed)
+        timestamp = time.time()
+        asset = r.table('assets').get(asset_id).update({'timestamp': timestamp, 'resolutions': file_name}).run(g.rdb_conn)
+        
+        # Return updated asset as request response
+        return jsonify(asset)
+    
+
 #### Asset in Select Mode
 @app.route("/select/<string:asset_id>")
 def selectDevice(asset_id):
+    return render_template('explore.html')
+
+#### Asset in Render Mode
+@app.route("/render/<string:asset_id>")
+def renderAsset(asset_id):
     return render_template('explore.html')
 
 """
@@ -259,6 +325,23 @@ def get_assets():
     selection = list(r.table('assets').run(g.rdb_conn))
     return json.dumps(selection)
 
+"""
+Retrieving a single asset
+"""
+@app.route("/assets/<string:asset_id>", methods=['GET'])
+def get_asset(asset_id):
+    file = r.table('assets').get(asset_id).run(g.rdb_conn)
+    return json.dumps(file)
+
+"""
+Retrieving a single file
+"""
+@app.route("/uploads/<path:path>")
+def get_image(path):
+    return app.send_static_file(os.path.join('uploads', path))
+
+
+
 #### Creating an user
 
 # We will create a new user in response to a POST request to `/users`
@@ -282,12 +365,6 @@ def new_user():
     inserted = r.table('users').insert(request.json).run(g.rdb_conn)
     return jsonify(id=inserted['generated_keys'][0])
 
-#### Creating a file
-@app.route("/files", methods=['POST'])
-def new_file():
-    inserted = r.table('files').insert(request.json).run(g.rdb_conn)
-    return jsonify(id=inserted['generated_keys'][0])
-
 #### Retrieving a single user
 
 # Every new user gets assigned a unique ID. The browser can retrieve
@@ -302,32 +379,6 @@ def new_file():
 def get_user(user_id):
     user = r.table('users').get(user_id).run(g.rdb_conn)
     return json.dumps(user)
-
-#### Retrieving a single file
-@app.route("/files/<string:file_id>", methods=['GET'])
-def get_file(file_id):
-    file = r.table('files').get(file_id).run(g.rdb_conn)
-    return json.dumps(file)
-
-#### Retrieving a single file
-@app.route("/assets/<string:asset_id>", methods=['GET'])
-def get_asset(asset_id):
-    file = r.table('assets').get(asset_id).run(g.rdb_conn)
-    return json.dumps(file)
-
-#### Retrieving a single file
-@app.route("/uploads/<path:path>")
-def get_image(path):
-    return app.send_static_file(os.path.join('uploads', path))
-
-@app.route("/edit")
-def edit():
-    return render_template('explore.html')
-
-@app.route("/select")
-def select():
-    return render_template('explore.html')
-
 
 #### Deleting an user
 
@@ -365,7 +416,7 @@ if __name__ == '__main__':
 # this is transparent:
 #   
 #     for result in r.table('todos').run(g.rdb_conn):
-#         print result
+#         print result 
 #     
 #    
 # #### `replace` vs `update` ####
