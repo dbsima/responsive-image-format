@@ -23,8 +23,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.sources['0'] = {id: '0', path: "../uploads/" + asset['id'] + ".png", timestamp: this.model.toJSON()['timestamp']};
             console.log(asset['id'] + ".png");
             
-            this.model.bind('change', this.onRender);
-            //this.listenTo(this.model, "change", this.changings);
+            //this.model.bind('change', this.onRender);
+            this.listenTo(this.model, "change", this.changings);
         },
         
         changings: function () {
@@ -96,6 +96,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         ui : {},
 
         onRender : function () {
+            console.log("on render in select");
             function update(activeAnchor) {
                 var group = activeAnchor.getParent(),
                     
@@ -315,7 +316,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             }
             
             function loadImages(sources, callback) {
-                console.log(sources);
+                console.log("load images");
                 var images = {},
                     loadedImages = 0,
                     numImages = 0;
@@ -329,24 +330,24 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             
                 _.each(sources, function (val, key) {
                     if (val) {
-                        console.log(key);
+                        console.log(val.timestamp);
                         var id = key;
                         
                         images[id] = new Image();
                         images[id].onload = function () {
+                            console.log("image loaded " + val.timestamp);
                             // initStage only after all images are loaded
                             if (++loadedImages >= numImages) {
                                 callback(images);
                             }
                         };
-                        images[id].src = val.path;
+                        images[id].src = val.path + "?"+(new Date()).getTime();
+                        
                     }
                 });
             }
             
             function initStage(images) {
-                console.log(images);
-                
                 var stage_width, stage_height;
                 if (images[0].width < $('#container').width() && images[0].height < $('#container').height()) {
                     stage_width = images[0].width;
@@ -434,7 +435,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             App.vent.trigger("updateStage", {stage: stage});
                             console.log(group.getPosition());
                         });
-                        
                     }
                 });
                 

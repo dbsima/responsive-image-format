@@ -11,6 +11,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.listenTo(App.vent, "updateStage", this.onUpdateStage);
             
             this.listenTo(this.model, "change", this.changings);
+            this.listenTo(this.model, "sync", this.changings);
             
             this.options = options;
             
@@ -56,7 +57,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         
         onUpdateStage: function (options) {
             this.stage = options.stage;
-            //console.log(options.stage);
         },
         
         postStage: function (assetID, dataUrl) {
@@ -89,8 +89,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     console.log(assetID);
 
                     self.postStage(assetID, dataUrl);
-                    
-                    //self.model.set({timestamp: 1});
                 }
             });
         },
