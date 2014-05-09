@@ -76,8 +76,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     "initialLayerWidth": stage.getWidth(),
                     "initialLayerHeight" : stage.getHeight()
                 });
-                
-                
+
                 var layer = new Kinetic.Layer();
                 
                 var bg = new Kinetic.Rect({
@@ -123,7 +122,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         group.add(img); 
                     }
                 });
-                
                 stage.add(layer);
             }
             

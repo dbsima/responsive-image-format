@@ -27,6 +27,7 @@ define(['jquery', 'marionette', 'backbone', 'vent', 'templates'], function ($, M
             console.log("deleteFile " + imgID);
             
             $.ajax({
+                async: "false",
                 type: "DELETE",
                 url: "/explore/" + imgID,
                 dataType: "text",
