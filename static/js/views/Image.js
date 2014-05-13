@@ -156,115 +156,77 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 switch (activeAnchor.name()) {
                 case 'topLeft':
                     topRight.y(anchorY);
-
                     topCenter.y(anchorY);
                     topCenter.x((topLeft.x() + topRight.x()) / 2);
-
                     bottomLeft.x(anchorX);
-
                     middleLeft.x(anchorX);
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
-
                     middleRight.y((topRight.y() + bottomRight.y()) / 2);
-
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
                     break;
-
                 case 'topCenter':
                     topRight.y(anchorY);
-
                     topLeft.y(anchorY);
-
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
-
                     middleRight.y((topRight.y() + bottomRight.y()) / 2);
                     break;
-
                 case 'topRight':
                     topLeft.y(anchorY);
-
                     topCenter.y(anchorY);
                     topCenter.x((topLeft.x() + topRight.x()) / 2);
-
                     bottomRight.x(anchorX);
-
                     middleRight.x(anchorX);
                     middleRight.y((topLeft.y() + bottomRight.y()) / 2);
-
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
-
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
                     break;
-
                 case 'middleRight':
                     topRight.x(anchorX);
-
                     bottomRight.x(anchorX);
-
                     topCenter.x((topLeft.x() + topRight.x()) / 2);
-
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
                     break;
-
                 case 'bottomRight':
                     topCenter.x((topLeft.x() + topRight.x()) / 2);
-
                     bottomLeft.y(anchorY);
-
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
-
                     bottomCenter.y(anchorY);
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
-
                     topRight.x(anchorX);
-
                     middleRight.x(anchorX);
                     middleRight.y((topRight.y() + bottomRight.y()) / 2);
                     break;
-
                 case 'bottomCenter':
                     bottomRight.y(anchorY);
-
                     bottomLeft.y(anchorY);
-
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
-
                     middleRight.y((topRight.y() + bottomRight.y()) / 2);
                     break;
-
                 case 'bottomLeft':
                     bottomRight.y(anchorY);
                     topLeft.x(anchorX);
-
                     middleLeft.x(anchorX);
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
-
                     bottomCenter.y(anchorY);
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
-
                     middleRight.y((topRight.y() + bottomRight.y()) / 2);
-
                     topCenter.x((topLeft.x() + topRight.x()) / 2);
                     break;
-
                 case 'middleLeft':
                     topLeft.x(anchorX);
-
                     bottomLeft.x(anchorX);
-
                     topCenter.x((topLeft.x() + topRight.x()) / 2);
-
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
                     break;
                 }
 
-                image.setPosition(topLeft.getPosition());
+                image.position({x: topLeft.x(), y: topLeft.y()});
 
                 var width = topRight.x() - topLeft.x(),
                     height = bottomLeft.y() - topLeft.y();
 
                 if (width && height) {
-                    image.setSize({width: width, height: height});
+                    image.size({width: width, height: height});
                     
                     App.vent.trigger("showCurrentLayerSize", {
                         "currentLayerWidth": width,

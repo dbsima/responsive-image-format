@@ -96,7 +96,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         onRender : function () {
             console.log("on render in select");
             function update(activeAnchor) {
-                
+                /*
                 var group = activeAnchor.getParent(),
                     
                     topLeft = group.find('.topLeft')[0],
@@ -145,8 +145,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         "currentLayerWidth": width,
                         "currentLayerHeight" : height
                     });
-                }
-                /*
+                }*/
+            
                 var activeHandle = activeAnchor;
                 var group = activeHandle.getParent();
                 
@@ -195,12 +195,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     break;
                 }
 
-
-
                 // Calculate new dimensions. Height is simply the dy of the handles.
                 // Width is increased/decreased by a factor of how much the height changed.
                 newHeight = bottomLeft.y() - topLeft.y();
-                newWidth = image.getWidth() * newHeight / image.getHeight();
+                newWidth = image.width() * newHeight / image.height();
 
                 // It's too small: move the active handle back to the old position
                 if (newWidth < minWidth || newHeight < minHeight) {
@@ -227,17 +225,16 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 }
 
                 newHeight = bottomLeft.y() - topLeft.y();
-                newWidth = image.getWidth() * newHeight / image.getHeight();//for restricted resizing
-
+                newWidth = image.width() * newHeight / image.height();//for restricted resizing
 
                 // Move the image to adjust for the new dimensions.
                 // The position calculation changes depending on where it is anchored.
                 // ie. When dragging on the right, it is anchored to the top left,
                 //     when dragging on the left, it is anchored to the top right.
                 if (activeHandleName === "topRight" || activeHandleName === "bottomRight") {
-                    image.setPosition(topLeft.x(), topLeft.y());
+                    image.position({x: topLeft.x(), y: topLeft.y()});
                 } else if (activeHandleName === "topLeft" || activeHandleName === "bottomLeft") {
-                    image.setPosition(topRight.x() - newWidth, topRight.y());
+                    image.position({x: topRight.x() - newWidth, y: topRight.y()});
                 }
 
                 imageX = image.x();
@@ -245,24 +242,20 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 console.log(image.getPosition());
 
                 // Update handle positions to reflect new image dimensions
-                topLeft.x(imageX);
-                topLeft.y(imageY);
-                topRight.x(imageX + newWidth);
-                topRight.y(imageY);
-                bottomRight.x(imageX + newWidth);
-                bottomRight.y(imageY + newHeight);
-                bottomLeft.x(imageX);
-                bottomLeft.y(imageY + newHeight);
+                topLeft.position({x: imageX, y: imageY});
+                topRight.position({x: imageX + newWidth, y: imageY});
+                bottomRight.position({x: imageX + newWidth, y: imageY + newHeight});
+                bottomLeft.position({x: imageX, y: imageY + newHeight});
 
                 // Set the image's size to the newly calculated dimensions
                 if (newWidth && newHeight) {
-                    image.setSize({width: newWidth, height: newHeight});
+                    image.size({width: newWidth, height: newHeight});
 
                     App.vent.trigger("showCurrentLayerSize", {
                         "currentLayerWidth": newWidth,
                         "currentLayerHeight" : newHeight
                     });
-                }*/
+                }
             }
             
             var l = 10;

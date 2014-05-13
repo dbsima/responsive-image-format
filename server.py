@@ -93,6 +93,17 @@ def not_found(error=None):
     resp.status_code = 404
     return resp
 
+#### 
+@app.errorhandler(401)
+def not_authorized(error=None):
+    message = {
+        'status': 401,
+        'message': 'You must first login/signup'
+    }
+    resp = jsonify(message)
+    resp.status_code = 401
+    return resp
+
 """
 Check if a file has extention in ALLOWED_EXTENSIONS
 """
