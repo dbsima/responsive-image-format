@@ -10,11 +10,14 @@ define(["jquery", "backbone", "cookie"],
 
                 //this.checkIsUserSignedIn();
             },*/
-            
+            initialize: function (options) {
+                //console.log(options);
+            },
             // Default values for all of the Model attributes
             defaults: {
                 email: "",
-                isSignedIn: false
+                isSignedIn: false,
+                currentTab: ""
             }
         });
     });

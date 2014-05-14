@@ -57,8 +57,7 @@ define(['app',
         return {
             initialize: function (options) {
                 this.options = options;
-                
-                this.user_model = new UserModel();
+                //this.user_model = new UserModel();
             },
             
             index: function () {
@@ -83,8 +82,11 @@ define(['app',
             },
 
             listFiles: function () {
+                var user_model = new UserModel();
+                
                 app.header.show(new Header({
-                    model: this.user_model
+                    model: user_model,
+                    tab: "explore"
                 }));
 
                 this.collection = new FilesCollectionModel();
@@ -106,8 +108,10 @@ define(['app',
 
             editFile: function (path) {
                 //console.log("path in controller" + path);
+                var user_model = new UserModel();
                 app.header.show(new Header({
-                    model: this.user_model
+                    model: user_model,
+                    tab: "edit"
                 }));
                 
                 var layerModel = new LayerModel();
@@ -133,8 +137,10 @@ define(['app',
             },
             
             selectDevice: function (path) {
+                var user_model = new UserModel();
                 app.header.show(new Header({
-                    model: this.user_model
+                    model: user_model,
+                    tab: "select"
                 }));
                 
                 this.model = new AssetModel({path: path});
@@ -157,8 +163,10 @@ define(['app',
             },
             
             renderAsset: function (path) {
+                var user_model = new UserModel();
                 app.header.show(new Header({
-                    model: this.user_model
+                    model: user_model,
+                    tab: "render"
                 }));
                 
                 this.model = new AssetModel({path: path});

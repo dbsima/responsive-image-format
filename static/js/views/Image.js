@@ -128,7 +128,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         
         renderFile: function () {
             console.log("render");
-            // Let us extract the value from the textbox now 
+            
         },
         
         regions : {},
@@ -136,6 +136,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         ui : {},
 
         onRender : function () {
+            // length of the anchor
+            var l = 10;
+            
+            // function for updating the stage when an anchor is dragged
             function update(activeAnchor) {
                 var group = activeAnchor.getParent(),
                     
@@ -219,12 +223,14 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
                     break;
                 }
-
+                // update the position of the image
                 image.position({x: topLeft.x(), y: topLeft.y()});
 
+                // compute the new width and height of the image
                 var width = topRight.x() - topLeft.x(),
                     height = bottomLeft.y() - topLeft.y();
 
+                // update the weighe and height of the image
                 if (width && height) {
                     image.size({width: width, height: height});
                     
@@ -234,8 +240,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     });
                 }
             }
-            
-            var l = 10;
             
             function addAnchor(group, x, y, name) {
                 var stage = group.getStage(),

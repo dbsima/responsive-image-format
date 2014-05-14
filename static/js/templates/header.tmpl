@@ -14,10 +14,10 @@
             </p>
 
             <ul class="nav">
-              <li class="active"><a href="/explore">Explorer</a></li>
-              <li><a href="/edit">Editor</a></li>
-              <li><a href="/select">Selector</a></li>
-              <li><a href="/render">Renderer</a></li>
+              <li <% if (currentTab === "explore") { %> class="active"<% } %> ><a href="/explore">Explorer</a></li>
+              <li <% if (currentTab === "edit") { %> class="active"<% } %> ><a href="/edit">Editor</a></li>
+              <li <% if (currentTab === "select") { %> class="active"<% } %> ><a href="/select">Selector</a></li>
+              <li <% if (currentTab === "render") { %> class="active"<% } %> ><a href="/render">Renderer</a></li>
             </ul>
           </div>
         </div>
