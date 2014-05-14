@@ -436,7 +436,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             App.vent.trigger("updateStage", {stage: stage});
                             console.log(group.getPosition());
                         });
-                        
                     }
                 });
                 

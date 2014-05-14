@@ -127,3 +127,5 @@
 2014-05-09T12:16:59.108653000 0.446366s info: To fully expose RethinkDB on the network, bind to all addresses
 2014-05-09T12:16:59.108654000 0.446367s info: by running rethinkdb with the `--bind all` command line option.
 2014-05-09T12:16:59.108662000 0.446375s info: Server ready
+2014-05-13T17:48:58.679724000 202062.154037s info: Applying data {"databases":{"3b850b58-2e24-4380-a8ef-2dd438df4bda":null},"rdb_namespaces":{"3c375f15-c1fe-4f3d-8d9a-327abb736e0d":null,"705e9cf8-af8d-4a15-8a75-13aa7d00a3bb":null,"db175876-131c-4d53-9559-e005268d0c6d":null,"fe6be88e-30e3-411d-b58a-20c1997c1ad9":null}}
+2014-05-13T17:50:11.266337000 202134.742221s info: Applying data {"databases":{"9871e6bf-b292-4ed4-a7fa-6d2e2c658c6f":null}}
