@@ -22,6 +22,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.stage = "";
             this.sources = {};
             
+            console.log(asset);
             for (i = 0; i < this.layers.length; i = i + 1) {
                 console.log(this.layers[i].id);
                 
@@ -33,12 +34,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     success: function (layer) {
                         self.sources[String(self.layers[self.i].index)] = {
                             id: String(self.layers[self.i].id),
-                            path: "../uploads/" + layer.get("name") + layer.get("type")
-                        };
-                        
-                        self.sources[String(1)] = {
-                            id: "59df9e20-a3b5-4402-aaa4-b09f891006e8",
-                            path: "../uploads/" + layer.get("name") + layer.get("type")
+                            path: "../files/" + layer.get("id") + layer.get("type")
                         };
                     }
                 });
@@ -48,7 +44,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         events : {
             'click #btnApply' : 'applyOperation',
             'click #btnSelect' : 'selectDisplay',
-            'click #btnRender' : 'renderFile'
+            'click #btnAddLayer' : 'addLayer'
         },
         
         changings: function () {
@@ -126,9 +122,36 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             });*/
         },
         
-        renderFile: function () {
-            console.log("render");
-            
+        addLayer: function () {
+            console.log("addLayer");
+            // Getting the properties of file from file field
+            var file_data = $("#layer").prop("files")[0];
+            // Creating object of FormData class
+            var form_data = new FormData();
+            // Appending parameter named file with properties of file_field to form_data
+            form_data.append("file", file_data);
+            // Appending parameter named asset_id with current asset_id
+            var assetID = document.getElementById('btnAddLayer').getAttribute('data-id');
+            form_data.append("asset_id", assetID);
+            $.ajax({
+                async: "false",
+                url: "/layers",
+                dataType: 'text',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                success: function (response) {
+                    console.log("success POST on /layers");
+                    console.log(response);
+                    
+                },
+                error: function (response) {
+                    console.log("error POST on /layers");
+                    console.log(response);
+                }
+            });
         },
         
         regions : {},
@@ -136,9 +159,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         ui : {},
 
         onRender : function () {
-            // length of the anchor
-            var l = 10;
-            
             // function for updating the stage when an anchor is dragged
             function update(activeAnchor) {
                 var group = activeAnchor.getParent(),
@@ -151,11 +171,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     bottomCenter = group.find('.bottomCenter')[0],
                     bottomLeft = group.find('.bottomLeft')[0],
                     middleLeft = group.find('.middleLeft')[0],
+                    rotate = group.find('.rotate')[0],
                     image = group.find('.image')[0],
                     
                     anchorX = activeAnchor.x(),
                     anchorY = activeAnchor.y();
-
+                
                 // update anchor positions
                 switch (activeAnchor.name()) {
                 case 'topLeft':
@@ -167,13 +188,16 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
                     middleRight.y((topRight.y() + bottomRight.y()) / 2);
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
+                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2); 
                     break;
+                        
                 case 'topCenter':
                     topRight.y(anchorY);
                     topLeft.y(anchorY);
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
                     middleRight.y((topRight.y() + bottomRight.y()) / 2);
                     break;
+                        
                 case 'topRight':
                     topLeft.y(anchorY);
                     topCenter.y(anchorY);
@@ -182,30 +206,38 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     middleRight.x(anchorX);
                     middleRight.y((topLeft.y() + bottomRight.y()) / 2);
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
+                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2);    
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
                     break;
+                        
                 case 'middleRight':
                     topRight.x(anchorX);
                     bottomRight.x(anchorX);
                     topCenter.x((topLeft.x() + topRight.x()) / 2);
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
+                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2);    
                     break;
+                        
                 case 'bottomRight':
                     topCenter.x((topLeft.x() + topRight.x()) / 2);
                     bottomLeft.y(anchorY);
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
                     bottomCenter.y(anchorY);
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
+                    rotate.y(anchorY + 50);
+                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2); 
                     topRight.x(anchorX);
                     middleRight.x(anchorX);
                     middleRight.y((topRight.y() + bottomRight.y()) / 2);
                     break;
+                        
                 case 'bottomCenter':
                     bottomRight.y(anchorY);
                     bottomLeft.y(anchorY);
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
                     middleRight.y((topRight.y() + bottomRight.y()) / 2);
                     break;
+                        
                 case 'bottomLeft':
                     bottomRight.y(anchorY);
                     topLeft.x(anchorX);
@@ -213,14 +245,18 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
                     bottomCenter.y(anchorY);
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
+                    rotate.y(anchorY + 50);    
+                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2);    
                     middleRight.y((topRight.y() + bottomRight.y()) / 2);
                     topCenter.x((topLeft.x() + topRight.x()) / 2);
                     break;
+                        
                 case 'middleLeft':
                     topLeft.x(anchorX);
                     bottomLeft.x(anchorX);
                     topCenter.x((topLeft.x() + topRight.x()) / 2);
                     bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
+                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2);    
                     break;
                 }
                 // update the position of the image
@@ -230,7 +266,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 var width = topRight.x() - topLeft.x(),
                     height = bottomLeft.y() - topLeft.y();
 
-                // update the weighe and height of the image
+                // update the weight and height of the image
                 if (width && height) {
                     image.size({width: width, height: height});
                     
@@ -241,16 +277,16 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 }
             }
             
+            // Add anchor in a group at a position
             function addAnchor(group, x, y, name) {
                 var stage = group.getStage(),
                     layer = group.getLayer(),
-                    anchor = new Kinetic.Rect({
-                        x: x - l / 2,
-                        y: y - l / 2,
-                        width: l,
-                        height: l,
-                        stroke: '#000',
-                        fill: '#fff',
+                    anchor = new Kinetic.Circle({
+                        x: x,
+                        y: y,
+                        radius: 8,
+                        stroke: '#666',
+                        fill: '#ddd',
                         opacity: 0.5,
                         name: name,
                         draggable: true,
@@ -317,7 +353,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 }
                 
                 group.add(anchor);
-                anchor.hide();
+                //anchor.hide();
             }
             
             function loadImages(sources, callback) {
@@ -345,13 +381,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 callback(images);
                             }
                         };
+                        console.log(val.path);
                         images[id].src = val.path;
                     }
                 });
             }
             
             function initStage(images) {
-                console.log(images);
                 
                 var stage_width, stage_height;
                 if (images[0].width < $('#container').width() && images[0].height < $('#container').height()) {
@@ -362,7 +398,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     stage_height = $('#container').height();
                 }
                 
-                console.log("here" + stage_width + "-" + $('#container').height());
+                //console.log("here" + stage_width + "-" + $('#container').height());
                 
                 var stage = new Kinetic.Stage({
                     container: 'container',
@@ -391,11 +427,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     select(node);
                 });
                 
-                // For each layer create group and add anchors
+                // For each layer create a group and add anchors
                 _.each(images, function (val, key) {
                     if (val) {
-                        console.log(key);
-                        
                         var group = new Kinetic.Group({
                             x: 0,
                             y: 0,
@@ -413,7 +447,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         });
                         
                         layer.add(group);
-                        stage.add(layer);
+                        
                         
                         var img = new Kinetic.Image({
                             x: 0,
@@ -431,7 +465,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         addAnchor(group, img.getWidth() / 2, img.getHeight(), 'bottomCenter');
                         addAnchor(group, 0, img.getHeight(), 'bottomLeft');
                         addAnchor(group, 0, img.getHeight() / 2, 'middleLeft');
-
+                        
+                        addAnchor(group, img.getWidth() / 2, img.getHeight() + 50, 'rotate');
+                        
                         group.on('dragstart', function () {
                             this.moveToTop();
                         });
@@ -441,6 +477,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             console.log(group.getPosition());
                         });
                     }
+                    stage.add(layer);
                 });
                 
                 stage.add(layer);
@@ -459,7 +496,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                     children[i].getName() === 'bottomRight' ||
                                     children[i].getName() === 'bottomCenter' ||
                                     children[i].getName() === 'bottomLeft' ||
-                                    children[i].getName() === 'middleLeft') {
+                                    children[i].getName() === 'middleLeft' ||
+                                    children[i].getName() === 'rotate') {
                                 children[i].show();
                             }
                         }
@@ -481,7 +519,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                         grandChildren[j].getName() === 'bottomRight' ||
                                         grandChildren[j].getName() === 'bottomCenter' ||
                                         grandChildren[j].getName() === 'bottomLeft' ||
-                                        grandChildren[j].getName() === 'middleLeft') {
+                                        grandChildren[j].getName() === 'middleLeft' ||
+                                        grandChildren[j].getName() === 'rotate') {
                                     grandChildren[j].hide();
                                     layer.draw();
                                 }

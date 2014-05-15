@@ -27,7 +27,7 @@ MY_DB = 'mydb'
 
 # Where will the uploaded files be stored
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/uploads')
+UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/files')
 # Set of allowed file extensions
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'svg'])
 
@@ -152,18 +152,35 @@ def explore():
     if request.method == 'POST':
         file = request.files['file']
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            fileName, fileExtension = os.path.splitext(filename)
+            #filename = secure_filename(file.filename)
+            #fileName, fileExtension = os.path.splitext(filename)
 
-            inserted = r.table('files').insert({'filename': fileName, 'type': fileExtension, 'user_email': session_email}).run(g.rdb_conn) 
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], inserted['generated_keys'][0] + fileExtension))
+            #inserted = r.table('files').insert({'filename': fileName, 'type': fileExtension, 'user_email': session_email}).run(g.rdb_conn) 
+            #file.save(os.path.join(app.config['UPLOAD_FOLDER'], inserted['generated_keys'][0] + fileExtension))
             
+            layerName, layerExtension = os.path.splitext(file.filename)
+            insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
+            insertedAsset = r.table('assets').insert({'timestamp': "", 'type': layerExtension, 'resolutions': "", 'layers': [{'id': insertedLayer['generated_keys'][0], 'index': 0}]}).run(g.rdb_conn)
+            
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension))
+            
+            src_filename = os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension)
+            dst_filename = os.path.join(app.config['UPLOAD_FOLDER'], insertedAsset['generated_keys'][0] + layerExtension)
+
+            shutil.copy(src_filename, dst_filename)
+            
+            #file.save(os.path.join(app.config['UPLOAD_FOLDER'], insertedAsset['generated_keys'][0] + layerExtension))
     return render_template('explore.html', email=session_email)
 
-
+'''
 #### Retrieving a single file
 @app.route("/explore/<string:path>", methods=['GET'])
 def createAsset(path):
+    asset_name, assetExtension = os.path.splitext(path)
+    asset = r.table('assets').get(asset_name).run(g.rdb_conn)
+    #return json.dumps(file)
+    return redirect('/edit/' + insertedAsset['generated_keys'][0])
+    """
     layerName, layerExtension = os.path.splitext(path)
     
     insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
@@ -173,14 +190,31 @@ def createAsset(path):
     dst_filename = os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension)
     
     shutil.copy(src_filename, dst_filename)
-    
-    return redirect('/edit/' + insertedAsset['generated_keys'][0])
-
+    """
+    #return redirect('/edit/' + insertedAsset['generated_keys'][0])
+'''
 #### Retrieving a single layer
 @app.route("/layers/<string:layer_id>", methods=['GET'])
 def get_layer(layer_id):
     layer = r.table('layers').get(layer_id).run(g.rdb_conn)
     return json.dumps(layer)
+
+
+@app.route("/layers", methods=['POST'])
+def add_layer():
+    file = request.files['file']
+    asset_id = request.form['asset_id']
+    
+    if file and asset_id and allowed_file(file.filename):
+        layerName, layerExtension = os.path.splitext(file.filename)
+        insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension))    
+        
+        # update the layers of the asset by appending the new layer with the index = max(indexes) + 1
+        asset = r.table('assets').get(asset_id).update({'layers': r.row['layers'].append({"index": r.row['layers'].max('index')['index'] + 1, "id": insertedLayer['generated_keys'][0]})}).run(g.rdb_conn)
+        # Return updated asset as request response
+        return jsonify(asset)
+    return "error"
 
 #### get asset
 @app.route("/edit/<string:asset_id>")
@@ -249,6 +283,17 @@ def delete_file(file_id):
         r.table('files').get(fileName).delete().run(g.rdb_conn)
     
         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], file_id))
+    return render_template('explore.html')
+
+"""
+"""
+@app.route('/assets/<string:asset_id>', methods=['DELETE'])
+def delete_asset(asset_id):
+    if request.method == 'DELETE':
+        fileName, fileExtension = os.path.splitext(asset_id)
+        
+        r.table('assets').get(fileName).delete().run(g.rdb_conn)
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], asset_id))
     return render_template('explore.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -347,9 +392,10 @@ def get_asset(asset_id):
 """
 Retrieving a single file
 """
-@app.route("/uploads/<path:path>")
+@app.route("/files/<path:path>")
 def get_image(path):
-    return app.send_static_file(os.path.join('uploads', path))
+    #print path
+    return app.send_static_file(os.path.join('files', path))
 
 
 

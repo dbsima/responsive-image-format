@@ -6,9 +6,10 @@ define(['marionette', 'templates', 'models/User'],
             template : templates.header,
             
             initialize: function (options) {
+                
                 options = options || {};
                 if (options.tab && options.model) {
-                    options.model.set('currentTab', options.tab);
+                    options.model.set('tab', options.tab);
                 }
 
             },

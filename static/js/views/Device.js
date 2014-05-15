@@ -20,7 +20,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             var asset = this.model.toJSON();
             
             this.sources = {};
-            this.sources['0'] = {id: '0', path: "../uploads/" + asset.id + ".png", timestamp: this.model.toJSON().timestamp};
+            this.sources['0'] = {id: '0', path: "../files/" + asset.id + ".png", timestamp: this.model.toJSON().timestamp};
             console.log(asset.id + ".png");
             
             //this.model.bind('change', this.onRender);

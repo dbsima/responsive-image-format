@@ -12,6 +12,7 @@ define(function (require) {
         uploadFile  : require('tpl!templates/uploadFile.tmpl'),
         searchPanel  : require('tpl!templates/searchPanel.tmpl'),
         file        : require('tpl!templates/file.tmpl'),
+        asset        : require('tpl!templates/asset.tmpl'),
         editFile    : require('tpl!templates/editFile.tmpl'),
         operations  : require('tpl!templates/operations.tmpl'),
         image       : require('tpl!templates/image.tmpl'),

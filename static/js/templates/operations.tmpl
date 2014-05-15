@@ -7,6 +7,14 @@
         </div>
         <div id="collapseOne" class="accordion-body collapse in">
             <div class="accordion-inner">
+                <div class="btn-group btn-group-justified">
+                    <a class="btn btn-default" id="btnHideLayer" data-id="<%= id %><%= type %>" role="button">
+                        <span class="icon-eye-open">
+                    </a>
+                    <a class="btn btn-default" id="btnDeleteLayer" data-id="<%= id %><%= type %>" role="button">
+                        <span class="icon-trash">
+                    </a>
+                </div>
                 <form role="form">
                     <div class="form-group">
                         <input class="form-control" id="resizeInputWidth" type="number" min=1 max="<%= initialWidth %>" step=1 value="<%= currentWidth %>">

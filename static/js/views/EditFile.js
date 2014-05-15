@@ -12,8 +12,7 @@ define(['marionette', 'vent', 'templates'],
 
             regions : {
                 operations  : '#operations',
-                image       : '#image',
-                layers      : '#layers'
+                image       : '#image'
             },
 
             ui : {},
@@ -28,7 +27,6 @@ define(['marionette', 'vent', 'templates'],
             onRender : function () {
                 this.operations.show(this.options.operations);
                 this.image.show(this.options.image);
-                this.layers.show(this.options.layers);
             },
             
             onShow: function () {

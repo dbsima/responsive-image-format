@@ -10,7 +10,8 @@ define(["jquery", "backbone"],
                 id: "",
                 timestamp: "",
                 layers: {},
-                resolutions: ""
+                resolutions: "",
+                type: ""
             },
             
             url: function () {

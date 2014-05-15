@@ -4,8 +4,8 @@ define(['app',
         'views/IndexHeader',
         'views/Login',
         'views/Register',
-        'models/FilesCollection',
-        'views/FilesCollection',
+        'models/AssetsCollection',
+        'views/AssetsCollection',
         'views/Body',
         'views/Header',
         'views/Footer',
@@ -21,7 +21,6 @@ define(['app',
         'views/RenderAsset',
         'views/Display',
         'models/User',
-        'models/File',
         'models/Layer',
         'models/Asset'
        ],
@@ -31,8 +30,8 @@ define(['app',
                   IndexHeaderView,
                   LoginView,
                   RegisterView,
-                  FilesCollectionModel,
-                  FilesCollectionView,
+                  AssetsCollectionModel,
+                  AssetsCollectionView,
                   BodyView,
                   Header,
                   Footer,
@@ -48,7 +47,6 @@ define(['app',
                   RenderAssetView,
                   DisplayView,
                   UserModel,
-                  FileModel,
                   LayerModel,
                   AssetModel
                  ) {
@@ -89,17 +87,18 @@ define(['app',
                     tab: "explore"
                 }));
 
-                this.collection = new FilesCollectionModel();
-                
+                //this.collection = new FilesCollectionModel();
+                this.collection = new AssetsCollectionModel();
                 var self = this;
                 this.collection.fetch({
                     success: function (files) {
-                        var filesView = new FilesCollectionView({ collection: self.collection });
-
+                        //var filesView = new FilesCollectionView({ collection: self.collection });
+                        var assetsView = new AssetsCollectionView({ collection: self.collection });
                         app.body.show(new BodyView({
                             searchPanel: new SearchPanel(),
                             uploadFile: new UploadFile(),
-                            filesView: filesView
+                            //filesView: filesView
+                            assetsView: assetsView
                         }));
                     }
                 });

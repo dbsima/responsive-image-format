@@ -1,0 +1,1 @@
+ asset = r.table('assets').get(asset_id)('layers').append({"index": 1, "id": insertedLayer['generated_keys'][0]}).run(g.rdb_conn)

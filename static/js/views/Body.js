@@ -1,5 +1,5 @@
-define(['marionette', 'vent', 'templates', 'views/UploadFile', 'views/File', 'views/FilesCollection', 'views/SearchPanel'],
-       function (Marionette, vent, templates, UploadFile, File, FilesCollection) {
+define(['marionette', 'vent', 'templates', 'views/UploadFile', 'views/SearchPanel', 'views/AssetsCollection'],
+       function (Marionette, vent, templates, UploadFile, AssetsCollection) {
         "use strict";
 
         return Marionette.Layout.extend({
@@ -13,7 +13,8 @@ define(['marionette', 'vent', 'templates', 'views/UploadFile', 'views/File', 'vi
             regions : {
                 searchPanel     : '#searchPanel',
                 uploadFile      : '#uploadFile',
-                filesCollection : '#filesCollection'
+                //filesCollection : '#filesCollection'
+                assetsCollection : '#assetsCollection'
             },
 
             ui : {},
@@ -28,10 +29,10 @@ define(['marionette', 'vent', 'templates', 'views/UploadFile', 'views/File', 'vi
             onRender : function () {
                 this.searchPanel.show(this.options.searchPanel);
                 this.uploadFile.show(this.options.uploadFile);
-                this.filesCollection.show(this.options.filesView);
+                this.assetsCollection.show(this.options.assetsView);
             },
             
-            onShow: function() {
+            onShow: function () {
                 //this.filesCollection.show(this.options);
             }
         });

@@ -17,7 +17,7 @@ define(["jquery", "backbone", "cookie"],
             defaults: {
                 email: "",
                 isSignedIn: false,
-                currentTab: ""
+                tab: ""
             }
         });
     });
