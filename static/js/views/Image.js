@@ -21,9 +21,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.stage = "";
             this.sources = {};
             
-            console.log(asset);
+            //console.log(asset);
             for (i = 0; i < this.layers.length; i = i + 1) {
-                console.log(this.layers[i].id);
+                //console.log(this.layers[i].id);
                 
                 var layerModel = new LayerModel({path: this.layers[i].id}),
                     self = this;
@@ -47,9 +47,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         },
         
         changings: function () {
-            console.log("change");
+            //console.log("change");
             //this.model.fetch();
-            console.log(this.model.toJSON());
+           // console.log(this.model.toJSON());
         },
         
         onUpdateStage: function (options) {
@@ -65,12 +65,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 data: JSON.stringify({"composed_image": dataUrl}, null, '\t'),
                 success: function (response) {
                     console.log("success POST on /assets/:assetID");
-                    console.log(response);
+                    //console.log(response);
                     
                 },
                 error: function (response) {
                     console.log("error POST on /assets/:assetID");
-                    console.log(response);
+                    //console.log(response);
                 }
             });
         },
@@ -82,7 +82,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             self.stage.toDataURL({
                 callback: function (dataUrl) {
                     var assetID = document.getElementById('btnApply').getAttribute('data-id');
-                    console.log(assetID);
+                    //console.log(assetID);
                     self.postStage(assetID, dataUrl);
                 }
             });
@@ -95,14 +95,14 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             self.stage.toDataURL({
                 callback: function (dataUrl) {
                     var assetID = document.getElementById('btnApply').getAttribute('data-id');
-                    console.log(assetID);
+                    //console.log(assetID);
                     self.postStage(assetID, dataUrl);
                 }
             });
         },
         
         selectDisplay: function () {
-            console.log("select");
+            //console.log("select");
         },
         
         addLayer: function () {
@@ -129,7 +129,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 type: 'post',
                 success: function (response) {
                     console.log("success POST on /layers");
-                    console.log(response);
+                    //console.log(response);
                     var that = self;
                     self.model.fetch({
                         success: function (layer) {
@@ -143,13 +143,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 },
                 error: function (response) {
                     console.log("error POST on /layers");
-                    console.log(response);
+                    //console.log(response);
                 }
             });
         },
         
         onRender : function () {
-            console.log(this.sources);
+            //console.log(this.sources);
             // function for updating the stage when an anchor is dragged
             function update(activeAnchor) {
                 var group = activeAnchor.getParent(),
@@ -262,8 +262,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     image.size({width: width, height: height});
                     
                     App.vent.trigger("showCurrentLayerSize", {
-                        "currentLayerWidth": width,
-                        "currentLayerHeight" : height
+                        "current_width": width,
+                        "current_height" : height
                     });
                 }
             }
@@ -359,7 +359,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             
                 _.each(sources, function (val, key) {
                     if (val) {
-                        console.log(key);
+                        //console.log(key);
                         var id = key;
                         
                         images[id] = new Image();
@@ -369,8 +369,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 callback(images);
                             }
                         };
-                        console.log(val.path);
+                        //console.log(val.path);
                         images[id].src = val.path;
+                        images[id].name = val.id;
                     }
                 });
             }
@@ -396,8 +397,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 
                 // send initial width and size
                 App.vent.trigger("showInitialLayerSize", {
-                    "initialLayerWidth": stage.getWidth(),
-                    "initialLayerHeight" : stage.getHeight()
+                    "initial_width": stage.getWidth(),
+                    "initial_height" : stage.getHeight()
                 });
                 
                 var layer = new Kinetic.Layer(),
@@ -426,19 +427,22 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         group.on('click', function () {
                             var image = group.find('.image')[0];
                             
+                            //console.log();
                             App.vent.trigger("showCurrentLayerSize", {
-                                "currentLayerWidth": image.getWidth(),
-                                "currentLayerHeight" : image.getHeight()
+                                "current_width": image.getWidth(),
+                                "current_height" : image.getHeight(),
+                                "current_layer": image.getId()
                             });
                         });
                         
                         layer.add(group);
-                        
+                        //console.log(images[key].name);
                         var img = new Kinetic.Image({
                             x: 0,
                             y: 0,
                             image: images[key],
-                            name: 'image'
+                            name: 'image',
+                            id: images[key].name
                         });
                         
                         group.add(img);

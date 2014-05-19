@@ -21,17 +21,16 @@ sudo pip install rethinkdb
 ```
 Running the application
 -----------------------
-Run RethinkDB server
+Run RethinkDB server in a tab of the terminal
 ```shell
 rethinkdb
 ```
-Create database and tables
+Create database and tables in another tab
 ```shell
 cd responsive-image-format
 python server.py --setup
 ```
 Run app
-Create database and tables
 ```shell
 python server.py
 ```

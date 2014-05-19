@@ -12,10 +12,11 @@ define(["jquery", "backbone"],
                 type: "",
                 index: "",
             
-                initialWidth: "",
-                initialHeight: "",
-                currentWidth: "",
-                currentHeight: ""
+                initial_width: "",
+                initial_height: "",
+                current_width: "",
+                current_height: "",
+                current_layer: ""
             },
             
             url: function () {
