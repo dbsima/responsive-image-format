@@ -263,14 +263,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             function addAnchor(group, x, y, name) {
                 var stage = group.getStage(),
                     layer = group.getLayer(),
-                    anchor = new Kinetic.Rect({
-                        x: x - l / 2,
-                        y: y - l / 2,
-                        width: l,
-                        height: l,
-                        stroke: '#000',
-                        fill: '#fff',
-                        opacity: 0.5,
+                    anchor = new Kinetic.Circle({
+                        x: x,
+                        y: y,
+                        radius: 8,
+                        stroke: '#666',
+                        fill: '#ddd',
+                        opacity: 0.7,
                         name: name,
                         draggable: true,
                         dragOnTop: false
@@ -357,12 +356,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     stage_height = $('#container').height();
                 }
                 
-                console.log("here" + stage_width + "-" + $('#container').height());
+                //console.log("here1 " + stage_width + "-" + $('#container').width());
+                //console.log("here2 " + stage_height + "-" + $('#container').height());
                 
                 var stage = new Kinetic.Stage({
                     container: 'container',
-                    width: images[0].width,
-                    height: images[0].height
+                    width: stage_width,
+                    height: stage_height
                 });
                 
                 // send initial width and size

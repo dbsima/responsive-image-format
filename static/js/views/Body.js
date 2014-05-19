@@ -13,7 +13,6 @@ define(['marionette', 'vent', 'templates', 'views/UploadFile', 'views/SearchPane
             regions : {
                 searchPanel     : '#searchPanel',
                 uploadFile      : '#uploadFile',
-                //filesCollection : '#filesCollection'
                 assetsCollection : '#assetsCollection'
             },
 

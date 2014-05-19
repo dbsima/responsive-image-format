@@ -11,7 +11,8 @@ define(["jquery", "backbone"],
                 timestamp: "",
                 layers: {},
                 resolutions: "",
-                type: ""
+                type: "",
+                change: ""
             },
             
             url: function () {

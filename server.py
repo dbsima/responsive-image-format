@@ -152,12 +152,6 @@ def explore():
     if request.method == 'POST':
         file = request.files['file']
         if file and allowed_file(file.filename):
-            #filename = secure_filename(file.filename)
-            #fileName, fileExtension = os.path.splitext(filename)
-
-            #inserted = r.table('files').insert({'filename': fileName, 'type': fileExtension, 'user_email': session_email}).run(g.rdb_conn) 
-            #file.save(os.path.join(app.config['UPLOAD_FOLDER'], inserted['generated_keys'][0] + fileExtension))
-            
             layerName, layerExtension = os.path.splitext(file.filename)
             insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
             insertedAsset = r.table('assets').insert({'timestamp': "", 'type': layerExtension, 'resolutions': "", 'layers': [{'id': insertedLayer['generated_keys'][0], 'index': 0}]}).run(g.rdb_conn)
@@ -172,27 +166,6 @@ def explore():
             #file.save(os.path.join(app.config['UPLOAD_FOLDER'], insertedAsset['generated_keys'][0] + layerExtension))
     return render_template('explore.html', email=session_email)
 
-'''
-#### Retrieving a single file
-@app.route("/explore/<string:path>", methods=['GET'])
-def createAsset(path):
-    asset_name, assetExtension = os.path.splitext(path)
-    asset = r.table('assets').get(asset_name).run(g.rdb_conn)
-    #return json.dumps(file)
-    return redirect('/edit/' + insertedAsset['generated_keys'][0])
-    """
-    layerName, layerExtension = os.path.splitext(path)
-    
-    insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
-    insertedAsset = r.table('assets').insert({'timestamp': "", 'resolutions': "", 'layers': [{'id': insertedLayer['generated_keys'][0], 'index': 0}]}).run(g.rdb_conn)
-    
-    src_filename = os.path.join(app.config['UPLOAD_FOLDER'], path)
-    dst_filename = os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension)
-    
-    shutil.copy(src_filename, dst_filename)
-    """
-    #return redirect('/edit/' + insertedAsset['generated_keys'][0])
-'''
 #### Retrieving a single layer
 @app.route("/layers/<string:layer_id>", methods=['GET'])
 def get_layer(layer_id):
@@ -272,17 +245,6 @@ def selectDevice(asset_id):
 #### Asset in Render Mode
 @app.route("/render/<string:asset_id>")
 def renderAsset(asset_id):
-    return render_template('explore.html')
-
-"""
-"""
-@app.route('/explore/<string:file_id>', methods=['DELETE'])
-def delete_file(file_id):
-    if request.method == 'DELETE':
-        fileName, fileExtension = os.path.splitext(file_id)
-        r.table('files').get(fileName).delete().run(g.rdb_conn)
-    
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], file_id))
     return render_template('explore.html')
 
 """

@@ -6,14 +6,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
     return Marionette.Layout.extend({
         template : templates.image,
 
-        initialize: function (options) {
+        initialize: function () {
+            console.log("initialize");
             this.listenTo(App.vent, "initStage", this.onInitStage);
             this.listenTo(App.vent, "updateStage", this.onUpdateStage);
             
             this.listenTo(this.model, "change", this.changings);
             this.listenTo(this.model, "sync", this.changings);
-            
-            this.options = options;
             
             var i, asset = this.model.toJSON();
             this.layers = asset.layers;
@@ -49,6 +48,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         
         changings: function () {
             console.log("change");
+            //this.model.fetch();
+            console.log(this.model.toJSON());
         },
         
         onUpdateStage: function (options) {
@@ -80,10 +81,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             
             self.stage.toDataURL({
                 callback: function (dataUrl) {
-
                     var assetID = document.getElementById('btnApply').getAttribute('data-id');
                     console.log(assetID);
-
                     self.postStage(assetID, dataUrl);
                 }
             });
@@ -97,7 +96,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 callback: function (dataUrl) {
                     var assetID = document.getElementById('btnApply').getAttribute('data-id');
                     console.log(assetID);
-
                     self.postStage(assetID, dataUrl);
                 }
             });
@@ -105,21 +103,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         
         selectDisplay: function () {
             console.log("select");
-            /*
-            var self = this;
-            $.ajax({
-                async: "false",
-                type: "GET",
-                url: "/select/" + self.assetID,
-                dataType: 'text',
-    
-                success: function (response) {
-                    console.log("success GET on /select/:assetID");
-                },
-                error: function (response) {
-                    console.log("error GET on /select/:assetID");
-                }
-            });*/
         },
         
         addLayer: function () {
@@ -133,6 +116,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             // Appending parameter named asset_id with current asset_id
             var assetID = document.getElementById('btnAddLayer').getAttribute('data-id');
             form_data.append("asset_id", assetID);
+            
+            var self = this;
             $.ajax({
                 async: "false",
                 url: "/layers",
@@ -145,6 +130,15 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 success: function (response) {
                     console.log("success POST on /layers");
                     console.log(response);
+                    var that = self;
+                    self.model.fetch({
+                        success: function (layer) {
+                            // lot of hacking in here
+                            that.initialize();
+                            that.render();
+                            console.log("success fetching layer");
+                        }
+                    });
                     
                 },
                 error: function (response) {
@@ -154,11 +148,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             });
         },
         
-        regions : {},
-
-        ui : {},
-
         onRender : function () {
+            console.log(this.sources);
             // function for updating the stage when an anchor is dragged
             function update(activeAnchor) {
                 var group = activeAnchor.getParent(),
@@ -276,7 +267,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     });
                 }
             }
-            
             // Add anchor in a group at a position
             function addAnchor(group, x, y, name) {
                 var stage = group.getStage(),
@@ -287,7 +277,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         radius: 8,
                         stroke: '#666',
                         fill: '#ddd',
-                        opacity: 0.5,
+                        opacity: 0.7,
                         name: name,
                         draggable: true,
                         dragOnTop: false
@@ -340,8 +330,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             y: pos.y
                         }
                     });
-                }
-                
+                }         
                 // set anchors middleLeft and middleRight to move only on horizontal
                 if (anchor.name() === 'middleLeft' || anchor.name() === 'middleRight') {
                     anchor.dragBoundFunc(function (pos) {
@@ -351,11 +340,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         }
                     });
                 }
-                
                 group.add(anchor);
                 //anchor.hide();
             }
-            
+            // 
             function loadImages(sources, callback) {
                 console.log(sources);
                 var images = {},
@@ -386,7 +374,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     }
                 });
             }
-            
+            // 
             function initStage(images) {
                 
                 var stage_width, stage_height;
@@ -426,7 +414,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     var node = e.target;
                     select(node);
                 });
-                
                 // For each layer create a group and add anchors
                 _.each(images, function (val, key) {
                     if (val) {
@@ -435,7 +422,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             y: 0,
                             draggable: true
                         });
-                        
                         // update W & H in Operations -> Resize
                         group.on('click', function () {
                             var image = group.find('.image')[0];
@@ -447,7 +433,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         });
                         
                         layer.add(group);
-                        
                         
                         var img = new Kinetic.Image({
                             x: 0,
@@ -529,7 +514,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     }
                 }
             }
-            
+            // call function to load layers
             loadImages(this.sources, initStage);
         }
     });
