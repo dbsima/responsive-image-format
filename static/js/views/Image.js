@@ -11,20 +11,45 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.listenTo(App.vent, "initStage", this.onInitStage);
             this.listenTo(App.vent, "updateStage", this.onUpdateStage);
             
-            this.listenTo(this.model, "change", this.changings);
-            this.listenTo(this.model, "sync", this.changings);
+            this.listenTo(App.vent, "afterLayerDeleted", this.onLayerDeleted);
             
             var i, asset = this.model.toJSON();
-            this.layers = asset.layers;
             this.assetID = asset.id;
             
             this.stage = "";
             this.sources = {};
             
-            //console.log(asset);
+            console.log("here0");
+            console.log(asset);
+            var self = this;
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/layersOfAsset/" + asset.id,
+                dataType: 'json',
+                success: function (layers) {
+                    console.log("success GET on /layers with asset_id in json");
+                    console.log(layers);
+                    var i;
+                    for (i = 0; i < layers.length; i = i + 1) {
+                        console.log("layer id " + layers[i].id + layers[i].type);
+                        this.sources[i] = {
+                            id: String(layers[i].id),
+                            path: "../files/" + layers[i].id + layers[i].type
+                        };
+                    }
+                    console.log("here1");
+                    console.log(this.sources);
+                }.bind(this),
+                error: function (response) {
+                    console.log("error GET on /layers with asset_id in json");
+                }
+            });
+            console.log("here2");
+            console.log(this.sources);
+            /*
             for (i = 0; i < this.layers.length; i = i + 1) {
-                //console.log(this.layers[i].id);
-                
+                console.log("layer id " + this.layers[i].id);
                 var layerModel = new LayerModel({path: this.layers[i].id}),
                     self = this;
                 self.i = i;
@@ -37,7 +62,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         };
                     }
                 });
-            }
+            }*/
         },
 
         events : {
@@ -46,10 +71,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             'click #btnAddLayer' : 'addLayer'
         },
         
-        changings: function () {
-            //console.log("change");
-            //this.model.fetch();
-           // console.log(this.model.toJSON());
+        onLayerDeleted: function (options) {
+            console.log("layer deleted");
         },
         
         onUpdateStage: function (options) {
@@ -58,7 +81,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         
         postStage: function (assetID, dataUrl) {
             $.ajax({
-                async: "false",
+                async: false,
                 type: "POST",
                 url: "/assets/" + assetID,
                 contentType: 'application/json;charset=UTF-8',
@@ -81,9 +104,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             
             self.stage.toDataURL({
                 callback: function (dataUrl) {
-                    var assetID = document.getElementById('btnApply').getAttribute('data-id');
-                    //console.log(assetID);
-                    self.postStage(assetID, dataUrl);
+                    var asset_id = document.getElementById('btnApply').getAttribute('data-id');
+                    self.postStage(asset_id, dataUrl);
                 }
             });
         },
@@ -94,9 +116,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             var self = this;
             self.stage.toDataURL({
                 callback: function (dataUrl) {
-                    var assetID = document.getElementById('btnApply').getAttribute('data-id');
-                    //console.log(assetID);
-                    self.postStage(assetID, dataUrl);
+                    var asset_id = document.getElementById('btnApply').getAttribute('data-id');
+                    self.postStage(asset_id, dataUrl);
                 }
             });
         },
@@ -119,7 +140,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             
             var self = this;
             $.ajax({
-                async: "false",
+                async: false,
                 url: "/layers",
                 dataType: 'text',
                 cache: false,
@@ -260,10 +281,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 // update the weight and height of the image
                 if (width && height) {
                     image.size({width: width, height: height});
-                    
+
                     App.vent.trigger("showCurrentLayerSize", {
                         "current_width": width,
-                        "current_height" : height
+                        "current_height": height,
+                        "current_layer": image.name,
+                        "current_asset" : document.getElementById('btnAddLayer').getAttribute('data-id')
+                        
                     });
                 }
             }
@@ -345,6 +369,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             }
             // 
             function loadImages(sources, callback) {
+                console.log("here3")
                 console.log(sources);
                 var images = {},
                     loadedImages = 0,
@@ -359,13 +384,14 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             
                 _.each(sources, function (val, key) {
                     if (val) {
-                        //console.log(key);
+                        //console.log(val.path + " - " + val.id);
                         var id = key;
                         
                         images[id] = new Image();
                         images[id].onload = function () {
                             // initStage only after all images are loaded
                             if (++loadedImages >= numImages) {
+                                console.log(images);
                                 callback(images);
                             }
                         };
@@ -431,7 +457,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             App.vent.trigger("showCurrentLayerSize", {
                                 "current_width": image.getWidth(),
                                 "current_height" : image.getHeight(),
-                                "current_layer": image.getId()
+                                "current_layer": image.getId(),
+                                "current_asset": document.getElementById('btnAddLayer').getAttribute('data-id')
                             });
                         });
                         

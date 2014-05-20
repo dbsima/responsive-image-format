@@ -10,13 +10,15 @@ define(["jquery", "backbone"],
                 id: "",
                 name: "",
                 type: "",
-                index: "",
+                time_stamp: "",
+                asset_id: "",
             
                 initial_width: "",
                 initial_height: "",
                 current_width: "",
                 current_height: "",
-                current_layer: ""
+                current_layer: "",
+                curret_asset: ""
             },
             
             url: function () {

@@ -17,18 +17,18 @@ define(['jquery', 'marionette', 'backbone', 'vent', 'templates'], function ($, M
         },
 
         editFile: function () {
-            var imgID = $(event.target).data('id');
-            console.log("editFile " + imgID);
+            var asset_id = document.getElementById('btnEditFile').getAttribute('data-id');
+            console.log("editFile " + asset_id);
         },
         
         deleteFile: function () {
-            var imgID = $(event.target).data('id');
-            console.log("deleteFile " + imgID);
+            var asset_id = document.getElementById('btnDeleteFile').getAttribute('data-id');
+            console.log("deleteFile " + asset_id);
             
             $.ajax({
-                async: "false",
+                async: false,
                 type: "DELETE",
-                url: "/assets/" + imgID,
+                url: "/assets/" + asset_id,
                 dataType: "text",
                 success: function (response) {
                     console.log("success DELETE on /assets/:imgID");

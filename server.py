@@ -152,39 +152,33 @@ def explore():
     if request.method == 'POST':
         file = request.files['file']
         if file and allowed_file(file.filename):
-            layerName, layerExtension = os.path.splitext(file.filename)
-            insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
-            insertedAsset = r.table('assets').insert({'timestamp': "", 'type': layerExtension, 'resolutions': "", 'layers': [{'id': insertedLayer['generated_keys'][0], 'index': 0}]}).run(g.rdb_conn)
+            layer_name, layer_extension = os.path.splitext(file.filename)
             
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension))
+            time_stamp = time.time()
+            inserted_asset = r.table('assets').insert({'time_stamp': time_stamp, 'type': layer_extension, 'resolutions': ""}).run(g.rdb_conn)
+            inserted_layer = r.table('layers').insert({'asset_id': inserted_asset['generated_keys'][0], 'name': layer_name, 'type': layer_extension, 'time_stamp': time_stamp}).run(g.rdb_conn)
             
-            src_filename = os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension)
-            dst_filename = os.path.join(app.config['UPLOAD_FOLDER'], insertedAsset['generated_keys'][0] + layerExtension)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], inserted_layer['generated_keys'][0] + layer_extension))
+            
+            src_filename = os.path.join(app.config['UPLOAD_FOLDER'], inserted_layer['generated_keys'][0] + layer_extension)
+            dst_filename = os.path.join(app.config['UPLOAD_FOLDER'], inserted_asset['generated_keys'][0] + layer_extension)
 
             shutil.copy(src_filename, dst_filename)
-            
-            #file.save(os.path.join(app.config['UPLOAD_FOLDER'], insertedAsset['generated_keys'][0] + layerExtension))
     return render_template('explore.html', email=session_email)
 
-#### Retrieving a single layer
-@app.route("/layers/<string:layer_id>", methods=['GET'])
-def get_layer(layer_id):
-    layer = r.table('layers').get(layer_id).run(g.rdb_conn)
-    return json.dumps(layer)
-
-
 @app.route("/layers", methods=['POST'])
-def add_layer():
+def addLayer():
     file = request.files['file']
     asset_id = request.form['asset_id']
     
     if file and asset_id and allowed_file(file.filename):
-        layerName, layerExtension = os.path.splitext(file.filename)
-        insertedLayer = r.table('layers').insert({'name': layerName, 'type': layerExtension}).run(g.rdb_conn)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], insertedLayer['generated_keys'][0] + layerExtension))    
+        time_stamp = time.time()
+        layer_name, layer_extension = os.path.splitext(file.filename)
+        inserted_layer = r.table('layers').insert({'name': layer_name, 'type': layer_extension, 'asset_id': asset_id, 'time_stamp': time_stamp}).run(g.rdb_conn)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], inserted_layer['generated_keys'][0] + layer_extension))    
         
-        # update the layers of the asset by appending the new layer with the index = max(indexes) + 1
-        asset = r.table('assets').get(asset_id).update({'layers': r.row['layers'].append({"index": r.row['layers'].max('index')['index'] + 1, "id": insertedLayer['generated_keys'][0]})}).run(g.rdb_conn)
+        # update the layers of the asset by appending the new layer
+        asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
         # Return updated asset as request response
         return jsonify(asset)
     return "error"
@@ -207,8 +201,8 @@ def patchAsset(asset_id):
         composed_image.close()
 
         # Insert a timestamp in the asset (meaning something changed)
-        timestamp = time.time()
-        asset = r.table('assets').get(asset_id).update({'timestamp': timestamp}).run(g.rdb_conn)
+        time_stamp = time.time()
+        asset = r.table('assets').get(asset_id).update({'time_stamp': time_stamp}).run(g.rdb_conn)
         
         # Return updated asset as request response
         return jsonify(asset)
@@ -231,7 +225,7 @@ def patchAsset(asset_id):
 
         # Insert a timestamp in the asset (meaning something changed)
         timestamp = time.time()
-        asset = r.table('assets').get(asset_id).update({'timestamp': timestamp, 'resolutions': file_name}).run(g.rdb_conn)
+        asset = r.table('assets').get(asset_id).update({'time_stamp': timestamp, 'resolutions': file_name}).run(g.rdb_conn)
         
         # Return updated asset as request response
         return jsonify(asset)
@@ -248,15 +242,45 @@ def renderAsset(asset_id):
     return render_template('explore.html')
 
 """
+Delete asset
 """
 @app.route('/assets/<string:asset_id>', methods=['DELETE'])
-def delete_asset(asset_id):
-    if request.method == 'DELETE':
-        fileName, fileExtension = os.path.splitext(asset_id)
-        
-        r.table('assets').get(fileName).delete().run(g.rdb_conn)
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], asset_id))
-    return render_template('explore.html')
+def deleteAsset(asset_id):
+    file_name, file_extension = os.path.splitext(asset_id)
+    # get all layers of asset_id
+    layers = list(r.table('layers').filter({'asset_id': file_name}).run(g.rdb_conn))
+    # delete asset_id from assets
+    deleted_asset = r.table('assets').get(file_name).delete().run(g.rdb_conn)
+    # delete all layers of asset_id from layers
+    deleted_layers = r.table('layers').filter({'asset_id': file_name}).delete().run(g.rdb_conn)
+    # delete asset_id file
+    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], asset_id))
+    #delete all layer_id files
+    for layer in layers:
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['type']))
+    # return deleted asset
+    return json.dumps(deleted_asset)
+
+"""
+Delete layer
+"""
+@app.route('/layers/<string:layer_id>', methods=['DELETE'])
+def deleteLayer(layer_id):
+    if "asset_id" in request.json:
+        asset_id = request.json['asset_id']
+        print layer_id
+        # remove file layer_id
+        layer = r.table('layers').get(layer_id).run(g.rdb_conn)
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['type']))
+        # remove layer_id from layers
+        deleted_layer = r.table('layers').get(layer_id).delete().run(g.rdb_conn)
+        # add a new time_stamp to asset_id
+        time_stamp = time.time()
+        asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
+        # return deleted_layer
+        return json.dumps(deleted_layer)
+    
+    return "error"
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -332,10 +356,16 @@ def get_files():
     return json.dumps(selection)
 
 #### Listing existing layers
+@app.route("/layers/<string:asset_id>", methods=['GET'])
+def getLayers(asset_id):
+    layers = list(r.table('layers').filter({'asset_id': asset_id}).order_by(r.asc('time_stamp')).run(g.rdb_conn))
+    return json.dumps(layers)
+
+#### Listing existing layers
 @app.route("/layers", methods=['GET'])
-def get_layers():
-    selection = list(r.table('layers').run(g.rdb_conn))
-    return json.dumps(selection)
+def getAllLayers():
+    layers = list(r.table('layers').run(g.rdb_conn))
+    return json.dumps(layers)
 
 #### Listing existing assets
 @app.route("/assets", methods=['GET'])
@@ -347,9 +377,17 @@ def get_assets():
 Retrieving a single asset
 """
 @app.route("/assets/<string:asset_id>", methods=['GET'])
-def get_asset(asset_id):
-    file = r.table('assets').get(asset_id).run(g.rdb_conn)
-    return json.dumps(file)
+def getAsset(asset_id):
+    asset = r.table('assets').get(asset_id).run(g.rdb_conn)
+    return json.dumps(asset)
+
+"""
+Retrieving all layers of asset_id
+"""
+@app.route("/layersOfAsset/<string:asset_id>", methods=['GET'])
+def getAllLayerForAsset(asset_id):
+    layers = list(r.table('layers').filter({'asset_id': asset_id}).order_by(r.asc('time_stamp')).run(g.rdb_conn))
+    return json.dumps(layers)
 
 """
 Retrieving a single file

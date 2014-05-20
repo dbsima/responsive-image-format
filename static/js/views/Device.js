@@ -38,7 +38,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         
         postStage: function (assetID, dataUrl) {
             $.ajax({
-                async: "false",
+                async: false,
                 type: "POST",
                 url: "/assets/" + assetID,
                 contentType: 'application/json;charset=UTF-8',

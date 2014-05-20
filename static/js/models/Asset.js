@@ -8,8 +8,7 @@ define(["jquery", "backbone"],
             
             defaults: {
                 id: "",
-                timestamp: "",
-                layers: {},
+                time_stamp: "",
                 resolutions: "",
                 type: "",
                 change: ""
