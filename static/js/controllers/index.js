@@ -102,7 +102,7 @@ define(['app',
                         }));
                     }
                 });
-                app.footer.show(new Footer(app.options));
+                //app.footer.show(new Footer(app.options));
             },
 
             editFile: function (path) {
@@ -132,7 +132,7 @@ define(['app',
                     }
                 });
 
-                app.footer.show(new Footer(app.options));
+                //app.footer.show(new Footer(app.options));
             },
             
             selectDevice: function (path) {
@@ -158,7 +158,7 @@ define(['app',
                         }));
                     }
                 });
-                app.footer.show(new Footer(app.options));
+                //app.footer.show(new Footer(app.options));
             },
             
             renderAsset: function (path) {
@@ -184,7 +184,7 @@ define(['app',
                         }));
                     }
                 });
-                app.footer.show(new Footer(app.options));
+                //app.footer.show(new Footer(app.options));
             }
         };
     });

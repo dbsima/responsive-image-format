@@ -17,10 +17,9 @@ import time
 import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError, RqlDriverError
 
-#### Connection details
-
-# We will use these settings later in the code to connect to the
-# RethinkDB server.
+"""
+### Connection details
+"""
 RDB_HOST =  os.environ.get('RDB_HOST') or 'localhost'
 RDB_PORT = os.environ.get('RDB_PORT') or 28015
 MY_DB = 'mydb'
@@ -31,13 +30,9 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/files')
 # Set of allowed file extensions
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'svg'])
 
-#### Setting up the app database
-
-# The app will use the tables `users` and `files` in the database specified by the
-# `MY_DB` variable.  We'll create the database and table here using
-# [`db_create`](http://www.rethinkdb.com/api/python/db_create/)
-# and
-# [`table_create`](http://www.rethinkdb.com/api/python/table_create/) commands.
+"""
+### Setting up the app database
+"""
 def dbSetup():
     connection = r.connect(host=RDB_HOST, port=RDB_PORT)
     try:
@@ -62,12 +57,9 @@ app.config.update(dict(
     SECRET_KEY='development_key'
 ))
 
-#### Managing connections
-
-# The pattern we're using for managing database connections is to have **a connection per request**. 
-# We're using Flask's `@app.before_request` and `@app.teardown_request` for 
-# [opening a database connection](http://www.rethinkdb.com/api/python/connect/) and 
-# [closing it](http://www.rethinkdb.com/api/python/close/) respectively.
+"""
+### Managing connections (open and close it)
+"""
 @app.before_request
 def before_request():
     try:
@@ -82,7 +74,9 @@ def teardown_request(exception):
     except AttributeError:
         pass
 
-#### 
+"""
+### 
+"""
 @app.errorhandler(404)
 def not_found(error=None):
     message = {
@@ -93,7 +87,9 @@ def not_found(error=None):
     resp.status_code = 404
     return resp
 
-#### 
+"""
+### 
+"""
 @app.errorhandler(401)
 def not_authorized(error=None):
     message = {
@@ -105,41 +101,43 @@ def not_authorized(error=None):
     return resp
 
 """
-Check if a file has extention in ALLOWED_EXTENSIONS
+### Check if a file has extention in ALLOWED_EXTENSIONS
 """
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 """
-Home
+### Home
 """
 @app.route('/')
 def api_root():
     return render_template('explore.html')
 
- 
 """
-Edit Tab without asset
+### Edit Tab without asset
 """
 @app.route("/edit")
 def edit():
     return render_template('explore.html')
 
 """
-Select Tab without asset
+### Select Tab without asset
 """
 @app.route("/select")
 def select():
     return render_template('explore.html')
 
 """
-Render Tab without asset
+### Render Tab without asset
 """
 @app.route("/render")
 def render():
     return render_template('explore.html')  
 
+"""
+###
+"""
 @app.route('/explore', methods=['GET', 'POST'])
 def explore():
     if not session.get('logged_in'):
@@ -155,7 +153,7 @@ def explore():
             layer_name, layer_extension = os.path.splitext(file.filename)
             
             time_stamp = time.time()
-            inserted_asset = r.table('assets').insert({'time_stamp': time_stamp, 'type': layer_extension, 'resolutions': ""}).run(g.rdb_conn)
+            inserted_asset = r.table('assets').insert({'time_stamp': time_stamp, 'type': layer_extension, 'resolutions': "", 'shared': 'false', 'user_id': ''}).run(g.rdb_conn)
             inserted_layer = r.table('layers').insert({'asset_id': inserted_asset['generated_keys'][0], 'name': layer_name, 'type': layer_extension, 'time_stamp': time_stamp}).run(g.rdb_conn)
             
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], inserted_layer['generated_keys'][0] + layer_extension))
@@ -166,6 +164,10 @@ def explore():
             shutil.copy(src_filename, dst_filename)
     return render_template('explore.html', email=session_email)
 
+
+"""
+###
+"""
 @app.route("/layers", methods=['POST'])
 def addLayer():
     file = request.files['file']
@@ -183,13 +185,18 @@ def addLayer():
         return jsonify(asset)
     return "error"
 
-#### get asset
+"""
+### Get asset
+"""
 @app.route("/edit/<string:asset_id>")
 def editAsset(asset_id):
     return render_template('explore.html')
 
+"""
+### 
+"""
 @app.route("/assets/<string:asset_id>", methods=['POST'])
-def patchAsset(asset_id):
+def patch_asset(asset_id):
     
     if 'composed_image' in request.json:
         # Get only the encoded data
@@ -230,22 +237,25 @@ def patchAsset(asset_id):
         # Return updated asset as request response
         return jsonify(asset)
     
-
+"""
 #### Asset in Select Mode
+"""
 @app.route("/select/<string:asset_id>")
-def selectDevice(asset_id):
-    return render_template('explore.html')
-
-#### Asset in Render Mode
-@app.route("/render/<string:asset_id>")
-def renderAsset(asset_id):
+def select_device(asset_id):
     return render_template('explore.html')
 
 """
-Delete asset
+#### Asset in Render Mode
+"""
+@app.route("/render/<string:asset_id>")
+def render_asset(asset_id):
+    return render_template('explore.html')
+
+"""
+### Delete asset
 """
 @app.route('/assets/<string:asset_id>', methods=['DELETE'])
-def deleteAsset(asset_id):
+def delete_asset(asset_id):
     file_name, file_extension = os.path.splitext(asset_id)
     # get all layers of asset_id
     layers = list(r.table('layers').filter({'asset_id': file_name}).run(g.rdb_conn))
@@ -262,10 +272,10 @@ def deleteAsset(asset_id):
     return json.dumps(deleted_asset)
 
 """
-Delete layer
+### Delete layer
 """
 @app.route('/layers/<string:layer_id>', methods=['DELETE'])
-def deleteLayer(layer_id):
+def delete_layer(layer_id):
     if "asset_id" in request.json:
         asset_id = request.json['asset_id']
         print layer_id
@@ -333,122 +343,86 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('login'))
 
-#### Listing existing users
-
-# To retrieve all existing users, we are using
-# [`r.table`](http://www.rethinkdb.com/api/python/table/)
-# command to query the database in response to a GET request from the
-# browser. When `table(table_name)` isn't followed by an additional
-# command, it returns all documents in the table.
-#    
-# Running the query returns an iterator that automatically streams
-# data from the server in efficient batches.
-
-@app.route("/users", methods=['GET'])
-def get_users():
-    selection = list(r.table('users').run(g.rdb_conn))
-    return json.dumps(selection)
-
-#### Listing existing files
-@app.route("/files", methods=['GET'])
-def get_files():
-    selection = list(r.table('files').run(g.rdb_conn))
-    return json.dumps(selection)
-
-#### Listing existing layers
+"""
+### Retrieve a single layer
+"""
 @app.route("/layers/<string:asset_id>", methods=['GET'])
-def getLayers(asset_id):
+def get_layer(asset_id):
     layers = list(r.table('layers').filter({'asset_id': asset_id}).order_by(r.asc('time_stamp')).run(g.rdb_conn))
     return json.dumps(layers)
 
-#### Listing existing layers
+"""
+### Listing existing layers
+"""
 @app.route("/layers", methods=['GET'])
-def getAllLayers():
+def get_all_layers():
     layers = list(r.table('layers').run(g.rdb_conn))
     return json.dumps(layers)
 
-#### Listing existing assets
+"""
+### Listing existing assets
+"""
 @app.route("/assets", methods=['GET'])
 def get_assets():
     selection = list(r.table('assets').run(g.rdb_conn))
     return json.dumps(selection)
 
 """
-Retrieving a single asset
+### Retrieving a single asset
 """
 @app.route("/assets/<string:asset_id>", methods=['GET'])
-def getAsset(asset_id):
+def get_asset(asset_id):
     asset = r.table('assets').get(asset_id).run(g.rdb_conn)
     return json.dumps(asset)
 
 """
-Retrieving all layers of asset_id
+### Retrieving all layers of asset_id
 """
 @app.route("/layersOfAsset/<string:asset_id>", methods=['GET'])
-def getAllLayerForAsset(asset_id):
+def get_all_layer_for_asset(asset_id):
     layers = list(r.table('layers').filter({'asset_id': asset_id}).order_by(r.asc('time_stamp')).run(g.rdb_conn))
     return json.dumps(layers)
 
 """
-Retrieving a single file
+### Retrieving a single file
 """
 @app.route("/files/<path:path>")
 def get_image(path):
-    #print path
     return app.send_static_file(os.path.join('files', path))
 
-
-
-#### Creating an user
-
-# We will create a new user in response to a POST request to `/users`
-# with a JSON payload using
-# [`table.insert`](http://www.rethinkdb.com/api/python/insert/).
-#
-# The `insert` operation returns a single object specifying the number
-# of successfully created objects and their corresponding IDs:
-# 
-# ```
-# {
-#   "inserted": 1,
-#   "errors": 0,
-#   "generated_keys": [
-#     "773666ac-841a-44dc-97b7-b6f3931e9b9f"
-#   ]
-# }
-# ```
+"""
+### Creating a new user
+"""
 @app.route("/users", methods=['POST'])
 def new_user():
     inserted = r.table('users').insert(request.json).run(g.rdb_conn)
     return jsonify(id=inserted['generated_keys'][0])
 
-#### Retrieving a single user
+"""
+#### Deleting an user
+"""
+@app.route("/users/<string:user_id>", methods=['DELETE'])
+def delete_user(user_id):
+    return jsonify(r.table('users').get(user_id).delete().run(g.rdb_conn))
 
-# Every new user gets assigned a unique ID. The browser can retrieve
-# a specific task by GETing `/users/<user_id>`. To query the database
-# for a single document by its ID, we use the
-# [`get`](http://www.rethinkdb.com/api/python/get/)
-# command.
-#
-# Using a user's ID will prove more useful when we decide to update
-# it, mark it completed, or delete it.
+"""
+### Retrieving a single user
+"""
 @app.route("/users/<string:user_id>", methods=['GET'])
 def get_user(user_id):
     user = r.table('users').get(user_id).run(g.rdb_conn)
     return json.dumps(user)
 
-#### Deleting an user
-
-# To delete an user item we'll call a
-# [`delete`](http://www.rethinkdb.com/api/python/delete/)
-# command on a `DELETE /users/<user_id>` request.
-@app.route("/users/<string:user_id>", methods=['DELETE'])
-def delete_user(user_id):
-    return jsonify(r.table('users').get(user_id).delete().run(g.rdb_conn))
-
+"""
+### Listing existing users
+"""
+@app.route("/users", methods=['GET'])
+def get_users():
+    selection = list(r.table('users').run(g.rdb_conn))
+    return json.dumps(selection)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Run the Flask nrif app')
+    parser = argparse.ArgumentParser(description='Run New-Responsive-Image-Format app')
     parser.add_argument('--setup', dest='run_setup', action='store_true')
 
     args = parser.parse_args()
@@ -456,30 +430,3 @@ if __name__ == '__main__':
         dbSetup()
     else:
         app.run(debug=True, port=6003, host='0.0.0.0')
-
-# ### Best practices ###
-#
-# #### Managing connections: a connection per request ####
-#
-# The RethinkDB server doesn't use a thread-per-connnection approach
-# so opening connections per request will not slow down your database.
-# 
-# #### Fetching multiple rows: batched iterators ####
-#
-# When fetching multiple rows from a table, RethinkDB returns a
-# batched iterator initially containing a subset of the complete
-# result. Once the end of the current batch is reached, a new batch is
-# automatically retrieved from the server. From a coding point of view
-# this is transparent:
-#   
-#     for result in r.table('todos').run(g.rdb_conn):
-#         print result 
-#     
-#    
-# #### `replace` vs `update` ####
-#
-# Both `replace` and `update` operations can be used to modify one or
-# multiple rows. Their behavior is different:
-#    
-# *   `replace` will completely replace the existing rows with new values
-# *   `update` will merge existing rows with the new values

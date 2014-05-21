@@ -136,37 +136,42 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             form_data.append("file", file_data);
             // Appending parameter named asset_id with current asset_id
             var assetID = document.getElementById('btnAddLayer').getAttribute('data-id');
-            form_data.append("asset_id", assetID);
             
-            var self = this;
-            $.ajax({
-                async: false,
-                url: "/layers",
-                dataType: 'text',
-                cache: false,
-                contentType: false,
-                processData: false,
-                data: form_data,
-                type: 'post',
-                success: function (response) {
-                    console.log("success POST on /layers");
-                    //console.log(response);
-                    var that = self;
-                    self.model.fetch({
-                        success: function (layer) {
-                            // lot of hacking in here
-                            that.initialize();
-                            that.render();
-                            console.log("success fetching layer");
-                        }
-                    });
-                    
-                },
-                error: function (response) {
-                    console.log("error POST on /layers");
-                    //console.log(response);
-                }
-            });
+            if (file_data) {
+                //console.log("asdadsa"+ assetID);
+                form_data.append("asset_id", assetID);
+                var self = this;
+                $.ajax({
+                    async: false,
+                    url: "/layers",
+                    dataType: 'text',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
+                    type: 'post',
+                    success: function (response) {
+                        console.log("success POST on /layers");
+                        //console.log(response);
+                        var that = self;
+                        self.model.fetch({
+                            success: function (layer) {
+                                // lot of hacking in here
+                                that.initialize();
+                                that.render();
+                                console.log("success fetching layer");
+                            }
+                        });
+
+                    },
+                    error: function (response) {
+                        console.log("error POST on /layers");
+                        //console.log(response);
+                    }
+                });
+            } else {
+                console.log("no file uploaded");
+            }
         },
         
         onRender : function () {

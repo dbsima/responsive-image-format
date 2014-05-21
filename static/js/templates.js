@@ -11,7 +11,6 @@ define(function (require) {
         footer      : require('tpl!templates/footer.tmpl'),
         uploadFile  : require('tpl!templates/uploadFile.tmpl'),
         searchPanel  : require('tpl!templates/searchPanel.tmpl'),
-        file        : require('tpl!templates/file.tmpl'),
         asset        : require('tpl!templates/asset.tmpl'),
         editFile    : require('tpl!templates/editFile.tmpl'),
         operations  : require('tpl!templates/operations.tmpl'),
@@ -21,7 +20,6 @@ define(function (require) {
         devices     : require('tpl!templates/devices.tmpl'),
         device      : require('tpl!templates/device.tmpl'),
         renderAsset: require('tpl!templates/renderAsset.tmpl'),
-        //devices     : require('tpl!templates/devices.tmpl'),
         display      : require('tpl!templates/display.tmpl'),
     };
 });
