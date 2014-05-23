@@ -1,5 +1,4 @@
 from flask import Flask, url_for, json, jsonify, g, request, Response, render_template, make_response, send_from_directory, abort, session, flash, redirect
-from util import make_json_response, make_error_response, bad_id_response
 from werkzeug.utils import secure_filename
 
 import argparse
@@ -12,7 +11,6 @@ import random
 import shutil
 
 import time
-
 
 import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError, RqlDriverError
@@ -47,9 +45,8 @@ def dbSetup():
     finally:
         connection.close()
 
-
 app = Flask(__name__)
-# set maximum allowed payload to 16 megabytes (RequestEntityTooLarge exception)
+# set maximum allowed payload to 16 megabytes
 #app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_object(__name__)
@@ -75,7 +72,7 @@ def teardown_request(exception):
         pass
 
 """
-### 
+###
 """
 @app.errorhandler(404)
 def not_found(error=None):
@@ -88,7 +85,7 @@ def not_found(error=None):
     return resp
 
 """
-### 
+###
 """
 @app.errorhandler(401)
 def not_authorized(error=None):
@@ -133,7 +130,7 @@ def select():
 """
 @app.route("/render")
 def render():
-    return render_template('explore.html')  
+    return render_template('explore.html')
 
 """
 ###
@@ -144,41 +141,51 @@ def explore():
         abort(401)
     if not session.get('email'):
         abort(401)
-        
+
     session_email = session.get('email')
-    
+
     if request.method == 'POST':
         file = request.files['file']
         if file and allowed_file(file.filename):
             layer_name, layer_extension = os.path.splitext(file.filename)
-            
+
             time_stamp = time.time()
-            inserted_asset = r.table('assets').insert({'time_stamp': time_stamp, 'type': layer_extension, 'resolutions': "", 'shared': 'false', 'user_id': ''}).run(g.rdb_conn)
-            inserted_layer = r.table('layers').insert({'asset_id': inserted_asset['generated_keys'][0], 'name': layer_name, 'type': layer_extension, 'time_stamp': time_stamp}).run(g.rdb_conn)
-            
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], inserted_layer['generated_keys'][0] + layer_extension))
-            
-            src_filename = os.path.join(app.config['UPLOAD_FOLDER'], inserted_layer['generated_keys'][0] + layer_extension)
-            dst_filename = os.path.join(app.config['UPLOAD_FOLDER'], inserted_asset['generated_keys'][0] + layer_extension)
+            asset = r.table('assets').insert({'time_stamp': time_stamp,\
+                                                       'type': layer_extension,\
+                                                       'resolutions': "",\
+                                                       'shared': 'false',\
+                                                       'user_id': ''\
+                                                       }).run(g.rdb_conn)
+            asset_id = asset['generated_keys'][0]
+            layer = r.table('layers').insert({'asset_id': asset_id,\
+                                                       'name': layer_name,\
+                                                       'type': layer_extension,\
+                                                       'time_stamp': time_stamp\
+                                                       }).run(g.rdb_conn)
+            layer_id = layer['generated_keys'][0]
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'],\
+                                   layer_id + layer_extension))
 
-            shutil.copy(src_filename, dst_filename)
+            src = os.path.join(app.config['UPLOAD_FOLDER'], layer_id + layer_extension)
+            dst = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + layer_extension)
+
+            shutil.copy(src, dst)
     return render_template('explore.html', email=session_email)
-
 
 """
 ###
 """
 @app.route("/layers", methods=['POST'])
-def addLayer():
+def add_layer():
     file = request.files['file']
     asset_id = request.form['asset_id']
-    
+
     if file and asset_id and allowed_file(file.filename):
         time_stamp = time.time()
         layer_name, layer_extension = os.path.splitext(file.filename)
-        inserted_layer = r.table('layers').insert({'name': layer_name, 'type': layer_extension, 'asset_id': asset_id, 'time_stamp': time_stamp}).run(g.rdb_conn)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], inserted_layer['generated_keys'][0] + layer_extension))    
-        
+        layer = r.table('layers').insert({'name': layer_name, 'type': layer_extension, 'asset_id': asset_id, 'time_stamp': time_stamp}).run(g.rdb_conn)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], layer['generated_keys'][0] + layer_extension))
+
         # update the layers of the asset by appending the new layer
         asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
         # Return updated asset as request response
@@ -189,15 +196,15 @@ def addLayer():
 ### Get asset
 """
 @app.route("/edit/<string:asset_id>")
-def editAsset(asset_id):
+def edit_asset(asset_id):
     return render_template('explore.html')
 
 """
-### 
+###
 """
 @app.route("/assets/<string:asset_id>", methods=['POST'])
 def patch_asset(asset_id):
-    
+
     if 'composed_image' in request.json:
         # Get only the encoded data
         _, b64data = request.json['composed_image'].split(',')
@@ -210,15 +217,15 @@ def patch_asset(asset_id):
         # Insert a timestamp in the asset (meaning something changed)
         time_stamp = time.time()
         asset = r.table('assets').get(asset_id).update({'time_stamp': time_stamp}).run(g.rdb_conn)
-        
+
         # Return updated asset as request response
         return jsonify(asset)
-    
+
     if 'image_resolution' in request.json:
         data_url = request.json['image_resolution']
         display_w = str(request.json['display_width'])
         display_h = str(request.json['display_height'])
-        
+
         file_name = asset_id + "_" + display_w + "x" + display_h
         path_to_file = os.path.join(app.config['UPLOAD_FOLDER'], file_name + ".png")
 
@@ -233,10 +240,10 @@ def patch_asset(asset_id):
         # Insert a timestamp in the asset (meaning something changed)
         timestamp = time.time()
         asset = r.table('assets').get(asset_id).update({'time_stamp': timestamp, 'resolutions': file_name}).run(g.rdb_conn)
-        
+
         # Return updated asset as request response
         return jsonify(asset)
-    
+
 """
 #### Asset in Select Mode
 """
@@ -289,7 +296,7 @@ def delete_layer(layer_id):
         asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
         # return deleted_layer
         return json.dumps(deleted_layer)
-    
+
     return "error"
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -299,7 +306,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         user = r.table('users').get(email).run(g.rdb_conn)
-        
+
         if json.dumps(user) == 'null':
             flash('wrong email!')
         else:
@@ -308,8 +315,8 @@ def login():
                 session['email'] = email
                 return redirect(url_for('explore'))
             else:
-                flash("wrong password")   
-    
+                flash("wrong password")
+
     return render_template('explore.html', error=error)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -319,13 +326,13 @@ def register():
         email = request.form['email']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
-        
+
         if password != confirm_password:
             flash("Passwords do not match!")
             return render_template('index.html', error=error)
-        
+
         user = r.table('users').get(email).run(g.rdb_conn)
-        
+
         if json.dumps(user) == 'null':
             inserted = r.table('users').insert({'email': email, 'password': password}).run(g.rdb_conn)
             session['logged_in'] = True
@@ -334,7 +341,7 @@ def register():
             return redirect(url_for('explore'))
         else:
             flash("Email already exists!")
-            
+
     return render_template('explore.html', error=error)
 
 @app.route('/logout')
@@ -342,6 +349,31 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('login'))
+
+
+@app.route('/signin', methods=['POST'])
+def sign_in():
+    if 'email' in request.json and 'password' in request.json:
+        email = request.json['email']
+        password = request.json['password']
+
+        user = r.table('users').get(email).run(g.rdb_conn)
+        if json.dumps(user) == 'null':
+            return "Wrong email!"
+        else:
+            if user['password'] == password:
+                session['logged_in'] = True
+                session['email'] = email
+                return "Success"
+            else:
+                return "Wrong password!"
+    else:
+        return "No email or password!"
+
+@app.route('/signout', methods=['GET'])
+def sign_out():
+    session.pop('logged_in', None)
+    return "Success"
 
 """
 ### Retrieve a single layer
@@ -364,7 +396,7 @@ def get_all_layers():
 """
 @app.route("/assets", methods=['GET'])
 def get_assets():
-    selection = list(r.table('assets').run(g.rdb_conn))
+    selection = list(r.table('assets').order_by(r.desc('time_stamp')).run(g.rdb_conn))
     return json.dumps(selection)
 
 """
@@ -421,6 +453,9 @@ def get_users():
     selection = list(r.table('users').run(g.rdb_conn))
     return json.dumps(selection)
 
+"""
+###
+"""
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run New-Responsive-Image-Format app')
     parser.add_argument('--setup', dest='run_setup', action='store_true')

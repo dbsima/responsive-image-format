@@ -1,5 +1,5 @@
 New Responsive Image Format
-==================
+===========================
 
 Requirements
 ------------

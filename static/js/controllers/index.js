@@ -55,24 +55,25 @@ define(['app',
         return {
             initialize: function (options) {
                 this.options = options;
-                //this.user_model = new UserModel();
+                this.userModel = new UserModel();
             },
-            
+
             index: function () {
                 app.header.show(new IndexHeaderView(app.options));
                 app.footer.show(new Footer(app.options));
-                
+
             },
-            
+
             register: function () {
                 app.body.show(new RegisterView({
-                    model: this.user_model
+                    model: this.userModel
                 }));
-                
+
                 app.footer.show(new Footer(app.options));
             },
-            
+
             login: function () {
+                var user_model = new UserModel();
                 app.body.show(new LoginView({
                     model: this.user_model
                 }));
@@ -81,7 +82,7 @@ define(['app',
 
             listFiles: function () {
                 var user_model = new UserModel();
-                
+
                 app.header.show(new Header({
                     model: user_model,
                     tab: "explore"
@@ -112,10 +113,10 @@ define(['app',
                     model: user_model,
                     tab: "edit"
                 }));
-                
+
                 var layerModel = new LayerModel();
                 this.model = new AssetModel({path: path});
-                
+
                 var self = this;
                 this.model.fetch({
                     success: function (asset) {
@@ -134,22 +135,22 @@ define(['app',
 
                 //app.footer.show(new Footer(app.options));
             },
-            
+
             selectDevice: function (path) {
                 var user_model = new UserModel();
                 app.header.show(new Header({
                     model: user_model,
                     tab: "select"
                 }));
-                
+
                 this.model = new AssetModel({path: path});
-                
+
                 var self = this;
                 this.model.fetch({
                     success: function (asset) {
                         app.body.show(new SelectDeviceView({
                             devices: new DevicesView({
-                                
+
                             }),
                             device: new DeviceView({
                                 model: self.model,
@@ -160,22 +161,22 @@ define(['app',
                 });
                 //app.footer.show(new Footer(app.options));
             },
-            
+
             renderAsset: function (path) {
                 var user_model = new UserModel();
                 app.header.show(new Header({
                     model: user_model,
                     tab: "render"
                 }));
-                
+
                 this.model = new AssetModel({path: path});
-                
+
                 var self = this;
                 this.model.fetch({
                     success: function (asset) {
                         app.body.show(new RenderAssetView({
                             devices: new DevicesView({
-                                
+
                             }),
                             display: new DisplayView({
                                 model: self.model,
