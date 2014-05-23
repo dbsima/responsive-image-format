@@ -10,15 +10,15 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             console.log("initialize");
             this.listenTo(App.vent, "initStage", this.onInitStage);
             this.listenTo(App.vent, "updateStage", this.onUpdateStage);
-            
+
             this.listenTo(App.vent, "afterLayerDeleted", this.onLayerDeleted);
-            
+
             var i, asset = this.model.toJSON();
             this.assetID = asset.id;
-            
+
             this.stage = "";
             this.sources = {};
-            
+
             console.log("here0");
             console.log(asset);
             var self = this;
@@ -70,15 +70,15 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             'click #btnSelect' : 'selectDisplay',
             'click #btnAddLayer' : 'addLayer'
         },
-        
+
         onLayerDeleted: function (options) {
             console.log("layer deleted");
         },
-        
+
         onUpdateStage: function (options) {
             this.stage = options.stage;
         },
-        
+
         postStage: function (assetID, dataUrl) {
             $.ajax({
                 async: false,
@@ -89,7 +89,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 success: function (response) {
                     console.log("success POST on /assets/:assetID");
                     //console.log(response);
-                    
+
                 },
                 error: function (response) {
                     console.log("error POST on /assets/:assetID");
@@ -97,11 +97,11 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 }
             });
         },
-        
+
         onInitStage: function (options) {
             this.stage = options.stage;
             var self = this;
-            
+
             self.stage.toDataURL({
                 callback: function (dataUrl) {
                     var asset_id = document.getElementById('btnApply').getAttribute('data-id');
@@ -109,10 +109,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 }
             });
         },
-        
+
         applyOperation: function () {
             console.log("apply");
-            
+
             var self = this;
             self.stage.toDataURL({
                 callback: function (dataUrl) {
@@ -121,11 +121,11 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 }
             });
         },
-        
+
         selectDisplay: function () {
             //console.log("select");
         },
-        
+
         addLayer: function () {
             console.log("addLayer");
             // Getting the properties of file from file field
@@ -136,7 +136,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             form_data.append("file", file_data);
             // Appending parameter named asset_id with current asset_id
             var assetID = document.getElementById('btnAddLayer').getAttribute('data-id');
-            
+
             if (file_data) {
                 //console.log("asdadsa"+ assetID);
                 form_data.append("asset_id", assetID);
@@ -173,115 +173,115 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 console.log("no file uploaded");
             }
         },
-        
+
         onRender : function () {
             //console.log(this.sources);
             // function for updating the stage when an anchor is dragged
             function update(activeAnchor) {
                 var group = activeAnchor.getParent(),
-                    
-                    topLeft = group.find('.topLeft')[0],
-                    topCenter = group.find('.topCenter')[0],
-                    topRight = group.find('.topRight')[0],
-                    middleRight = group.find('.middleRight')[0],
-                    bottomRight = group.find('.bottomRight')[0],
-                    bottomCenter = group.find('.bottomCenter')[0],
-                    bottomLeft = group.find('.bottomLeft')[0],
-                    middleLeft = group.find('.middleLeft')[0],
-                    rotate = group.find('.rotate')[0],
+
+                    handleTL = group.find('.handleTL')[0],
+                    handleTC = group.find('.handleTC')[0],
+                    handleTR = group.find('.handleTR')[0],
+                    handleMR = group.find('.handleMR')[0],
+                    handleBR = group.find('.handleBR')[0],
+                    handleBC = group.find('.handleBC')[0],
+                    handleBL = group.find('.handleBL')[0],
+                    handleML = group.find('.handleML')[0],
+                    handleR = group.find('.handleR')[0],
                     image = group.find('.image')[0],
-                    
+
                     anchorX = activeAnchor.x(),
                     anchorY = activeAnchor.y();
-                
+
                 // update anchor positions
                 switch (activeAnchor.name()) {
-                case 'topLeft':
-                    topRight.y(anchorY);
-                    topCenter.y(anchorY);
-                    topCenter.x((topLeft.x() + topRight.x()) / 2);
-                    bottomLeft.x(anchorX);
-                    middleLeft.x(anchorX);
-                    middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
-                    middleRight.y((topRight.y() + bottomRight.y()) / 2);
-                    bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
-                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2); 
+                case 'handleTL':
+                    handleTR.y(anchorY);
+                    handleTC.y(anchorY);
+                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
+                    handleBL.x(anchorX);
+                    handleML.x(anchorX);
+                    handleML.y((handleTL.y() + handleBL.y()) / 2);
+                    handleMR.y((handleTR.y() + handleBR.y()) / 2);
+                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
+                    handleR.x((handleBL.x() + handleBR.x()) / 2);
                     break;
-                        
-                case 'topCenter':
-                    topRight.y(anchorY);
-                    topLeft.y(anchorY);
-                    middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
-                    middleRight.y((topRight.y() + bottomRight.y()) / 2);
+
+                case 'handleTC':
+                    handleTR.y(anchorY);
+                    handleTL.y(anchorY);
+                    handleML.y((handleTL.y() + handleBL.y()) / 2);
+                    handleMR.y((handleTR.y() + handleBR.y()) / 2);
                     break;
-                        
-                case 'topRight':
-                    topLeft.y(anchorY);
-                    topCenter.y(anchorY);
-                    topCenter.x((topLeft.x() + topRight.x()) / 2);
-                    bottomRight.x(anchorX);
-                    middleRight.x(anchorX);
-                    middleRight.y((topLeft.y() + bottomRight.y()) / 2);
-                    bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
-                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2);    
-                    middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
+
+                case 'handleTR':
+                    handleTL.y(anchorY);
+                    handleTC.y(anchorY);
+                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
+                    handleBR.x(anchorX);
+                    handleMR.x(anchorX);
+                    handleMR.y((handleTL.y() + handleBR.y()) / 2);
+                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
+                    handleR.x((handleBL.x() + handleBR.x()) / 2);
+                    handleML.y((handleTL.y() + handleBL.y()) / 2);
                     break;
-                        
-                case 'middleRight':
-                    topRight.x(anchorX);
-                    bottomRight.x(anchorX);
-                    topCenter.x((topLeft.x() + topRight.x()) / 2);
-                    bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
-                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2);    
+
+                case 'handleMR':
+                    handleTR.x(anchorX);
+                    handleBR.x(anchorX);
+                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
+                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
+                    handleR.x((handleBL.x() + handleBR.x()) / 2);
                     break;
-                        
-                case 'bottomRight':
-                    topCenter.x((topLeft.x() + topRight.x()) / 2);
-                    bottomLeft.y(anchorY);
-                    middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
-                    bottomCenter.y(anchorY);
-                    bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
-                    rotate.y(anchorY + 50);
-                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2); 
-                    topRight.x(anchorX);
-                    middleRight.x(anchorX);
-                    middleRight.y((topRight.y() + bottomRight.y()) / 2);
+
+                case 'handleBR':
+                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
+                    handleBL.y(anchorY);
+                    handleML.y((handleTL.y() + handleBL.y()) / 2);
+                    handleBC.y(anchorY);
+                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
+                    handleR.y(anchorY + 50);
+                    handleR.x((handleBL.x() + handleBR.x()) / 2);
+                    handleTR.x(anchorX);
+                    handleMR.x(anchorX);
+                    handleMR.y((handleTR.y() + handleBR.y()) / 2);
                     break;
-                        
-                case 'bottomCenter':
-                    bottomRight.y(anchorY);
-                    bottomLeft.y(anchorY);
-                    middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
-                    middleRight.y((topRight.y() + bottomRight.y()) / 2);
+
+                case 'handleBC':
+                    handleBR.y(anchorY);
+                    handleBL.y(anchorY);
+                    handleML.y((handleTL.y() + handleBL.y()) / 2);
+                    handleMR.y((handleTR.y() + handleBR.y()) / 2);
                     break;
-                        
-                case 'bottomLeft':
-                    bottomRight.y(anchorY);
-                    topLeft.x(anchorX);
-                    middleLeft.x(anchorX);
-                    middleLeft.y((topLeft.y() + bottomLeft.y()) / 2);
-                    bottomCenter.y(anchorY);
-                    bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
-                    rotate.y(anchorY + 50);    
-                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2);    
-                    middleRight.y((topRight.y() + bottomRight.y()) / 2);
-                    topCenter.x((topLeft.x() + topRight.x()) / 2);
+
+                case 'handleBL':
+                    handleBR.y(anchorY);
+                    handleTL.x(anchorX);
+                    handleML.x(anchorX);
+                    handleML.y((handleTL.y() + handleBL.y()) / 2);
+                    handleBC.y(anchorY);
+                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
+                    handleR.y(anchorY + 50);
+                    handleR.x((handleBL.x() + handleBR.x()) / 2);
+                    handleMR.y((handleTR.y() + handleBR.y()) / 2);
+                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
                     break;
-                        
-                case 'middleLeft':
-                    topLeft.x(anchorX);
-                    bottomLeft.x(anchorX);
-                    topCenter.x((topLeft.x() + topRight.x()) / 2);
-                    bottomCenter.x((bottomLeft.x() + bottomRight.x()) / 2);
-                    rotate.x((bottomLeft.x() + bottomRight.x()) / 2);    
+
+                case 'handleML':
+                    handleTL.x(anchorX);
+                    handleBL.x(anchorX);
+                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
+                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
+                    handleR.x((handleBL.x() + handleBR.x()) / 2);
                     break;
                 }
                 // update the position of the image
-                image.position({x: topLeft.x(), y: topLeft.y()});
+                image.position({x: handleTL.x(), y: handleTL.y()});
 
                 // compute the new width and height of the image
-                var width = topRight.x() - topLeft.x(),
-                    height = bottomLeft.y() - topLeft.y();
+                var width = handleTR.x() - handleTL.x(),
+                    height = handleBL.y() - handleTL.y();
 
                 // update the weight and height of the image
                 if (width && height) {
@@ -292,7 +292,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         "current_height": height,
                         "current_layer": image.name,
                         "current_asset" : document.getElementById('btnAddLayer').getAttribute('data-id')
-                        
                     });
                 }
             }
@@ -316,52 +315,52 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     update(this);
                     layer.draw();
                 });
-                
+
                 anchor.on('mousedown touchstart', function () {
                     group.setDraggable(false);
                     this.moveToTop();
                 });
-                
+
                 anchor.on('dragend', function () {
                     group.setDraggable(true);
                     layer.draw();
                 });
-                
+
                 // add hover styling
                 anchor.on('mouseover', function () {
                     var layer = this.getLayer();
-                    
-                    if (anchor.name() === 'topCenter' || anchor.name() === 'bottomCenter') {
+
+                    if (anchor.name() === 'handleTC' || anchor.name() === 'handleBC') {
                         document.body.style.cursor = 'ns-resize';
-                    } else if (anchor.name() === 'middleLeft' || anchor.name() === 'middleRight') {
+                    } else if (anchor.name() === 'handleML' || anchor.name() === 'handleMR') {
                         document.body.style.cursor = 'ew-resize';
-                    } else if (anchor.name() === 'topLeft' || anchor.name() === 'bottomRight') {
+                    } else if (anchor.name() === 'handleTL' || anchor.name() === 'handleBR') {
                         document.body.style.cursor = 'nwse-resize';
-                    } else if (anchor.name() === 'topRight' || anchor.name() === 'bottomLeft') {
+                    } else if (anchor.name() === 'handleTR' || anchor.name() === 'handleBL') {
                         document.body.style.cursor = 'nesw-resize';
                     }
                     this.setStrokeWidth(4);
                     layer.draw();
                 });
-                
+
                 anchor.on('mouseout', function () {
                     var layer = this.getLayer();
                     document.body.style.cursor = 'default';
                     this.strokeWidth(2);
                     layer.draw();
                 });
-                
-                // set anchors topCenter and bottomCenter to move only on vertical
-                if (anchor.name() === 'topCenter' || anchor.name() === 'bottomCenter') {
+
+                // set anchors handleTC and handleBC to move only on vertical
+                if (anchor.name() === 'handleTC' || anchor.name() === 'handleBC') {
                     anchor.dragBoundFunc(function (pos) {
                         return {
                             x: this.getAbsolutePosition().x,
                             y: pos.y
                         }
                     });
-                }         
-                // set anchors middleLeft and middleRight to move only on horizontal
-                if (anchor.name() === 'middleLeft' || anchor.name() === 'middleRight') {
+                }
+                // set anchors handleML and handleMR to move only on horizontal
+                if (anchor.name() === 'handleML' || anchor.name() === 'handleMR') {
                     anchor.dragBoundFunc(function (pos) {
                         return {
                             x: pos.x,
@@ -372,26 +371,26 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 group.add(anchor);
                 //anchor.hide();
             }
-            // 
+            //
             function loadImages(sources, callback) {
                 console.log("here3")
                 console.log(sources);
                 var images = {},
                     loadedImages = 0,
                     numImages = 0;
-                
+
                 // count the number of images to load
                 _.each(sources, function (val, key) {
                     if (val) {
                         numImages = numImages + 1;
                     }
                 });
-            
+
                 _.each(sources, function (val, key) {
                     if (val) {
                         //console.log(val.path + " - " + val.id);
                         var id = key;
-                        
+
                         images[id] = new Image();
                         images[id].onload = function () {
                             // initStage only after all images are loaded
@@ -406,9 +405,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     }
                 });
             }
-            // 
+            //
             function initStage(images) {
-                
+
                 var stage_width, stage_height;
                 if (images[0].width < $('#container').width() && images[0].height < $('#container').height()) {
                     stage_width = images[0].width;
@@ -417,21 +416,21 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     stage_width = $('#container').width();
                     stage_height = $('#container').height();
                 }
-                
+
                 //console.log("here" + stage_width + "-" + $('#container').height());
-                
+
                 var stage = new Kinetic.Stage({
                     container: 'container',
                     width: images[0].width,
                     height: images[0].height
                 });
-                
+
                 // send initial width and size
                 App.vent.trigger("showInitialLayerSize", {
                     "initial_width": stage.getWidth(),
                     "initial_height" : stage.getHeight()
                 });
-                
+
                 var layer = new Kinetic.Layer(),
                     bg = new Kinetic.Rect({
                         width: stage.getWidth(),
@@ -441,7 +440,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         y: 0
                     });
                 layer.add(bg);
-                
+
                 layer.on('mousedown', function (e) {
                     var node = e.target;
                     select(node);
@@ -457,7 +456,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         // update W & H in Operations -> Resize
                         group.on('click', function () {
                             var image = group.find('.image')[0];
-                            
+
                             //console.log();
                             App.vent.trigger("showCurrentLayerSize", {
                                 "current_width": image.getWidth(),
@@ -466,7 +465,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 "current_asset": document.getElementById('btnAddLayer').getAttribute('data-id')
                             });
                         });
-                        
+
                         layer.add(group);
                         //console.log(images[key].name);
                         var img = new Kinetic.Image({
@@ -476,23 +475,23 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             name: 'image',
                             id: images[key].name
                         });
-                        
+
                         group.add(img);
-                        addAnchor(group, 0, 0, 'topLeft');
-                        addAnchor(group, img.getWidth() / 2, 0, 'topCenter');
-                        addAnchor(group, img.getWidth(), 0, 'topRight');
-                        addAnchor(group, img.getWidth(), img.getHeight() / 2, 'middleRight');
-                        addAnchor(group, img.getWidth(), img.getHeight(), 'bottomRight');
-                        addAnchor(group, img.getWidth() / 2, img.getHeight(), 'bottomCenter');
-                        addAnchor(group, 0, img.getHeight(), 'bottomLeft');
-                        addAnchor(group, 0, img.getHeight() / 2, 'middleLeft');
-                        
-                        addAnchor(group, img.getWidth() / 2, img.getHeight() + 50, 'rotate');
-                        
+                        addAnchor(group, 0, 0, 'handleTL');
+                        addAnchor(group, img.getWidth() / 2, 0, 'handleTC');
+                        addAnchor(group, img.getWidth(), 0, 'handleTR');
+                        addAnchor(group, img.getWidth(), img.getHeight() / 2, 'handleMR');
+                        addAnchor(group, img.getWidth(), img.getHeight(), 'handleBR');
+                        addAnchor(group, img.getWidth() / 2, img.getHeight(), 'handleBC');
+                        addAnchor(group, 0, img.getHeight(), 'handleBL');
+                        addAnchor(group, 0, img.getHeight() / 2, 'handleML');
+
+                        addAnchor(group, img.getWidth() / 2, img.getHeight() + 50, 'handleR');
+
                         group.on('dragstart', function () {
                             this.moveToTop();
                         });
-                        
+
                         group.on('dragend', function () {
                             App.vent.trigger("updateStage", {stage: stage});
                             console.log(group.getPosition());
@@ -500,25 +499,25 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     }
                     stage.add(layer);
                 });
-                
+
                 stage.add(layer);
                 App.vent.trigger("initStage", {stage: stage});
-                
+
                 function select(node) {
                     deselect();
-                    
+
                     if (node.parent.nodeType = 'Kinetic.Group') {
                         var i, children = node.parent.children;
                         for (i = 1; i < children.length; i = i + 1) {
-                            if (children[i].getName() === 'topLeft' ||
-                                    children[i].getName() === 'topCenter' ||
-                                    children[i].getName() === 'topRight' ||
-                                    children[i].getName() === 'middleRight' ||
-                                    children[i].getName() === 'bottomRight' ||
-                                    children[i].getName() === 'bottomCenter' ||
-                                    children[i].getName() === 'bottomLeft' ||
-                                    children[i].getName() === 'middleLeft' ||
-                                    children[i].getName() === 'rotate') {
+                            if (children[i].getName() === 'handleTL' ||
+                                    children[i].getName() === 'handleTC' ||
+                                    children[i].getName() === 'handleTR' ||
+                                    children[i].getName() === 'handleMR' ||
+                                    children[i].getName() === 'handleBR' ||
+                                    children[i].getName() === 'handleBC' ||
+                                    children[i].getName() === 'handleBL' ||
+                                    children[i].getName() === 'handleML' ||
+                                    children[i].getName() === 'handleR') {
                                 children[i].show();
                             }
                         }
@@ -533,15 +532,15 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                         if (grandChildren) {
                             for (j = 1; j < grandChildren.length; j = j + 1) {
-                                if (grandChildren[j].getName() === 'topLeft' ||
-                                        grandChildren[j].getName() === 'topCenter' ||
-                                        grandChildren[j].getName() === 'topRight' ||
-                                        grandChildren[j].getName() === 'middleRight' ||
-                                        grandChildren[j].getName() === 'bottomRight' ||
-                                        grandChildren[j].getName() === 'bottomCenter' ||
-                                        grandChildren[j].getName() === 'bottomLeft' ||
-                                        grandChildren[j].getName() === 'middleLeft' ||
-                                        grandChildren[j].getName() === 'rotate') {
+                                if (grandChildren[j].getName() === 'handleTL' ||
+                                        grandChildren[j].getName() === 'handleTC' ||
+                                        grandChildren[j].getName() === 'handleTR' ||
+                                        grandChildren[j].getName() === 'handleMR' ||
+                                        grandChildren[j].getName() === 'handleBR' ||
+                                        grandChildren[j].getName() === 'handleBC' ||
+                                        grandChildren[j].getName() === 'handleBL' ||
+                                        grandChildren[j].getName() === 'handleML' ||
+                                        grandChildren[j].getName() === 'handleR') {
                                     grandChildren[j].hide();
                                     layer.draw();
                                 }

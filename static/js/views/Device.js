@@ -61,7 +61,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
             self.stage.toDataURL({
                 callback: function (dataUrl) {
-
                     var assetID = document.getElementById('btnSave').getAttribute('data-id');
                     console.log(assetID);
 
