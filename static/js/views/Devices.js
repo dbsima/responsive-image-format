@@ -6,25 +6,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap'], functi
     return Marionette.Layout.extend({
         template : templates.devices,
 
-        events : {
-        },
-
-        regions : {},
-
-        ui : {},
-
         initialize: function () {
             //this.listenTo(this.model, "change", this.render);
             this.listenTo(App.vent, "showDevices", this.onShowDevices);
             console.log("here2");
-        },
-        
-        onShowDevices : function () {
-            
-        },
-
-        onRender : function () {
-            
         }
     });
 });

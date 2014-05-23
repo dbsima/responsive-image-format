@@ -15,10 +15,6 @@ define(['marionette', 'vent', 'templates'],
                 image       : '#image'
             },
 
-            ui : {},
-
-            events : {},
-
             initialize : function (options) {
                 this.options = options;
                 //console.log("here in editFileView I have " + this.options);
@@ -27,10 +23,6 @@ define(['marionette', 'vent', 'templates'],
             onRender : function () {
                 this.operations.show(this.options.operations);
                 this.image.show(this.options.image);
-            },
-            
-            onShow: function () {
-                //this.filesCollection.show(this.options);
             }
         });
     });

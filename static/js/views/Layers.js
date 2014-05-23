@@ -5,7 +5,6 @@ define(['marionette', 'vent', 'templates'], function (Marionette, vent, template
 
     return Marionette.Layout.extend({
         template : templates.layers,
-        
         tagName: 'div'
     });
 });

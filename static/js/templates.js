@@ -7,7 +7,6 @@ define(function (require) {
         login       : require('tpl!templates/login.tmpl'),
         header      : require('tpl!templates/header.tmpl'),
         body        : require('tpl!templates/body.tmpl'),
-        sidebar     : require('tpl!templates/sidebar.tmpl'),
         footer      : require('tpl!templates/footer.tmpl'),
         uploadFile  : require('tpl!templates/uploadFile.tmpl'),
         searchPanel  : require('tpl!templates/searchPanel.tmpl'),

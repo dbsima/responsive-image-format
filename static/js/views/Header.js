@@ -4,16 +4,12 @@ define(['marionette', 'templates', 'models/User'],
 
         return Marionette.ItemView.extend({
             template : templates.header,
-            
+
             initialize: function (options) {
-                
                 options = options || {};
                 if (options.tab && options.model) {
                     options.model.set('tab', options.tab);
                 }
-
-            },
-            updateTab: function (option) {
             }
         });
     });

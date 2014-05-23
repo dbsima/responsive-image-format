@@ -5,9 +5,6 @@ define(['marionette', 'vent', 'templates', 'views/Asset'], function (Marionette,
 
     return Marionette.CollectionView.extend({
         itemView: AssetView,
-        tagName: 'ul',
-        initialize: function (options) {
-            //console.log("collection view");
-        }
+        tagName: 'ul'
     });
 });

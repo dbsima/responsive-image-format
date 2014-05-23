@@ -36,9 +36,9 @@ def dbSetup():
     try:
         r.db_create(MY_DB).run(connection)
         r.db(MY_DB).table_create('users', primary_key='email').run(connection)
-        r.db(MY_DB).table_create('files').run(connection)
         r.db(MY_DB).table_create('assets').run(connection)
         r.db(MY_DB).table_create('layers').run(connection)
+        r.db(MY_DB).table_create('versions').run(connection)
         print 'Database setup completed. Now run the app without --setup.'
     except RqlRuntimeError:
         print 'App database already exists. Run the app without --setup.'
@@ -151,17 +151,26 @@ def explore():
 
             time_stamp = time.time()
             asset = r.table('assets').insert({'time_stamp': time_stamp,\
-                                                       'type': layer_extension,\
-                                                       'resolutions': "",\
-                                                       'shared': 'false',\
-                                                       'user_id': ''\
-                                                       }).run(g.rdb_conn)
+                                               'type': layer_extension,\
+                                               'resolutions': "",\
+                                               'shared': 'false',\
+                                               'user_id': ''\
+                                               }).run(g.rdb_conn)
             asset_id = asset['generated_keys'][0]
+            # default version is the original image
+            version = r.table('versions').insert({'asset_id': asset_id,\
+                                                   'name': asset_id,\
+                                                   'type': layer_extension,\
+                                                   'width': "",\
+                                                   'height': "",\
+                                                   'ppi': ""\
+                                                   }).run(g.rdb_conn)
+            # first layer is the original image
             layer = r.table('layers').insert({'asset_id': asset_id,\
-                                                       'name': layer_name,\
-                                                       'type': layer_extension,\
-                                                       'time_stamp': time_stamp\
-                                                       }).run(g.rdb_conn)
+                                               'name': layer_name,\
+                                               'type': layer_extension,\
+                                               'time_stamp': time_stamp\
+                                               }).run(g.rdb_conn)
             layer_id = layer['generated_keys'][0]
             file.save(os.path.join(app.config['UPLOAD_FOLDER'],\
                                    layer_id + layer_extension))
@@ -223,10 +232,11 @@ def patch_asset(asset_id):
 
     if 'image_resolution' in request.json:
         data_url = request.json['image_resolution']
-        display_w = str(request.json['display_width'])
-        display_h = str(request.json['display_height'])
+        version_w = str(request.json['display_width'])
+        version_h = str(request.json['display_height'])
 
-        file_name = asset_id + "_" + display_w + "x" + display_h
+        #
+        file_name = asset_id + "_" + version_w + "x" + version_h
         path_to_file = os.path.join(app.config['UPLOAD_FOLDER'], file_name + ".png")
 
         # Get only the encoded data
@@ -239,7 +249,17 @@ def patch_asset(asset_id):
 
         # Insert a timestamp in the asset (meaning something changed)
         timestamp = time.time()
-        asset = r.table('assets').get(asset_id).update({'time_stamp': timestamp, 'resolutions': file_name}).run(g.rdb_conn)
+        asset = r.table('assets').get(asset_id).update({'time_stamp': timestamp,\
+                                                        'resolutions': file_name
+                                                        }).run(g.rdb_conn)
+
+        version = r.table('versions').insert({'asset_id': asset_id,\
+                                               'name': file_name,\
+                                               'type': '.png',\
+                                               'width': version_w,\
+                                               'height': version_h,\
+                                               'ppi': ""\
+                                               }).run(g.rdb_conn)
 
         # Return updated asset as request response
         return jsonify(asset)
@@ -392,6 +412,14 @@ def get_all_layers():
     return json.dumps(layers)
 
 """
+### Listing existing versions
+"""
+@app.route("/versions", methods=['GET'])
+def get_all_versions():
+    versions = list(r.table('versions').run(g.rdb_conn))
+    return json.dumps(versions)
+
+"""
 ### Listing existing assets
 """
 @app.route("/assets", methods=['GET'])
@@ -411,9 +439,17 @@ def get_asset(asset_id):
 ### Retrieving all layers of asset_id
 """
 @app.route("/layersOfAsset/<string:asset_id>", methods=['GET'])
-def get_all_layer_for_asset(asset_id):
+def get_all_layers_for_asset(asset_id):
     layers = list(r.table('layers').filter({'asset_id': asset_id}).order_by(r.asc('time_stamp')).run(g.rdb_conn))
     return json.dumps(layers)
+
+"""
+### Retrieving all versions of asset_id
+"""
+@app.route("/versionsOfAsset/<string:asset_id>", methods=['GET'])
+def get_all_versions_for_asset(asset_id):
+    versions = list(r.table('versions').filter({'asset_id': asset_id}).run(g.rdb_conn))
+    return json.dumps(versions)
 
 """
 ### Retrieving a single file

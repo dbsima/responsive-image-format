@@ -1,10 +1,8 @@
-define(['marionette','vent','templates'], 
+define(['marionette','vent','templates'],
 function (Marionette,vent,templates) {
-  "use strict";
+    "use strict";
 
-  return Marionette.Layout.extend({
-
-    template : templates.footer
-  
-  });
+    return Marionette.Layout.extend({
+        template : templates.footer
+    });
 });

@@ -5,11 +5,8 @@ define(['jquery', 'marionette', 'backbone', 'vent', 'templates'], function ($, M
 
     return Marionette.ItemView.extend({
         template : templates.asset,
-        
+
         tagName: 'li',
-        
-        initialize: function () {
-        },
 
         events : {
             'click #btnEditFile' : 'editFile',
@@ -20,11 +17,11 @@ define(['jquery', 'marionette', 'backbone', 'vent', 'templates'], function ($, M
             var asset_id = document.getElementById('btnEditFile').getAttribute('data-id');
             console.log("editFile " + asset_id);
         },
-        
+
         deleteFile: function () {
             var asset_id = document.getElementById('btnDeleteFile').getAttribute('data-id');
             console.log("deleteFile " + asset_id);
-            
+
             $.ajax({
                 async: false,
                 type: "DELETE",
@@ -39,8 +36,8 @@ define(['jquery', 'marionette', 'backbone', 'vent', 'templates'], function ($, M
                     console.log(response);
                 }
             });
-            
-            // Remove model from collection 
+
+            // Remove model from collection
             // (TODO: it's a hack; if the model has more than one collection it wont work)
             this.model.collection.remove(this.model);
         }
