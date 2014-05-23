@@ -37,6 +37,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         },
 
         postStage: function (assetID, dataUrl) {
+            console.log('post stage ------');
             $.ajax({
                 async: false,
                 type: "POST",
@@ -46,7 +47,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 success: function (response) {
                     console.log("success POST on /assets/:assetID");
                     console.log(response);
-
                 },
                 error: function (response) {
                     console.log("error POST on /assets/:assetID");
@@ -65,7 +65,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     var assetID = document.getElementById('btnSave').getAttribute('data-id');
                     console.log(assetID);
 
-                    self.postStage(assetID, dataUrl);
+                    //self.postStage(assetID, dataUrl);
                 }
             });
         },

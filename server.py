@@ -225,7 +225,8 @@ def patch_asset(asset_id):
 
         # Insert a timestamp in the asset (meaning something changed)
         time_stamp = time.time()
-        asset = r.table('assets').get(asset_id).update({'time_stamp': time_stamp}).run(g.rdb_conn)
+        asset = r.table('assets').get(asset_id).update({'time_stamp': time_stamp\
+                                                        }).run(g.rdb_conn)
 
         # Return updated asset as request response
         return jsonify(asset)
@@ -242,7 +243,7 @@ def patch_asset(asset_id):
         # Get only the encoded data
         _, b64data = data_url.split(',')
 
-        # Write data into a file named <asset_id>_<display_w>x<display_h>.png
+        # Write data into a file named <asset_id>_<display_w>x<display_h>.extension
         composed_image = open(path_to_file, "wb")
         composed_image.write(b64data.decode('base64'))
         composed_image.close()
@@ -252,7 +253,7 @@ def patch_asset(asset_id):
         asset = r.table('assets').get(asset_id).update({'time_stamp': timestamp,\
                                                         'resolutions': file_name
                                                         }).run(g.rdb_conn)
-
+        #
         version = r.table('versions').insert({'asset_id': asset_id,\
                                                'name': file_name,\
                                                'type': '.png',\
