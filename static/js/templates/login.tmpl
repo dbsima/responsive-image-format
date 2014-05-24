@@ -1,14 +1,21 @@
-<form method="post">
-    <input type="email" name="email" placeholder="Email"><br>
-    <input type="password" name="password" placeholder="Password"><br>
-    <div class="checkbox">
-        <label>
-            <input name="remember" type="checkbox" value="Remember Me" checked> Remember Me
-        </label>
-    </div>
-    <input type="submit" value="Sign in">
-    <a href="/register">
-        "Don't have an account?"
-        <span>Sign up </span>
-    </a>
-</form>
+<div class="container center_div">
+    <form method="post">
+        <div class="input-group input-group-lg">
+            <input class="form-control" type="email" name="email" placeholder="Email">
+        </div>
+        <br>
+        <div class="input-group input-group-lg">
+            <input class="form-control" type="password" name="password" placeholder="Password">
+        </div>
+        <div class="checkbox">
+            <label>
+                <input name="remember" type="checkbox" value="Remember Me" checked> Remember Me
+            </label>
+        </div>
+        <input class="btn btn-primary btn-sm" type="submit" value="Sign in">
+        <a href="/register">
+            Don't have an account?
+            <span>Sign up </span>
+        </a>
+    </form>
+</div>
