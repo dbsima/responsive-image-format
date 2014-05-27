@@ -22,6 +22,7 @@ ul {
     position: relative;
     overflow: hidden;
 }
+
 .btn-file input[type=file] {
     position: absolute;
     top: 0;
@@ -36,32 +37,32 @@ ul {
     cursor: inherit;
     display: block;
 }
+
 input[readonly] {
     background-color: white !important;
     cursor: text !important;
 }
 
-.main-text
-{
+.main-text {
     position: absolute;
     top: 50px;
     width: 96.66666666666666%;
     color: #FFF;
 }
-.btn-min-block
-{
+
+.btn-min-block {
     min-width: 170px;
     line-height: 26px;
 }
-.btn-clear
-{
+
+.btn-clear {
     color: #FFF;
     background-color: transparent;
     border-color: #FFF;
     margin-right: 15px;
 }
-.btn-clear:hover
-{
+
+.btn-clear:hover {
     color: #000;
     background-color: #FFF;
 }

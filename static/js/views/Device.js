@@ -88,10 +88,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             // Let us extract the value from the textbox now
         },
 
-        regions : {},
-
-        ui : {},
-
         onRender : function () {
             console.log("on render in select");
             function update(activeAnchor) {

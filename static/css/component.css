@@ -83,8 +83,8 @@
 .md-device div,
 .md-device:before,
 .md-device:after {
-	-webkit-box-sizing: content-box; 
-	-moz-box-sizing: content-box; 
+	-webkit-box-sizing: content-box;
+	-moz-box-sizing: content-box;
 	box-sizing: content-box;
 }
 
@@ -417,74 +417,69 @@
 		-moz-transform: scale(0.5) translateX(-50%) translateY(10%);
 		-ms-transform: scale(0.5) translateX(-50%) translateY(10%);
 		transform: scale(0.5) translateX(-50%) translateY(10%);
-		
+
         -webkit-transform-origin: 0 0;
 		-moz-transform-origin: 0 0;
 		-ms-transform-origin: 0 0;
 		transform-origin: 0 0;
-		
+
         left: 50%;
 	}
 }
 
-
-/* Smartphones (portrait and landscape) ----------- */
-@media only screen 
-and (min-device-width : 320px) 
-and (max-device-width : 480px) {
-/* Styles */
+/*bootsnip stuff*/
+div.clear {
+    clear: both;
 }
 
-/* Smartphones (landscape) ----------- */
-@media only screen 
-and (min-width : 321px) {
-/* Styles */
+div.product-chooser {
+
 }
 
-/* Smartphones (portrait) ----------- */
-@media only screen 
-and (max-width : 320px) {
-/* Styles */
+div.product-chooser.disabled div.product-chooser-item {
+	zoom: 1;
+	filter: alpha(opacity=60);
+	opacity: 0.6;
+	cursor: default;
 }
 
-/* iPads (portrait and landscape) ----------- */
-@media only screen 
-and (min-device-width : 768px) 
-and (max-device-width : 1024px) {
-/* Styles */
+div.product-chooser div.product-chooser-item {
+	padding: 11px;
+	border-radius: 6px;
+	cursor: pointer;
+	position: relative;
+	border: 1px solid #efefef;
+	margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10x;
 }
 
-/* iPads (landscape) ----------- */
-@media only screen 
-and (min-device-width : 768px) 
-and (max-device-width : 1024px) 
-and (orientation : landscape) {
-/* Styles */
+div.product-chooser div.product-chooser-item.selected {
+	border: 4px solid #428bca;
+	background: #efefef;
+	padding: 8px;
+	filter: alpha(opacity=100);
+	opacity: 1;
 }
 
-/* iPads (portrait) ----------- */
-@media only screen 
-and (min-device-width : 768px) 
-and (max-device-width : 1024px) 
-and (orientation : portrait) {
-/* Styles */
+div.product-chooser div.product-chooser-item img {
+	padding: 0;
 }
 
-/* Desktops and laptops ----------- */
-@media only screen 
-and (min-width : 1224px) {
-/* Styles */
+div.product-chooser div.product-chooser-item span.title {
+	display: block;
+	margin: 10px 0 5px 0;
+	font-weight: bold;
+	font-size: 12px;
 }
 
-/* Large screens ----------- */
-@media only screen 
-and (min-width : 1824px) {
-/* Styles */
+div.product-chooser div.product-chooser-item span.description {
+	font-size: 12px;
 }
 
-/* iPhone 4 ----------- */
-@media
-only screen and (-webkit-min-device-pixel-ratio : 1.5),
-only screen and (min-device-pixel-ratio : 1.5) {
-/* Styles */
+div.product-chooser div.product-chooser-item input {
+	position: absolute;
+	left: 0;
+	top: 0;
+	visibility:hidden;
 }
