@@ -6,8 +6,6 @@ define(['jquery', 'marionette', 'backbone', 'vent', 'templates'], function ($, M
     return Marionette.ItemView.extend({
         template : templates.asset,
 
-        tagName: 'li',
-
         events : {
             'click #btnEditFile' : 'editFile',
             'click #btnDeleteFile' : 'deleteFile'

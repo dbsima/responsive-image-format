@@ -60,7 +60,7 @@ define(['app',
 
             index: function () {
                 app.header.show(new IndexHeaderView(app.options));
-                app.footer.show(new Footer(app.options));
+                //app.footer.show(new Footer(app.options));
 
             },
 
@@ -69,7 +69,7 @@ define(['app',
                     model: this.userModel
                 }));
 
-                app.footer.show(new Footer(app.options));
+                //app.footer.show(new Footer(app.options));
             },
 
             login: function () {
@@ -77,7 +77,7 @@ define(['app',
                 app.body.show(new LoginView({
                     model: this.user_model
                 }));
-                app.footer.show(new Footer(app.options));
+                //app.footer.show(new Footer(app.options));
             },
 
             listFiles: function () {

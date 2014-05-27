@@ -213,7 +213,6 @@ def edit_asset(asset_id):
 """
 @app.route("/assets/<string:asset_id>", methods=['POST'])
 def patch_asset(asset_id):
-
     if 'composed_image' in request.json:
         # Get only the encoded data
         _, b64data = request.json['composed_image'].split(',')

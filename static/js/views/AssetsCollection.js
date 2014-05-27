@@ -5,6 +5,8 @@ define(['marionette', 'vent', 'templates', 'views/Asset'], function (Marionette,
 
     return Marionette.CollectionView.extend({
         itemView: AssetView,
-        tagName: 'ul'
+        tagName: 'div',
+        tagClass: 'row'
+
     });
 });
