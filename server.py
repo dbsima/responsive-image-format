@@ -256,7 +256,6 @@ def patch_asset(asset_id):
         # If the pair (display_width, display_height) exists, just update it,
         # otherwise insert a new version
         versions = list(r.table('versions').filter({'asset_id': asset_id, 'display_width': version_w, 'display_height': version_h}).run(g.rdb_conn))
-        #for version in versions:
         if versions:
             version_id = versions[0]['id']
             version = r.table('versions').get(version_id).update({\
