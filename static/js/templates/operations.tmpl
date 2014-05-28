@@ -15,26 +15,26 @@
                             <% if (current_layer !== "") { %>
                             <div class="btn-group btn-group-justified">
                                 <a class="btn btn-primary" id="btnHideLayer" data-id="<%= current_layer %>" role="button">
-                                    <span class="glyphicon glyphicon-eye-open">
+                                    <i class="fa fa-eye fa-lg"></i> Hide
                                 </a>
                                 <a class="btn btn-danger" id="btnDeleteLayer" data-id="<%= current_layer %>" role="button">
-                                    <span class="glyphicon glyphicon-trash">
+                                    <i class="fa fa-trash-o fa-lg"></i> Delete
                                 </a>
                             </div>
                             <% } %>
-                            <form role="form">
-                                <div class="form-group">
-                                    <input class="form-control" id="resizeInputWidth" type="number" min=1 max="<%= initial_width %>" step=1 value="<%= current_width %>">
-                                </div>
-                                <div class="form-group">
-                                    <input class="form-control" id="resizeInputHeight" type="number" min=1 max="<%= initial_height %>" step=1 value="<%= current_height %>">
-                                </div>
-                                <div class="checkbox">
-                                    <label>
-                                        <input id="keepratio" type="checkbox"> Keep Ratio
-                                    </label>
-                                </div>
-                            </form>
+
+                            <div class="form-inline">
+                                <input class="form-control" id="resizeInputWidth" type="number" min=1 max="<%= initial_width %>" step=1 value="<%= current_width %>">
+                                <i class="fa fa-times fa-lg"></i>
+                                <input class="form-control" id="resizeInputHeight" type="number" min=1 max="<%= initial_height %>" step=1 value="<%= current_height %>">
+                            </div>
+
+                            <div class="checkbox">
+                                <label>
+                                    <input id="keepratio" type="checkbox"> Keep Ratio
+                                </label>
+                            </div>
+
                         </div>
                     </div>
                 </div>

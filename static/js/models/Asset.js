@@ -5,7 +5,7 @@ define(["jquery", "backbone"],
             initialize: function (options) {
                 //console.log(options);
             },
-            
+
             defaults: {
                 id: "",
                 time_stamp: "",
@@ -13,14 +13,15 @@ define(["jquery", "backbone"],
                 type: "",
                 change: "",
                 shared: "",
-                user_id: ""
+                user_id: "",
+                device: "md-device-1"
             },
-            
+
             url: function () {
                 var path = this.get("path");
                 return "/assets/" + path;
             },
-            
+
             toJSON: function (options) {
                 var result = Backbone.Model.prototype.toJSON.apply(this, arguments);
                 result.filters = this.get("filters") ? this.get("filters").toJSON(options) : {};

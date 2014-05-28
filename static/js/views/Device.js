@@ -17,6 +17,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.listenTo(App.vent, "initStage", this.onInitStage);
             this.listenTo(App.vent, "updateStage", this.onUpdateStage);
 
+            this.listenTo(App.vent, "changeDisplayInRenderer", this.onChangeDisplayInRenderer);
+
             var asset = this.model.toJSON();
 
             this.sources = {};
@@ -28,7 +30,17 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         },
 
         changings: function () {
-            console.log("change");
+            console.log("change " + this.model.get("device"));
+            //this.initialize();
+            //this.render();
+        },
+
+        onChangeDisplayInRenderer: function (options) {
+            console.log("here1" + options.device);
+            this.model.set('device', options.device);
+
+            // rerender the stage
+            this.render();
         },
 
         onUpdateStage: function (options) {

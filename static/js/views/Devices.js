@@ -27,6 +27,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap'], functi
                 $(event.currentTarget).parent().parent().parent().find('div.product-chooser-item').removeClass('selected');
                 $(event.currentTarget).addClass('selected');
                 $(event.currentTarget).find('input[type="radio"]').prop("checked", true);
+
+                App.vent.trigger("changeDisplayInRenderer", {device: event.currentTarget.id});
             }
         }
     });
