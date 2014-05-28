@@ -14,7 +14,18 @@ define(["jquery", "backbone"],
                 change: "",
                 shared: "",
                 user_id: "",
-                device: "md-device-1"
+                device: "md-device-1",
+                device_w: "1920",
+                device_h: "1080",
+
+                desktop_w: "1920",
+                desktop_h: "1080",
+                laptop_w: "1680",
+                laptop_h: "1050",
+                tablet_w: "1136",
+                tablet_h: "768",
+                phone_w: "1024",
+                phone_h: "640"
             },
 
             url: function () {

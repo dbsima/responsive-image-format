@@ -158,11 +158,12 @@ def explore():
                                                }).run(g.rdb_conn)
             asset_id = asset['generated_keys'][0]
             # default version is the original image
-            version = r.table('versions').insert({'asset_id': asset_id,\
+            version = r.table('versions').insert({'time_stamp': time_stamp,\
+                                                   'asset_id': asset_id,\
                                                    'name': asset_id,\
                                                    'type': layer_extension,\
-                                                   'width': "",\
-                                                   'height': "",\
+                                                   'display_width': "",\
+                                                   'display_height': "",\
                                                    'ppi': ""\
                                                    }).run(g.rdb_conn)
             # first layer is the original image
@@ -252,15 +253,25 @@ def patch_asset(asset_id):
         asset = r.table('assets').get(asset_id).update({'time_stamp': timestamp,\
                                                         'resolutions': file_name
                                                         }).run(g.rdb_conn)
-        #
-        version = r.table('versions').insert({'asset_id': asset_id,\
+        # If the pair (display_width, display_height) exists, just update it,
+        # otherwise insert a new version
+        versions = list(r.table('versions').filter({'asset_id': asset_id, 'display_width': version_w, 'display_height': version_h}).run(g.rdb_conn))
+        #for version in versions:
+        if versions:
+            version_id = versions[0]['id']
+            version = r.table('versions').get(version_id).update({\
+                                                        'time_stamp': timestamp,\
+                                                        'name': file_name
+                                                        }).run(g.rdb_conn)
+        else:
+            version = r.table('versions').insert({'time_stamp': timestamp,\
+                                                'asset_id': asset_id,\
                                                'name': file_name,\
                                                'type': '.png',\
-                                               'width': version_w,\
-                                               'height': version_h,\
+                                               'display_width': version_w,\
+                                               'display_height': version_h,\
                                                'ppi': ""\
                                                }).run(g.rdb_conn)
-
         # Return updated asset as request response
         return jsonify(asset)
 

@@ -39,6 +39,30 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             console.log("here1" + options.device);
             this.model.set('device', options.device);
 
+            console.log(options.device);
+
+            if (options.device === "md-device-1") {
+                this.model.set('device_w', this.model.get('desktop_w'));
+                this.model.set('device_h', this.model.get('desktop_h'));
+            } else if (options.device === "md-device-2") {
+                this.model.set('device_w', this.model.get('laptop_w'));
+                this.model.set('device_h', this.model.get('laptop_h'));
+            } else if (options.device === "md-device-3") {
+                this.model.set('device_w', this.model.get('tablet_w'));
+                this.model.set('device_h', this.model.get('tablet_h'));
+            } else if (options.device === "md-device-3 md-rotated") {
+                this.model.set('device_w', this.model.get('tablet_h'));
+                this.model.set('device_h', this.model.get('tablet_w'));
+            } else if (options.device === "md-device-4") {
+                this.model.set('device_w', this.model.get('phone_w'));
+                this.model.set('device_h', this.model.get('phone_h'));
+            } else if (options.device === "md-device-4 md-rotated") {
+                this.model.set('device_w', this.model.get('phone_h'));
+                this.model.set('device_h', this.model.get('phone_w'));
+            } else {
+                console.log("error: no options.device in onChangeDisplayInRenderer");
+            }
+
             // rerender the stage
             this.render();
         },
@@ -48,14 +72,14 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             //console.log(options.stage);
         },
 
-        postStage: function (assetID, dataUrl) {
+        postStage: function (assetID, deviceWidth, deviceHeight, dataUrl) {
             console.log('post stage ------');
             $.ajax({
                 async: false,
                 type: "POST",
                 url: "/assets/" + assetID,
                 contentType: 'application/json;charset=UTF-8',
-                data: JSON.stringify({"image_resolution": dataUrl, "display_width": 1000, "display_height": 500}, null, '\t'),
+                data: JSON.stringify({"image_resolution": dataUrl, "display_width": deviceWidth, "display_height": deviceHeight}, null, '\t'),
                 success: function (response) {
                     console.log("success POST on /assets/:assetID");
                     console.log(response);
@@ -88,9 +112,11 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             self.stage.toDataURL({
                 callback: function (dataUrl) {
                     var assetID = document.getElementById('btnSave').getAttribute('data-id');
-                    console.log(assetID);
+                    var deviceWidth = document.getElementById('btnSave').getAttribute('data-width');
+                    var deviceHeight = document.getElementById('btnSave').getAttribute('data-height');
+                    console.log(assetID + "-" + deviceWidth + "-" + deviceHeight);
 
-                    self.postStage(assetID, dataUrl);
+                    self.postStage(assetID, deviceWidth, deviceHeight, dataUrl);
                 }
             });
         },
