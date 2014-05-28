@@ -2,9 +2,10 @@
 *.pyc
 *.pyo
 env
+venv
 env*
 dist
-# 
+#
 
 # Installer logs
 pip-log.txt
@@ -18,4 +19,4 @@ nosetests.xml
 *.swp
 static/.DS_Store
 static/files/*
-rethinkdb_data/
+/rethinkdb_data/
