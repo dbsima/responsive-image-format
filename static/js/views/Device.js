@@ -23,23 +23,23 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
             this.sources = {};
             this.sources['0'] = {id: '0', path: "../files/" + asset.id + ".png", timestamp: this.model.toJSON().timestamp};
-            console.log(asset.id + ".png");
+            //console.log(asset.id + ".png");
 
             //this.model.bind('change', this.onRender);
             this.listenTo(this.model, "change", this.changings);
         },
 
         changings: function () {
-            console.log("change " + this.model.get("device"));
+            //console.log("change " + this.model.get("device"));
             //this.initialize();
             //this.render();
         },
 
         onChangeDisplayInRenderer: function (options) {
-            console.log("here1" + options.device);
+            //console.log("here1" + options.device);
             this.model.set('device', options.device);
 
-            console.log(options.device);
+            //console.log(options.device);
 
             if (options.device === "md-device-1") {
                 this.model.set('device_w', this.model.get('desktop_w'));
@@ -73,7 +73,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         },
 
         postStage: function (assetID, deviceWidth, deviceHeight, dataUrl) {
-            console.log('post stage ------');
+            //console.log('post stage ------');
             $.ajax({
                 async: false,
                 type: "POST",
@@ -82,11 +82,11 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 data: JSON.stringify({"image_resolution": dataUrl, "display_width": deviceWidth, "display_height": deviceHeight}, null, '\t'),
                 success: function (response) {
                     console.log("success POST on /assets/:assetID");
-                    console.log(response);
+                    //console.log(response);
                 },
                 error: function (response) {
                     console.log("error POST on /assets/:assetID");
-                    console.log(response);
+                    //console.log(response);
                 }
             });
         },
@@ -98,7 +98,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             self.stage.toDataURL({
                 callback: function (dataUrl) {
                     var assetID = document.getElementById('btnSave').getAttribute('data-id');
-                    console.log(assetID);
+                    //console.log(assetID);
 
                     //self.postStage(assetID, dataUrl);
                 }
@@ -106,7 +106,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         },
 
         saveResolution: function () {
-            console.log("save res");
+            //console.log("save res");
 
             var self = this;
             self.stage.toDataURL({
@@ -114,7 +114,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     var assetID = document.getElementById('btnSave').getAttribute('data-id');
                     var deviceWidth = document.getElementById('btnSave').getAttribute('data-width');
                     var deviceHeight = document.getElementById('btnSave').getAttribute('data-height');
-                    console.log(assetID + "-" + deviceWidth + "-" + deviceHeight);
+                    //console.log(assetID + "-" + deviceWidth + "-" + deviceHeight);
 
                     self.postStage(assetID, deviceWidth, deviceHeight, dataUrl);
                 }
@@ -122,12 +122,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         },
 
         renderFile: function () {
-            console.log("render");
+            //console.log("render");
             // Let us extract the value from the textbox now
         },
 
         onRender : function () {
-            console.log("on render in select");
+            //console.log("on render in select");
             function update(activeAnchor) {
                 var activeHandle = activeAnchor;
                 var group = activeHandle.getParent();
@@ -221,7 +221,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                 imageX = image.x();
                 imageY = image.y();
-                console.log(image.getPosition());
+                //console.log(image.getPosition());
 
                 // Update handle positions to reflect new image dimensions
                 topLeft.position({x: imageX, y: imageY});
@@ -297,7 +297,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             }
 
             function loadImages(sources, callback) {
-                console.log("load images");
+                //console.log("load images");
                 var images = {},
                     loadedImages = 0,
                     numImages = 0;
@@ -311,12 +311,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                 _.each(sources, function (val, key) {
                     if (val) {
-                        console.log(val.timestamp);
+                        //console.log(val.timestamp);
                         var id = key;
 
                         images[id] = new Image();
                         images[id].onload = function () {
-                            console.log("image loaded " + val.timestamp);
+                            //console.log("image loaded " + val.timestamp);
                             // initStage only after all images are loaded
                             if (++loadedImages >= numImages) {
                                 callback(images);
@@ -371,7 +371,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 // For each layer create group and add anchors
                 _.each(images, function (val, key) {
                     if (val) {
-                        console.log(key);
+                        //console.log(key);
 
                         var group = new Kinetic.Group({
                             x: 0,
@@ -411,7 +411,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                         group.on('dragend', function () {
                             App.vent.trigger("updateStage", {stage: stage});
-                            console.log(group.getPosition());
+                            //console.log(group.getPosition());
                         });
                     }
                 });

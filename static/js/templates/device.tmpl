@@ -1,13 +1,17 @@
-<div class="form-inline">
-    <input class="form-control" id="displayWidth" type="number" min=1 max="<%= device_w %>" step=1 value="<%= device_w %>">
-    <i class="fa fa-times fa-lg"></i>
-    <input class="form-control" id="displayHeight" type="number" min=1 max="<%= device_h %>" step=1 value="<%= device_h %>">
-    <a class="btn btn-primary" id="btnSave" data-id="<%= id %>" data-width="<%= device_w %>" data-height="<%= device_h %>" role="button">
-        <i class="fa fa-floppy-o fa-lg"></i> Save
-    </a>
-    <a class="btn btn-default" id="btnRender" data-id="<%= id %>" href="/render/<%= id %>" role="button">
-        <i class="fa fa-play fa-lg"></i>
-    Render</a>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="form-inline">
+        <input class="form-control" id="displayWidth" type="number" min=1 max="<%= device_w %>" step=1 value="<%= device_w %>">
+        <i class="fa fa-times fa-lg"></i>
+        <input class="form-control" id="displayHeight" type="number" min=1 max="<%= device_h %>" step=1 value="<%= device_h %>">
+        <a class="btn btn-primary" id="btnSave" data-id="<%= id %>" data-width="<%= device_w %>" data-height="<%= device_h %>" role="button">
+            <i class="fa fa-floppy-o fa-lg"></i> Save
+        </a>
+        <a class="btn btn-default" id="btnRender" data-id="<%= id %>" href="/render/<%= id %>" role="button">
+            <i class="fa fa-play fa-lg"></i>
+        Render</a>
+    </div>
+  </div>
 </div>
 
 <div class="md-device-wrapper">

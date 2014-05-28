@@ -15,6 +15,8 @@ import time
 import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError, RqlDriverError
 
+from passlib.apps import custom_app_context as pwd_context
+
 """
 ### Connection details
 """
@@ -51,7 +53,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_object(__name__)
 app.config.update(dict(
-    SECRET_KEY='development_key'
+    SECRET_KEY='the-quick-brown-fox-jumps-over-the-lazy-dog'
 ))
 
 """
@@ -348,6 +350,19 @@ def login():
                 flash("wrong password")
 
     return render_template('explore.html', error=error)
+
+"""
+### Return hashed password from plain password
+"""
+def hash_password(password):
+    return pwd_context.encrypt(password)
+
+"""
+### Check if plain passwords matched the hashed password
+"""
+def verify_password(password, password_hash):
+    return pwd_context.verify(password, password_hash)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
