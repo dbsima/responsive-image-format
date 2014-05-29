@@ -9,7 +9,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         tagName: 'div',
 
         events : {
-            'click #btnSave' : 'saveResolution'
+            'click #btnSave' : 'saveResolution',
+            'click #btnShowVersion' : 'showVersion',
+            'click #btnDeleteVersion' : 'deleteVersion'
         },
 
         initialize: function () {
@@ -19,17 +21,17 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
             this.listenTo(App.vent, "changeDisplayInRenderer", this.onChangeDisplayInRenderer);
 
-            var asset = this.model.toJSON();
+            this.asset = this.model.toJSON();
 
             this.sources = {};
-            this.sources['0'] = {id: '0', path: "../files/" + asset.id + ".png", timestamp: this.model.toJSON().timestamp};
+            this.sources['0'] = {id: '0', path: "../files/" + this.asset.id + ".png"};
 
             this.versions = {};
             var self = this;
             $.ajax({
                 async: false,
                 type: "GET",
-                url: "/versionsOfAsset/" + asset.id,
+                url: "/versionsOfAsset/" + self.asset.id,
                 dataType: 'json',
                 success: function (versions) {
                     console.log("success GET on /versionsOfAsset/assetId");
@@ -51,6 +53,41 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             });
             this.model.set('versions', this.versions);
             console.log(this.versions);
+        },
+
+        showVersion: function (event) {
+            console.log("show version");
+            console.log(event.currentTarget.dataset.id);
+            this.model.set("active_v", event.currentTarget.dataset.id);
+
+            this.sources['0'] = {id: '0', path: event.currentTarget.dataset.id};
+
+            // rerender the stage
+            this.render()
+        },
+
+        deleteVersion: function (event) {
+            console.log("delete version");
+            console.log(event.currentTarget.dataset.id);
+
+            var self = this;
+            $.ajax({
+                async: false,
+                url: "/versions/" + event.currentTarget.dataset.id,
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({"asset_id": self.asset.id}),
+                type: 'DELETE',
+                success: function (response) {
+                    console.log("success DELETE on /versions");
+                    console.log(response);
+                    //console.log(response);
+                    //App.vent.trigger("afterLayerDeleted", {"layer": "deleted"});
+                },
+                error: function (response) {
+                    console.log("error POST on /layers");
+                }
+            });
+            //this.model.set("active_v", "");
         },
 
         onChangeDisplayInRenderer: function (options) {

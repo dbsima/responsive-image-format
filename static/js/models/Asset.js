@@ -27,7 +27,8 @@ define(["jquery", "backbone"],
                 phone_w: "1024",
                 phone_h: "640",
 
-                versions: ""
+                versions: "",
+                active_v: ""
             },
 
             url: function () {

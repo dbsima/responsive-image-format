@@ -20,7 +20,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap'], functi
         },
 
         onSelectDevice : function (event) {
-            var self = this;
             //console.log(event.currentTarget.id);
             if ($(event.currentTarget).parent().parent().parent().not('.disabled')) {
                 //console.log(event.currentTarget.id);

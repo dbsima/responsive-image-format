@@ -335,8 +335,27 @@ def delete_layer(layer_id):
         asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
         # return deleted_layer
         return json.dumps(deleted_layer)
+    return "error: asset_id not present in json"
 
-    return "error"
+"""
+### Delete version
+"""
+@app.route('/versions/<string:version_id>', methods=['DELETE'])
+def delete_version(version_id):
+    if "asset_id" in request.json:
+        asset_id = request.json['asset_id']
+        print version_id
+        # remove file version_id
+        version = r.table('versions').get(version_id).run(g.rdb_conn)
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], version['id'] + version['type']))
+        # remove version_id from version
+        deleted_version = r.table('versions').get(version_id).delete().run(g.rdb_conn)
+        # add a new time_stamp to asset_id
+        time_stamp = time.time()
+        asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
+        # return deleted_layer
+        return json.dumps(deleted_version)
+    return "error: asset_id not present in json"
 
 """
 ### Return hashed password from plain password

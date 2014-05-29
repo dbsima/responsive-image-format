@@ -19,10 +19,10 @@
         <div class="btn-toolbar" role="toolbar">
             <% _.each(versions, function (val, key) { %>
             <div class="btn-group btn-group-xs">
-                <button type="button" class="btn btn-default">
+                <button type="button" class="btn btn-default" id="btnShowVersion" data-id=<%= val.path %>>
                     <%= val.display_w %><i class="fa fa-times"></i><%= val.display_h %>
                 </button>
-                <button type="button" class="btn btn-danger">
+                <button type="button" class="btn btn-danger" id="btnDeleteVersion" data-id=<%= val.id %>>
                     <i class="fa fa-times-circle"></i>
                 </button>
             </div>
