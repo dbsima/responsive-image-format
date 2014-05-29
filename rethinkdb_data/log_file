@@ -190,3 +190,21 @@
 2014-05-27T13:13:37.384288000 0.031349s info: To fully expose RethinkDB on the network, bind to all addresses
 2014-05-27T13:13:37.384297000 0.031358s info: by running rethinkdb with the `--bind all` command line option.
 2014-05-27T13:13:37.384322000 0.031383s info: Server ready
+2014-05-28T17:04:03.091398000 50756.242235s info: Server got SIGINT from pid 44180, uid 501; shutting down...
+2014-05-28T17:04:03.091682000 50756.242519s info: Shutting down client connections...
+2014-05-28T17:04:03.092165000 50756.243002s info: All client connections closed.
+2014-05-28T17:04:03.092174000 50756.243011s info: Shutting down storage engine... (This may take a while if you had a lot of unflushed data in the writeback cache.)
+2014-05-28T17:04:03.127510000 50756.278346s info: Storage engine shut down.
+2014-05-28T17:05:43.335746000 0.558417s info: Running rethinkdb 1.12.4 (CLANG 5.1 (clang-503.0.40))...
+2014-05-28T17:05:43.339712000 0.562384s info: Running on Darwin 13.1.0 x86_64
+2014-05-28T17:05:43.339755000 0.562426s info: Using cache size of 965 MB
+2014-05-28T17:05:43.339784000 0.562455s info: Loading data from directory /Users/sdragos/responsive-image-format/rethinkdb_data
+2014-05-28T17:05:43.351881000 0.574552s info: Listening for intracluster connections on port 29015
+2014-05-28T17:05:43.353616000 0.576288s info: Listening for client driver connections on port 28015
+2014-05-28T17:05:43.353755000 0.576427s info: Listening for administrative HTTP connections on port 8080
+2014-05-28T17:05:43.353757000 0.576428s info: Listening on addresses: 127.0.0.1, ::1
+2014-05-28T17:05:43.353768000 0.576439s info: To fully expose RethinkDB on the network, bind to all addresses
+2014-05-28T17:05:43.353769000 0.576440s info: by running rethinkdb with the `--bind all` command line option.
+2014-05-28T17:05:43.353777000 0.576448s info: Server ready
+2014-05-28T18:49:32.360298000 6229.721937s info: Applying data {"databases":{"50ac2788-1d7e-490a-9614-eb4b823275a6":null},"rdb_namespaces":{"650bcedb-a736-4544-a493-9494b7e72049":null,"d75ad8a0-0742-4172-8374-69104e828296":null,"e6114aa4-6d75-4f05-b213-12eb35d4f091":null,"e95b23b6-922c-4fea-a4eb-8b69857a42fc":null}}
+2014-05-28T20:39:07.180953000 8566.190864s info: Applying data {"databases":{"faa4d329-1253-40ef-9f3a-e0f5d0a99dd1":null},"rdb_namespaces":{"ec616f1e-4591-4906-8702-7bd857c799ec":null,"0d8bb489-ed18-48f4-a2c9-fd11e9555af6":null,"13e42315-0077-4e4e-9bd8-d6d78994ef4d":null,"cf7f8e06-ff31-4104-bd21-091b11b099f5":null}}

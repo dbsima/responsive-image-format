@@ -1,17 +1,30 @@
 <div class="panel panel-default">
   <div class="panel-body">
     <div class="form-inline">
-        <input class="form-control" id="displayWidth" type="number" min=1 max="<%= device_w %>" step=1 value="<%= device_w %>">
+        <input class="form-control" id="displayWidth" type="number" min=1 max="<%= display_w %>" step=1 value="<%= display_w %>">
         <i class="fa fa-times fa-lg"></i>
-        <input class="form-control" id="displayHeight" type="number" min=1 max="<%= device_h %>" step=1 value="<%= device_h %>">
-        <a class="btn btn-primary" id="btnSave" data-id="<%= id %>" data-width="<%= device_w %>" data-height="<%= device_h %>" role="button">
+        <input class="form-control" id="displayHeight" type="number" min=1 max="<%= display_h %>" step=1 value="<%= display_h %>">
+        <a class="btn btn-primary" id="btnSave" data-id="<%= id %>" data-width="<%= display_w %>" data-height="<%= display_h %>" role="button">
             <i class="fa fa-floppy-o fa-lg"></i> Save
         </a>
         <a class="btn btn-default" id="btnRender" data-id="<%= id %>" href="/render/<%= id %>" role="button">
-            <i class="fa fa-play fa-lg"></i>
-        Render</a>
+            <i class="fa fa-play fa-lg"></i> Render
+        </a>
     </div>
   </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="btn-toolbar" role="toolbar">
+            <div class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default">100x100</button>
+                <button type="button" class="btn btn-default">
+                    <i class="fa fa-times-circle"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="md-device-wrapper">

@@ -16,6 +16,7 @@ import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError, RqlDriverError
 
 from passlib.apps import custom_app_context as pwd_context
+from flask.ext.httpauth import HTTPBasicAuth
 
 """
 ### Connection details
@@ -55,6 +56,8 @@ app.config.from_object(__name__)
 app.config.update(dict(
     SECRET_KEY='the-quick-brown-fox-jumps-over-the-lazy-dog'
 ))
+
+auth = HTTPBasicAuth()
 
 """
 ### Managing connections (open and close it)
@@ -159,15 +162,7 @@ def explore():
                                                'user_id': ''\
                                                }).run(g.rdb_conn)
             asset_id = asset['generated_keys'][0]
-            # default version is the original image
-            version = r.table('versions').insert({'time_stamp': time_stamp,\
-                                                   'asset_id': asset_id,\
-                                                   'name': asset_id,\
-                                                   'type': layer_extension,\
-                                                   'display_width': "",\
-                                                   'display_height': "",\
-                                                   'ppi': ""\
-                                                   }).run(g.rdb_conn)
+
             # first layer is the original image
             layer = r.table('layers').insert({'asset_id': asset_id,\
                                                'name': layer_name,\
@@ -245,11 +240,6 @@ def patch_asset(asset_id):
         # Get only the encoded data
         _, b64data = data_url.split(',')
 
-        # Write data into a file named <asset_id>_<display_w>x<display_h>.extension
-        composed_image = open(path_to_file, "wb")
-        composed_image.write(b64data.decode('base64'))
-        composed_image.close()
-
         # Insert a timestamp in the asset (meaning something changed)
         timestamp = time.time()
         asset = r.table('assets').get(asset_id).update({'time_stamp': timestamp,\
@@ -264,8 +254,9 @@ def patch_asset(asset_id):
                                                         'time_stamp': timestamp,\
                                                         'name': file_name
                                                         }).run(g.rdb_conn)
+            version_type = versions[0]['type']
         else:
-            version = r.table('versions').insert({'time_stamp': timestamp,\
+            inserted = r.table('versions').insert({'time_stamp': timestamp,\
                                                 'asset_id': asset_id,\
                                                'name': file_name,\
                                                'type': '.png',\
@@ -273,6 +264,15 @@ def patch_asset(asset_id):
                                                'display_height': version_h,\
                                                'ppi': ""\
                                                }).run(g.rdb_conn)
+            version_id = inserted['generated_keys'][0]
+            version_type = '.png'
+
+        # Write data into a file named version_id.version_type
+        path_to_file = os.path.join(app.config['UPLOAD_FOLDER'], version_id + version_type)
+        composed_image = open(path_to_file, "wb")
+        composed_image.write(b64data.decode('base64'))
+        composed_image.close()
+
         # Return updated asset as request response
         return jsonify(asset)
 
@@ -298,6 +298,8 @@ def delete_asset(asset_id):
     file_name, file_extension = os.path.splitext(asset_id)
     # get all layers of asset_id
     layers = list(r.table('layers').filter({'asset_id': file_name}).run(g.rdb_conn))
+    # get all versions of asset_id
+    versions = list(r.table('versions').filter({'asset_id': file_name}).run(g.rdb_conn))
     # delete asset_id from assets
     deleted_asset = r.table('assets').get(file_name).delete().run(g.rdb_conn)
     # delete all layers of asset_id from layers
@@ -307,6 +309,11 @@ def delete_asset(asset_id):
     #delete all layer_id files
     for layer in layers:
         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['type']))
+    # delete all versions of asset_id from versions
+    deleted_versions = r.table('versions').filter({'asset_id': file_name}).delete().run(g.rdb_conn)
+    #delete all version_id files
+    for version in versions:
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], version['id'] + version['type']))
     # return deleted asset
     return json.dumps(deleted_asset)
 
@@ -473,7 +480,7 @@ def get_all_layers_for_asset(asset_id):
 """
 @app.route("/versionsOfAsset/<string:asset_id>", methods=['GET'])
 def get_all_versions_for_asset(asset_id):
-    versions = list(r.table('versions').filter({'asset_id': asset_id}).run(g.rdb_conn))
+    versions = list(r.table('versions').filter({'asset_id': asset_id}).order_by(r.asc('time_stamp')).run(g.rdb_conn))
     return json.dumps(versions)
 
 """

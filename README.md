@@ -9,7 +9,7 @@ Requirements
 
 Installation (Mac OS X)
 ----------------------
-Install RethinkDB (Make sure you're on OS X Lion or above (>= 10.7) and have Homebrew installed)
+Install RethinkDB v1.12.4 - The Wizard of Oz (Make sure you're on OS X Lion or above (>= 10.7) and have Homebrew installed)
 ```shell
 brew update && brew install rethinkdb
 ```
@@ -18,6 +18,7 @@ Clone & install Python drivers (2.x)
 git clone git@git.corp.adobe.com:sdragos/responsive-image-format.git
 sudo pip install Flask
 sudo pip install passlib
+sudo pip install Flask-HTTPAuth
 sudo pip install rethinkdb
 ```
 Running the application

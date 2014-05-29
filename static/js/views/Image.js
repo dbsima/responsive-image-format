@@ -19,8 +19,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.stage = "";
             this.sources = {};
 
-            console.log("here0");
-            console.log(asset);
             var self = this;
             $.ajax({
                 async: false,
@@ -29,7 +27,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 dataType: 'json',
                 success: function (layers) {
                     console.log("success GET on /layers with asset_id in json");
-                    console.log(layers);
+                    //console.log(layers);
                     var i;
                     for (i = 0; i < layers.length; i = i + 1) {
                         console.log("layer id " + layers[i].id + layers[i].type);
@@ -38,31 +36,11 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             path: "../files/" + layers[i].id + layers[i].type
                         };
                     }
-                    console.log("here1");
-                    console.log(this.sources);
                 }.bind(this),
                 error: function (response) {
                     console.log("error GET on /layers with asset_id in json");
                 }
             });
-            console.log("here2");
-            console.log(this.sources);
-            /*
-            for (i = 0; i < this.layers.length; i = i + 1) {
-                console.log("layer id " + this.layers[i].id);
-                var layerModel = new LayerModel({path: this.layers[i].id}),
-                    self = this;
-                self.i = i;
-                layerModel.fetch({
-                    async: false,
-                    success: function (layer) {
-                        self.sources[String(self.layers[self.i].index)] = {
-                            id: String(self.layers[self.i].id),
-                            path: "../files/" + layer.get("id") + layer.get("type")
-                        };
-                    }
-                });
-            }*/
         },
 
         events : {

@@ -23,16 +23,30 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
             this.sources = {};
             this.sources['0'] = {id: '0', path: "../files/" + asset.id + ".png", timestamp: this.model.toJSON().timestamp};
-            //console.log(asset.id + ".png");
+            
+            var self = this;
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/versionsOfAsset/" + asset.id,
+                dataType: 'json',
+                success: function (versions) {
+                    console.log("success GET on /versionsOfAsset/assetId");
+                    //console.log(layers);
+                    var i;
+                    for (i = 0; i < versions.length; i = i + 1) {
+                        console.log("layer id " + layers[i].id + layers[i].type);
+                        this.sources[i] = {
+                            id: String(layers[i].id),
+                            path: "../files/" + layers[i].id + layers[i].type
+                        };
+                    }
+                }.bind(this),
+                error: function (response) {
+                    console.log("error GET on /layers with asset_id in json");
+                }
+            });
 
-            //this.model.bind('change', this.onRender);
-            this.listenTo(this.model, "change", this.changings);
-        },
-
-        changings: function () {
-            //console.log("change " + this.model.get("device"));
-            //this.initialize();
-            //this.render();
         },
 
         onChangeDisplayInRenderer: function (options) {
@@ -42,27 +56,26 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             //console.log(options.device);
 
             if (options.device === "md-device-1") {
-                this.model.set('device_w', this.model.get('desktop_w'));
-                this.model.set('device_h', this.model.get('desktop_h'));
+                this.model.set('display_w', this.model.get('desktop_w'));
+                this.model.set('display_h', this.model.get('desktop_h'));
             } else if (options.device === "md-device-2") {
-                this.model.set('device_w', this.model.get('laptop_w'));
-                this.model.set('device_h', this.model.get('laptop_h'));
+                this.model.set('display_w', this.model.get('laptop_w'));
+                this.model.set('display_h', this.model.get('laptop_h'));
             } else if (options.device === "md-device-3") {
-                this.model.set('device_w', this.model.get('tablet_w'));
-                this.model.set('device_h', this.model.get('tablet_h'));
+                this.model.set('display_w', this.model.get('tablet_w'));
+                this.model.set('display_h', this.model.get('tablet_h'));
             } else if (options.device === "md-device-3 md-rotated") {
-                this.model.set('device_w', this.model.get('tablet_h'));
-                this.model.set('device_h', this.model.get('tablet_w'));
+                this.model.set('display_w', this.model.get('tablet_h'));
+                this.model.set('display_h', this.model.get('tablet_w'));
             } else if (options.device === "md-device-4") {
-                this.model.set('device_w', this.model.get('phone_w'));
-                this.model.set('device_h', this.model.get('phone_h'));
+                this.model.set('display_w', this.model.get('phone_w'));
+                this.model.set('display_h', this.model.get('phone_h'));
             } else if (options.device === "md-device-4 md-rotated") {
-                this.model.set('device_w', this.model.get('phone_h'));
-                this.model.set('device_h', this.model.get('phone_w'));
+                this.model.set('display_w', this.model.get('phone_h'));
+                this.model.set('display_h', this.model.get('phone_w'));
             } else {
                 console.log("error: no options.device in onChangeDisplayInRenderer");
             }
-
             // rerender the stage
             this.render();
         },
@@ -132,16 +145,16 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 var activeHandle = activeAnchor;
                 var group = activeHandle.getParent();
 
-                var topLeft = group.find(".topLeft")[0],
-                    topRight = group.find(".topRight")[0],
-                    bottomRight = group.find(".bottomRight")[0],
-                    bottomLeft = group.find(".bottomLeft")[0],
+                var handleTL = group.find(".handleTL")[0],
+                    handleTR = group.find(".handleTR")[0],
+                    handleBR = group.find(".handleBR")[0],
+                    handleBL = group.find(".handleBL")[0],
                     image = group.find(".image")[0],
                     activeHandleName = activeHandle.name(),
                     newWidth,
                     newHeight,
-                    minWidth = 32,
-                    minHeight = 32,
+                    minWidth = 1,
+                    minHeight = 1,
                     oldX,
                     oldY,
                     imageX,
@@ -151,72 +164,73 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 // This needs to happen so the dimension calculation can use the
                 // handle positions to determine the new width/height.
                 switch (activeHandleName) {
-                case "topLeft":
-                    oldY = topRight.y();
-                    oldX = bottomLeft.x();
-                    topRight.y(activeHandle.y());
-                    bottomLeft.x(activeHandle.x());
+                case "handleTL":
+                    oldY = handleTR.y();
+                    oldX = handleBL.x();
+                    handleTR.y(activeHandle.y());
+                    handleBL.x(activeHandle.x());
                     break;
-                case "topRight":
-                    oldY = topLeft.y();
-                    oldX = bottomRight.x();
-                    topLeft.y(activeHandle.y());
-                    bottomRight.x(activeHandle.x());
+                case "handleTR":
+                    oldY = handleTL.y();
+                    oldX = handleBR.x();
+                    handleTL.y(activeHandle.y());
+                    handleBR.x(activeHandle.x());
                     break;
-                case "bottomRight":
-                    oldY = bottomLeft.y();
-                    oldX = topRight.x();
-                    bottomLeft.y(activeHandle.y());
-                    topRight.x(activeHandle.x());
+                case "handleBR":
+                    oldY = handleBL.y();
+                    oldX = handleTR.x();
+                    handleBL.y(activeHandle.y());
+                    handleTR.x(activeHandle.x());
                     break;
-                case "bottomLeft":
-                    oldY = bottomRight.y();
-                    oldX = topLeft.x();
-                    bottomRight.y(activeHandle.y());
-                    topLeft.x(activeHandle.x());
+                case "handleBL":
+                    oldY = handleBR.y();
+                    oldX = handleTL.x();
+                    handleBR.y(activeHandle.y());
+                    handleTL.x(activeHandle.x());
                     break;
                 }
 
                 // Calculate new dimensions. Height is simply the dy of the handles.
                 // Width is increased/decreased by a factor of how much the height changed.
-                newHeight = bottomLeft.y() - topLeft.y();
+                newHeight = handleBL.y() - handleTL.y();
                 newWidth = image.width() * newHeight / image.height();
 
-                // It's too small: move the active handle back to the old position
-                if (newWidth < minWidth || newHeight < minHeight) {
+                // If the new resolution is lower than 1x1 or greater than the
+                // original resolution of the image, move the cursor back
+                if (newWidth < minWidth || newHeight < minHeight /*|| newWidth > image.width() || newHeight > image.height()*/) {
                     activeHandle.y(oldY);
                     activeHandle.x(oldX);
                     switch (activeHandleName) {
-                    case "topLeft":
-                        topRight.y(oldY);
-                        bottomLeft.x(oldX);
+                    case "handleTL":
+                        handleTR.y(oldY);
+                        handleBL.x(oldX);
                         break;
-                    case "topRight":
-                        topLeft.y(oldY);
-                        bottomRight.x(oldX);
+                    case "handleTR":
+                        handleTL.y(oldY);
+                        handleBR.x(oldX);
                         break;
-                    case "bottomRight":
-                        bottomLeft.y(oldY);
-                        topRight.x(oldX);
+                    case "handleBR":
+                        handleBL.y(oldY);
+                        handleTR.x(oldX);
                         break;
-                    case "bottomLeft":
-                        bottomRight.y(oldY);
-                        topLeft.x(oldX);
+                    case "handleBL":
+                        handleBR.y(oldY);
+                        handleTL.x(oldX);
                         break;
                     }
                 }
 
-                newHeight = bottomLeft.y() - topLeft.y();
+                newHeight = handleBL.y() - handleTL.y();
                 newWidth = image.width() * newHeight / image.height();//for restricted resizing
 
                 // Move the image to adjust for the new dimensions.
                 // The position calculation changes depending on where it is anchored.
                 // ie. When dragging on the right, it is anchored to the top left,
                 //     when dragging on the left, it is anchored to the top right.
-                if (activeHandleName === "topRight" || activeHandleName === "bottomRight") {
-                    image.position({x: topLeft.x(), y: topLeft.y()});
-                } else if (activeHandleName === "topLeft" || activeHandleName === "bottomLeft") {
-                    image.position({x: topRight.x() - newWidth, y: topRight.y()});
+                if (activeHandleName === "handleTR" || activeHandleName === "handleBR") {
+                    image.position({x: handleTL.x(), y: handleTL.y()});
+                } else if (activeHandleName === "handleTL" || activeHandleName === "handleBL") {
+                    image.position({x: handleTR.x() - newWidth, y: handleTR.y()});
                 }
 
                 imageX = image.x();
@@ -224,10 +238,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 //console.log(image.getPosition());
 
                 // Update handle positions to reflect new image dimensions
-                topLeft.position({x: imageX, y: imageY});
-                topRight.position({x: imageX + newWidth, y: imageY});
-                bottomRight.position({x: imageX + newWidth, y: imageY + newHeight});
-                bottomLeft.position({x: imageX, y: imageY + newHeight});
+                handleTL.position({x: imageX, y: imageY});
+                handleTR.position({x: imageX + newWidth, y: imageY});
+                handleBR.position({x: imageX + newWidth, y: imageY + newHeight});
+                handleBL.position({x: imageX, y: imageY + newHeight});
 
                 // Set the image's size to the newly calculated dimensions
                 if (newWidth && newHeight) {
@@ -276,9 +290,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 anchor.on('mouseover', function () {
                     var layer = this.getLayer();
 
-                    if (anchor.name() === 'topLeft' || anchor.name() === 'bottomRight') {
+                    if (anchor.name() === 'handleTL' || anchor.name() === 'handleBR') {
                         document.body.style.cursor = 'nwse-resize';
-                    } else if (anchor.name() === 'topRight' || anchor.name() === 'bottomLeft') {
+                    } else if (anchor.name() === 'handleTR' || anchor.name() === 'handleBL') {
                         document.body.style.cursor = 'nesw-resize';
                     }
                     this.setStrokeWidth(4);
@@ -400,10 +414,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         });
 
                         group.add(img);
-                        addAnchor(group, 0, 0, 'topLeft');
-                        addAnchor(group, img.getWidth(), 0, 'topRight');
-                        addAnchor(group, img.getWidth(), img.getHeight(), 'bottomRight');
-                        addAnchor(group, 0, img.getHeight(), 'bottomLeft');
+                        addAnchor(group, 0, 0, 'handleTL');
+                        addAnchor(group, img.getWidth(), 0, 'handleTR');
+                        addAnchor(group, img.getWidth(), img.getHeight(), 'handleBR');
+                        addAnchor(group, 0, img.getHeight(), 'handleBL');
 
                         group.on('dragstart', function () {
                             this.moveToTop();
@@ -425,10 +439,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     if (node.parent.nodeType = 'Kinetic.Group') {
                         var i, children = node.parent.children;
                         for (i = 1; i < children.length; i = i + 1) {
-                            if (children[i].getName() === 'topLeft' ||
-                                    children[i].getName() === 'topRight' ||
-                                    children[i].getName() === 'bottomRight' ||
-                                    children[i].getName() === 'bottomLeft') {
+                            if (children[i].getName() === 'handleTL' ||
+                                    children[i].getName() === 'handleTR' ||
+                                    children[i].getName() === 'handleBR' ||
+                                    children[i].getName() === 'handleBL') {
                                 children[i].show();
                             }
                         }
@@ -443,10 +457,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                         if (grandChildren) {
                             for (j = 1; j < grandChildren.length; j = j + 1) {
-                                if (grandChildren[j].getName() === 'topLeft' ||
-                                        grandChildren[j].getName() === 'topRight' ||
-                                        grandChildren[j].getName() === 'bottomRight' ||
-                                        grandChildren[j].getName() === 'bottomLeft') {
+                                if (grandChildren[j].getName() === 'handleTL' ||
+                                        grandChildren[j].getName() === 'handleTR' ||
+                                        grandChildren[j].getName() === 'handleBR' ||
+                                        grandChildren[j].getName() === 'handleBL') {
                                     grandChildren[j].hide();
                                     layer.draw();
                                 }
