@@ -21,6 +21,37 @@ sudo pip install passlib
 sudo pip install Flask-HTTPAuth
 sudo pip install rethinkdb
 ```
+
+Encoder/Decoder
+---------------
+Dependencies
+* libjpeg
+* libzlib
+* libwebp
+* PIL
+
+libwebp
+```shell
+sudo port selfupdate
+sudo port install webp
+```
+Test
+* png to webp
+```shell
+cwebp -q 80 image.png -o image.webp
+```
+* webp to png
+```shell
+dwebp image.webp -o image.png
+```
+
+PIL
+* get source code from https://pypi.python.org/pypi/Pillow/2.4.0#downloads
+* unzip it and go into dir
+```shell
+sudo CFLAGS=-Wunused-command-line-argument-hard-error-in-future python setup.py install
+```
+
 Running the application
 -----------------------
 Run RethinkDB server in a tab of the terminal
