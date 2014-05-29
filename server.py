@@ -224,7 +224,6 @@ def patch_asset(asset_id):
         time_stamp = time.time()
         asset = r.table('assets').get(asset_id).update({'time_stamp': time_stamp\
                                                         }).run(g.rdb_conn)
-
         # Return updated asset as request response
         return jsonify(asset)
 
