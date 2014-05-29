@@ -17,12 +17,16 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="btn-toolbar" role="toolbar">
+            <% _.each(versions, function (val, key) { %>
             <div class="btn-group btn-group-xs">
-                <button type="button" class="btn btn-default">100x100</button>
                 <button type="button" class="btn btn-default">
+                    <%= val.display_w %><i class="fa fa-times"></i><%= val.display_h %>
+                </button>
+                <button type="button" class="btn btn-danger">
                     <i class="fa fa-times-circle"></i>
                 </button>
             </div>
+            <% }); %>
         </div>
     </div>
 </div>

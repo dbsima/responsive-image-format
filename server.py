@@ -338,26 +338,6 @@ def delete_layer(layer_id):
 
     return "error"
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        user = r.table('users').get(email).run(g.rdb_conn)
-
-        if json.dumps(user) == 'null':
-            flash('wrong email!')
-        else:
-            if user['password'] == password:
-                session['logged_in'] = True
-                session['email'] = email
-                return redirect(url_for('explore'))
-            else:
-                flash("wrong password")
-
-    return render_template('explore.html', error=error)
-
 """
 ### Return hashed password from plain password
 """
@@ -370,6 +350,24 @@ def hash_password(password):
 def verify_password(password, password_hash):
     return pwd_context.verify(password, password_hash)
 
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = r.table('users').get(email).run(g.rdb_conn)
+
+        if json.dumps(user) == 'null':
+            flash('wrong email!')
+        else:
+            if verify_password(password, user['password']):
+                session['logged_in'] = True
+                session['email'] = email
+                return redirect(url_for('explore'))
+            else:
+                flash("wrong password")
+    return render_template('explore.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -386,10 +384,10 @@ def register():
         user = r.table('users').get(email).run(g.rdb_conn)
 
         if json.dumps(user) == 'null':
-            inserted = r.table('users').insert({'email': email, 'password': password}).run(g.rdb_conn)
+            hashed_password = hash_password(password)
+            inserted = r.table('users').insert({'email': email, 'password': hashed_password}).run(g.rdb_conn)
             session['logged_in'] = True
             session['email'] = email
-
             return redirect(url_for('explore'))
         else:
             flash("Email already exists!")

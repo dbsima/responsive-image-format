@@ -2,10 +2,18 @@
 *.pyc
 *.pyo
 env
-venv
 env*
 dist
-#
+
+# venv stuff
+www/analytics
+venv/bin
+venv/build
+venv/include
+venv/lib
+venv/local
+
+
 
 # Installer logs
 pip-log.txt
@@ -19,4 +27,4 @@ nosetests.xml
 *.swp
 static/.DS_Store
 static/files/*
-/rethinkdb_data/
+rethinkdb_data/

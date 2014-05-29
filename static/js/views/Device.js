@@ -23,7 +23,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
             this.sources = {};
             this.sources['0'] = {id: '0', path: "../files/" + asset.id + ".png", timestamp: this.model.toJSON().timestamp};
-            
+
+            this.versions = {};
             var self = this;
             $.ajax({
                 async: false,
@@ -35,10 +36,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     //console.log(layers);
                     var i;
                     for (i = 0; i < versions.length; i = i + 1) {
-                        console.log("layer id " + layers[i].id + layers[i].type);
-                        this.sources[i] = {
-                            id: String(layers[i].id),
-                            path: "../files/" + layers[i].id + layers[i].type
+                        console.log("versions id " + versions[i].id + versions[i].type);
+                        this.versions[i] = {
+                            id: String(versions[i].id),
+                            display_w: versions[i].display_width,
+                            display_h: versions[i].display_height,
+                            path: "../files/" + versions[i].id + versions[i].type
                         };
                     }
                 }.bind(this),
@@ -46,7 +49,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     console.log("error GET on /layers with asset_id in json");
                 }
             });
-
+            this.model.set('versions', this.versions);
+            console.log(this.versions);
         },
 
         onChangeDisplayInRenderer: function (options) {
