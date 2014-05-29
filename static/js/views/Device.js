@@ -23,6 +23,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
             this.asset = this.model.toJSON();
 
+            this.width = "";
+            this.height = "";
+
             this.sources = {};
             this.sources['0'] = {id: '0', path: "../files/" + this.asset.id + ".png"};
 

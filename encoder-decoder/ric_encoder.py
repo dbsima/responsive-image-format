@@ -33,6 +33,7 @@ def ric_decode(imgbuf):
         return None
     offset += boxLen
     layers = wrapper.unwrapLayers(imgbuf[offset:])
+    print layers
     outputImg = Decoder().decode(layers)
     output = StringIO()
     outputImg.save(output, "JPEG", quality = 90);

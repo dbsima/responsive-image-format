@@ -2,6 +2,7 @@
 
 import unittest
 import coder
+import decoder
 from PIL import Image
 import json
 from config_reader import LayerConfig
@@ -17,34 +18,27 @@ class TestCoder(unittest.TestCase):
         layers2 = []
         for layer in layers:
             i += 1
-            layerFileName = "/Users/sdragos/Responsive-Image-Container/samples/test_results/" + basename + "_layer" + str(i) + ".webp"
-            layer[0].save(layerFileName, "WEBP", quality=90)
+            layerFileName = "/Users/sdragos/responsive-image-format/encoder-decoder/samples/test_results/" + basename + "_layer" + str(i) + ".webp"
+            layer[0].save(layerFileName, "WEBP", quality=95)
             #layer[0].save(layerFileName+".png", "PNG", quality=95)
             # TODO: Run ssim test to see that the image we got is correct
             layer2 = Image.open(layerFileName)
             layers2.append(layer2)
-        #decoder = res_switch.ResSwitch.Algo.Decoder(layers2)
-        #dcd = decoder.decode()
-        #dcd.save("/tmp/decoded.png", "PNG")
-        #img.save("/tmp/crop.png", "PNG")
-
+        #print layers2
+        #the_decoder = decoder.Decoder()
+        #dcd = decoder.Decoder().decode(layers2)
+        #dcd.save("/Users/sdragos/responsive-image-format/encoder-decoder/samples/test_results/decoded.png", "PNG")
+        #img.save("/Users/sdragos/responsive-image-format/encoder-decoder/samples/test_results/crop.png", "PNG")
+    """
     def testEncodeCrop(self):
         # Currently this test passes anyway, but it creates a bunch of file that enable to peek into the outputs
         # Improvements: ssim test, output layers file size and final output file size
         self.encode("samples/bears-fishing.jpg", "samples/bears-fishing-crop-config.txt")
-
+    """
     def testEncodeResSwitch(self):
         # Currently this test passes anyway, but it creates a bunch of file that enable to peek into the outputs
         # Improvements: ssim test, output layers file size and final output file size
         self.encode("samples/res_switch.png", "samples/res_switch_config.txt")
-
-    def testCreateTargetImage(self):
-        img = Image.open("samples/bears-fishing.jpg")
-        encoder = coder.Coder()
-        # Create a crop and resize it
-        layerConf = LayerConfig(img, {"imgwidth": 200, "crop":(0, 0, 300, 300)})
-        target = encoder.createTargetImage(img, layerConf)
-        target.save("/Users/sdragos/Responsive-Image-Container/samples/test_results/target1.webp", "WEBP", quality=95)
 
 def main():
     unittest.main()
