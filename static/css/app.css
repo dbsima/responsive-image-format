@@ -18,6 +18,10 @@ ul {
     list-style: none;
 }
 
+.kineticjs-content {
+    outline: 1px solid grey;
+}
+
 .btn-file {
     position: relative;
     overflow: hidden;

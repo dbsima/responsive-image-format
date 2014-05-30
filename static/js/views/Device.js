@@ -429,7 +429,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     bg = new Kinetic.Rect({
                         width: stage.getWidth(),
                         height: stage.getHeight(),
-                        fill : 'grey',
+                        fill : '',
                         x: 0,
                         y: 0
                     });

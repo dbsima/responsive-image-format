@@ -13,8 +13,6 @@ venv/include
 venv/lib
 venv/local
 
-
-
 # Installer logs
 pip-log.txt
 
@@ -26,6 +24,5 @@ nosetests.xml
 # Vim
 *.swp
 
-.DS_Store
 static/files/*
 rethinkdb_data/
