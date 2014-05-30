@@ -1,19 +1,19 @@
-New Responsive Image Format
-===========================
+# New Responsive Image Format
 
-Requirements
-------------
+## Requirements
+
 * rethinkdb
 * python
 * python-flask
 
-Installation (Mac OS X)
-----------------------
-Install RethinkDB v1.12.4 - The Wizard of Oz (Make sure you're on OS X Lion or above (>= 10.7) and have Homebrew installed)
+## Installation (Mac OS X >= 10.7)
+
+### Install RethinkDB
+v1.12.4 - The Wizard of Oz (Make sure you have Homebrew installed)
 ```shell
 brew update && brew install rethinkdb
 ```
-Clone & install Python drivers (2.x)
+### Clone & install Python drivers (2.x)
 ```shell
 git clone git@git.corp.adobe.com:sdragos/responsive-image-format.git
 sudo pip install Flask
@@ -21,21 +21,19 @@ sudo pip install passlib
 sudo pip install Flask-HTTPAuth
 sudo pip install rethinkdb
 ```
-
-Encoder/Decoder
----------------
-Dependencies
+### Encoder/Decoder
+#### Dependencies
 * libjpeg
 * libzlib
 * libwebp
 * PIL
 
-libwebp
+#### libwebp
 ```shell
 sudo port selfupdate
 sudo port install webp
 ```
-Test
+##### Test libwebp
 * png to webp
 ```shell
 cwebp -q 80 image.png -o image.webp
@@ -45,15 +43,15 @@ cwebp -q 80 image.png -o image.webp
 dwebp image.webp -o image.png
 ```
 
-PIL
+#### PIL
 * get source code from https://pypi.python.org/pypi/Pillow/2.4.0#downloads
 * unzip it and go into dir
 ```shell
 sudo CFLAGS=-Wunused-command-line-argument-hard-error-in-future python setup.py install
 ```
 
-Running the application
------------------------
+## Running the application
+
 Run RethinkDB server in a tab of the terminal
 ```shell
 rethinkdb

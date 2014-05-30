@@ -336,6 +336,7 @@ def delete_asset(asset_id):
     #delete all version_id files
     for version in versions:
         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], version['id'] + version['type']))
+        # TODO remove webp layers
     # return deleted asset
     return json.dumps(deleted_asset)
 
