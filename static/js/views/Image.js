@@ -66,7 +66,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 data: JSON.stringify({"composed_image": dataUrl}, null, '\t'),
                 success: function (response) {
                     console.log("success POST on /assets/:assetID");
-                    //console.log(response);
+                    console.log(response);
 
                 },
                 error: function (response) {

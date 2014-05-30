@@ -30,7 +30,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.versionHeight = "";
 
             this.sources = {};
-            this.sources['0'] = {id: '0', path: "../files/" + this.asset.id + ".png"};
+            this.sources['0'] = {id: '0', path: "../files/" + this.asset.id + this.asset.type};
 
             this.versions = {};
             var self = this;

@@ -141,11 +141,13 @@ def explore():
 
     if request.method == 'POST':
         file = request.files['file']
+
         if file and allowed_file(file.filename):
             layer_name, layer_extension = os.path.splitext(file.filename)
 
             time_stamp = time.time()
             asset = r.table('assets').insert({'time_stamp': time_stamp,\
+                                               'name': layer_name,\
                                                'type': layer_extension,\
                                                'resolutions': "",\
                                                'shared': 'false',\
@@ -201,12 +203,14 @@ def edit_asset(asset_id):
 """
 @app.route("/assets/<string:asset_id>", methods=['POST'])
 def patch_asset(asset_id):
+    asset = r.table('assets').get(asset_id).run(g.rdb_conn)
+    asset_type = asset['type']
     if 'composed_image' in request.json:
         # Get only the encoded data
         _, b64data = request.json['composed_image'].split(',')
 
         # Write data into a file named <asset_id>.png
-        composed_image = open(os.path.join(app.config['UPLOAD_FOLDER'], asset_id + ".png"), "wb")
+        composed_image = open(os.path.join(app.config['UPLOAD_FOLDER'], asset_id + asset_type), "wb")
         composed_image.write(b64data.decode('base64'))
         composed_image.close()
 
@@ -228,7 +232,7 @@ def patch_asset(asset_id):
 
         #
         file_name = asset_id + "_" + version_w + "x" + version_h
-        path_to_file = os.path.join(app.config['UPLOAD_FOLDER'], file_name + ".png")
+        path_to_file = os.path.join(app.config['UPLOAD_FOLDER'], file_name + asset_type)
 
         # Get only the encoded data
         _, b64data = data_url.split(',')
@@ -254,7 +258,7 @@ def patch_asset(asset_id):
             inserted = r.table('versions').insert({'time_stamp': timestamp,\
                                                 'asset_id': asset_id,\
                                                'name': file_name,\
-                                               'type': '.png',\
+                                               'type': asset_type,\
                                                'display_width': display_w,\
                                                'display_height': display_h,\
                                                'version_width': version_w,\
@@ -262,7 +266,7 @@ def patch_asset(asset_id):
                                                'ppi': ""\
                                                }).run(g.rdb_conn)
             version_id = inserted['generated_keys'][0]
-            version_type = '.png'
+            version_type = asset_type
 
         # Write data into a file named version_id.version_type
         path_to_file = os.path.join(app.config['UPLOAD_FOLDER'], version_id + version_type)
@@ -308,7 +312,7 @@ def render_asset(asset_id):
         #print version['version_width']
         config.append({"imgwidth": int(version['version_width'])})
     print config
-    filename = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + ".png")
+    filename = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + versions[0]['type'])
     encode(filename, config)
     return render_template('explore.html')
 
