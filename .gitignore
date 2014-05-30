@@ -25,6 +25,7 @@ nosetests.xml
 
 # Vim
 *.swp
-static/.DS_Store
+
+.DS_Store
 static/files/*
 rethinkdb_data/

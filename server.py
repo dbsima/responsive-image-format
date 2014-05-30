@@ -282,7 +282,6 @@ def select_device(asset_id):
 
 def encode(filename, config):
     img = Image.open(filename)
-    basename = filename.split("/")[1]
     #config = json.load(open(configname, "rb"))
     layers = coder.Coder().encode(img, config)
     i = 0
@@ -290,7 +289,7 @@ def encode(filename, config):
     for layer in layers:
         i += 1
         #file.save(os.path.join(app.config['UPLOAD_FOLDER'],\layer_id + layer_extension))
-        layerFileName = "/Users/sdragos/responsive-image-format/encoder-decoder/samples/test_results/" + basename + "_layer" + str(i) + ".webp"
+        layerFileName = filename + "_layer" + str(i) + ".webp"
         layer[0].save(layerFileName, "WEBP", quality=95)
         #layer[0].save(layerFileName+".png", "PNG", quality=95)
         # TODO: Run ssim test to see that the image we got is correct
