@@ -4,9 +4,7 @@ define(['marionette', 'vent', 'templates'],
 
         return Marionette.Layout.extend({
             template : templates.renderAsset,
-
             tagName: 'div',
-
             className: 'row-fluid',
 
             regions : {

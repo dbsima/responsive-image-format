@@ -7,18 +7,11 @@ define(['jquery', 'marionette', 'backbone', 'vent', 'templates'], function ($, M
         template : templates.asset,
 
         events : {
-            'click #btnEditFile' : 'editFile',
             'click #btnDeleteFile' : 'deleteFile'
-        },
-
-        editFile: function () {
-            var asset_id = document.getElementById('btnEditFile').getAttribute('data-id');
-            console.log("editFile " + asset_id);
         },
 
         deleteFile: function () {
             var asset_id = document.getElementById('btnDeleteFile').getAttribute('data-id');
-            console.log("deleteFile " + asset_id);
 
             $.ajax({
                 async: false,

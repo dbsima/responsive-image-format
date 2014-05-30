@@ -1,22 +1,19 @@
 from flask import Flask, url_for, json, jsonify, g, request, Response, render_template, make_response, send_from_directory, abort, session, flash, redirect
 from werkzeug.utils import secure_filename
 
-import argparse
-import json
-import os
-
-import string
-import random
-
-import shutil
-
-import time
+import argparse, os, string, shutil, time
 
 import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError, RqlDriverError
 
 from passlib.apps import custom_app_context as pwd_context
 from flask.ext.httpauth import HTTPBasicAuth
+
+import sys
+sys.path.append("encoder-decoder")
+import coder, decoder
+from PIL import Image
+from config_reader import LayerConfig
 
 """
 ### Connection details
@@ -131,13 +128,6 @@ def select():
     return render_template('explore.html')
 
 """
-### Render Tab without asset
-"""
-@app.route("/render")
-def render():
-    return render_template('explore.html')
-
-"""
 ###
 """
 @app.route('/explore', methods=['GET', 'POST'])
@@ -229,8 +219,12 @@ def patch_asset(asset_id):
 
     if 'image_resolution' in request.json:
         data_url = request.json['image_resolution']
-        version_w = str(request.json['display_width'])
-        version_h = str(request.json['display_height'])
+        display_w = str(request.json['display_width'])
+        display_h = str(request.json['display_height'])
+        version_w = str(request.json['version_w'])
+        version_h = str(request.json['version_h'])
+
+        print version_w + "-"+version_h
 
         #
         file_name = asset_id + "_" + version_w + "x" + version_h
@@ -246,12 +240,14 @@ def patch_asset(asset_id):
                                                         }).run(g.rdb_conn)
         # If the pair (display_width, display_height) exists, just update it,
         # otherwise insert a new version
-        versions = list(r.table('versions').filter({'asset_id': asset_id, 'display_width': version_w, 'display_height': version_h}).run(g.rdb_conn))
+        versions = list(r.table('versions').filter({'asset_id': asset_id, 'display_width': display_w, 'display_height': display_h}).run(g.rdb_conn))
         if versions:
             version_id = versions[0]['id']
             version = r.table('versions').get(version_id).update({\
                                                         'time_stamp': timestamp,\
-                                                        'name': file_name
+                                                        'name': file_name,\
+                                                        'version_width': version_w,\
+                                                        'version_height': version_h,\
                                                         }).run(g.rdb_conn)
             version_type = versions[0]['type']
         else:
@@ -259,8 +255,10 @@ def patch_asset(asset_id):
                                                 'asset_id': asset_id,\
                                                'name': file_name,\
                                                'type': '.png',\
-                                               'display_width': version_w,\
-                                               'display_height': version_h,\
+                                               'display_width': display_w,\
+                                               'display_height': display_h,\
+                                               'version_width': version_w,\
+                                               'version_height': version_h,\
                                                'ppi': ""\
                                                }).run(g.rdb_conn)
             version_id = inserted['generated_keys'][0]
@@ -282,11 +280,37 @@ def patch_asset(asset_id):
 def select_device(asset_id):
     return render_template('explore.html')
 
+def encode(filename, config):
+    img = Image.open(filename)
+    basename = filename.split("/")[1]
+    #config = json.load(open(configname, "rb"))
+    layers = coder.Coder().encode(img, config)
+    i = 0
+    #layers2 = []
+    for layer in layers:
+        i += 1
+        #file.save(os.path.join(app.config['UPLOAD_FOLDER'],\layer_id + layer_extension))
+        layerFileName = "/Users/sdragos/responsive-image-format/encoder-decoder/samples/test_results/" + basename + "_layer" + str(i) + ".webp"
+        layer[0].save(layerFileName, "WEBP", quality=95)
+        #layer[0].save(layerFileName+".png", "PNG", quality=95)
+        # TODO: Run ssim test to see that the image we got is correct
+        #layer2 = Image.open(layerFileName)
+        #layers2.append(layer2)
+
 """
 #### Asset in Render Mode
 """
 @app.route("/render/<string:asset_id>")
 def render_asset(asset_id):
+    versions = list(r.table('versions').filter({'asset_id': asset_id}).order_by(r.asc('version_w')).run(g.rdb_conn))
+
+    config = []
+    for version in versions:
+        #print version['version_width']
+        config.append({"imgwidth": int(version['version_width'])})
+    print config
+    filename = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + ".png")
+    encode(filename, config)
     return render_template('explore.html')
 
 """

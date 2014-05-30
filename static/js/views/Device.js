@@ -19,12 +19,15 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.listenTo(App.vent, "initStage", this.onInitStage);
             this.listenTo(App.vent, "updateStage", this.onUpdateStage);
 
+            this.listenTo(App.vent, "showCurrentImageSize", this.onShowCurrentImageSize);
+
+
             this.listenTo(App.vent, "changeDisplayInRenderer", this.onChangeDisplayInRenderer);
 
             this.asset = this.model.toJSON();
 
-            this.width = "";
-            this.height = "";
+            this.versionWidth = "";
+            this.versionHeight = "";
 
             this.sources = {};
             this.sources['0'] = {id: '0', path: "../files/" + this.asset.id + ".png"};
@@ -56,6 +59,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             });
             this.model.set('versions', this.versions);
             console.log(this.versions);
+        },
+
+        onShowCurrentImageSize: function (options) {
+            this.versionWidth = options.currentImageWidth | 0;
+            this.versionHeight = options.currentImageHeight | 0;
+
+            console.log(this.versionWidth + "+" + this.versionHeight);
         },
 
         showVersion: function (event) {
@@ -129,14 +139,18 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             //console.log(options.stage);
         },
 
-        postStage: function (assetID, deviceWidth, deviceHeight, dataUrl) {
+        postStage: function (assetID, deviceWidth, deviceHeight, versionWidth, versionHeight, dataUrl) {
             //console.log('post stage ------');
             $.ajax({
                 async: false,
                 type: "POST",
                 url: "/assets/" + assetID,
                 contentType: 'application/json;charset=UTF-8',
-                data: JSON.stringify({"image_resolution": dataUrl, "display_width": deviceWidth, "display_height": deviceHeight}, null, '\t'),
+                data: JSON.stringify({"image_resolution": dataUrl,
+                                      "display_width": deviceWidth,
+                                      "display_height": deviceHeight,
+                                      "version_w": versionWidth,
+                                      "version_h": versionHeight}, null, '\t'),
                 success: function (response) {
                     console.log("success POST on /assets/:assetID");
                     //console.log(response);
@@ -173,7 +187,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     var deviceHeight = document.getElementById('btnSave').getAttribute('data-height');
                     //console.log(assetID + "-" + deviceWidth + "-" + deviceHeight);
 
-                    self.postStage(assetID, deviceWidth, deviceHeight, dataUrl);
+                    self.postStage(assetID, deviceWidth, deviceHeight, self.versionWidth, self.versionHeight, dataUrl);
                 }
             });
         },
@@ -291,9 +305,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 if (newWidth && newHeight) {
                     image.size({width: newWidth, height: newHeight});
 
-                    App.vent.trigger("showCurrentLayerSize", {
-                        "currentLayerWidth": newWidth,
-                        "currentLayerHeight" : newHeight
+                    App.vent.trigger("showCurrentImageSize", {
+                        "currentImageWidth": newWidth,
+                        "currentImageHeight" : newHeight
                     });
                 }
             }
