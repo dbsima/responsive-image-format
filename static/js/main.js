@@ -5,6 +5,7 @@ require.config({
         backbone    :   'lib/backbone',
         marionette  :   'lib/backbone.marionette',
         jquery      :   'lib/jquery.min',
+        jqueryUI    :   'lib/jquery-ui-1.10.4.min',
         bootstrap   :   'lib/bootstrap.min',
         tpl         :   'lib/tpl',
         prettify    :   'lib/prettify.min',

@@ -1,6 +1,6 @@
 /*global define*/
 
-define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/Layer'], function ($, App, Marionette, vent, templates, Kinetic, LayerModel) {
+define(['jquery', 'jqueryUI', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/Layer'], function ($, jqueryUI, App, Marionette, vent, templates, Kinetic, LayerModel) {
     "use strict";
 
     return Marionette.Layout.extend({
@@ -9,6 +9,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         tagName: 'div',
 
         initialize: function () {
+
             var asset = this.model.toJSON();
 
             this.sources = {};
@@ -23,24 +24,30 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             console.log("change");
         },
 
-        onRender: function () {
-            console.log("onRender in Device");
-            console.log(this.model.toJSON()['timestamp']);
+        onShow: function () {
+            console.log(this.$('#resizable'));//.resizable();
+            this.$('#resizable').resizable({
+                alsoResize:  '#resizable *',
+                aspectRatio: true
+            });
+            console.log("here");
+        },
 
+        onRender: function () {
             function loadImages(sources, callback) {
-                console.log('load images');
-                console.log(sources);
+                //console.log('load images');
+                //console.log(sources);
                 var images = {};
                 var loadedImages = 0;
                 var numImages = 0;
 
-                _.each(sources, function( val, key ) {
+                _.each(sources, function(val, key) {
                     if (val) {
                         numImages++;
                     }
                 });
 
-                _.each(sources, function( val, key ) {
+                _.each(sources, function(val, key) {
                     if (val) {
                         var id = key;
 
