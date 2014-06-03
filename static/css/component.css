@@ -81,49 +81,6 @@
 	position: absolute;
 }
 
-/* button for rotating a device */
-.md-device button {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 50px;
-	height: 50px;
-	border-radius: 50%;
-	z-index: 1001;
-	border: none;
-	color: #fff;
-	background: #101010;
-	text-align: center;
-	cursor: pointer;
-	margin: -25px 0 0 -25px;
-	opacity: 0;
-	outline: none;
-}
-
-.md-device:hover button,
-.touch .md-device button {
-	opacity: 1;
-}
-
-.md-device button:before {
-	font-family: 'md-icons';
-	speak: none;
-	font-style: normal;
-	font-weight: normal;
-	font-variant: normal;
-	text-transform: none;
-	font-size: 30px;
-	line-height: 50px;
-	-webkit-font-smoothing: antialiased;
-	content: "\e000";
-}
-
-.md-device.md-rotated button {
-	-webkit-transform: scaleX(-1);
-	-moz-transform: scaleX(-1);
-	transform: scaleX(-1);
-}
-
 /* Let's predefine some properties so that transitions happen smoothly */
 .md-border-element,
 .md-base-element,

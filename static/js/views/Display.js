@@ -62,10 +62,15 @@ define(['jquery', 'jqueryUI', 'app', 'marionette', 'vent', 'templates', 'kinetic
                         }
                     } else {
                         if (self.$('#md-image').length <= 0) {
-
                             self.$('#container').append('<img id="md-image" src="../files/' + self.asset.id + '_layer1.webp">');
-
-
+                        } else {
+                            _.each(self.versions, function (val, key) {
+                                if (val) {
+                                    console.log("--------------------------------");
+                                    console.log((ui.size.width - 60) + " - " + (ui.size.height - 60));
+                                    console.log(val.display_w + " - " + val.display_h);
+                                }
+                            });
                         }
                     }
                 }
