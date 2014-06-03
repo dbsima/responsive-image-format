@@ -10,14 +10,41 @@ define(['jquery', 'jqueryUI', 'app', 'marionette', 'vent', 'templates', 'kinetic
 
         initialize: function () {
 
-            var asset = this.model.toJSON();
+            this.asset = this.model.toJSON();
 
             this.sources = {};
             this.sources['0'] = {id: '0', path: "../files/" + this.model.toJSON().resolutions + ".png", timestamp: this.model.toJSON()['timestamp']};
-            console.log(asset['id'] + ".png");
+            console.log(this.asset.id);
 
-            //this.model.bind('change', this.onRender);
-            this.listenTo(this.model, "change", this.changings);
+
+            this.versions = {};
+            var self = this;
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/versionsOfAsset/" + self.asset.id,
+                dataType: 'json',
+                success: function (versions) {
+                    console.log("success GET on /versionsOfAsset/assetId");
+                    //console.log(layers);
+                    var i;
+                    for (i = 0; i < versions.length; i = i + 1) {
+                        console.log("versions id " + versions[i].id + versions[i].type);
+                        this.versions[i] = {
+                            id: String(versions[i].id),
+                            display_w: versions[i].display_width,
+                            display_h: versions[i].display_height,
+                            version_w: versions[i].width,
+                            version_h: versions[i].height,
+                            path: "../files/" + versions[i].id + versions[i].type
+                        };
+                    }
+                }.bind(this),
+                error: function (response) {
+                    console.log("error GET on /layers with asset_id in json");
+                }
+            });
+            this.model.set('versions', this.versions);
         },
 
         changings: function () {
@@ -25,107 +52,21 @@ define(['jquery', 'jqueryUI', 'app', 'marionette', 'vent', 'templates', 'kinetic
         },
 
         onShow: function () {
-            console.log(this.$('#resizable'));//.resizable();
+
+            var self = this;
+            console.log(self.versions[0].version_w + "-" + self.versions[0].version_h);
+            console.log(self.versions);
             this.$('#resizable').resizable({
-                alsoResize:  '#resizable *',
+                alsoResize:  '#resizable .md-device .display',
+                minHeight: self.versions[0].version_h,
+                minWidth: self.versions[0].version_w,
                 aspectRatio: true
             });
-            console.log("here");
+            //console.log("here");
         },
 
         onRender: function () {
-            function loadImages(sources, callback) {
-                //console.log('load images');
-                //console.log(sources);
-                var images = {};
-                var loadedImages = 0;
-                var numImages = 0;
-
-                _.each(sources, function(val, key) {
-                    if (val) {
-                        numImages++;
-                    }
-                });
-
-                _.each(sources, function(val, key) {
-                    if (val) {
-                        var id = key;
-
-                        images[id] = new Image();
-                        images[id].onload = function() {
-                            if(++loadedImages >= numImages) {
-                                callback(images);
-                            }
-                        };
-                        images[id].src = val["path"] + "?"+(new Date()).getTime();
-                    }
-                });
-            }
-
-            function initStage(images) {
-                console.log(images);
-
-                var stage = new Kinetic.Stage({
-                    container: 'container',
-                    width: $('#container').width(),
-                    height: $('#container').height()
-                });
-
-                // send initial width and size
-                App.vent.trigger("showInitialLayerSize", {
-                    "initialLayerWidth": stage.getWidth(),
-                    "initialLayerHeight" : stage.getHeight()
-                });
-
-                var layer = new Kinetic.Layer();
-
-                var bg = new Kinetic.Rect({
-                    width: stage.getWidth(),
-                    height: stage.getHeight(),
-                    fill : 'grey',
-                    x: 0,
-                    y: 0
-                });
-
-                layer.add(bg);
-
-                // For each layer create group and add anchors
-                _.each(images, function( val, key ) {
-                    if (val) {
-                        //console.log(key);
-
-                        var group = new Kinetic.Group({
-                            x: 0,
-                            y: 0
-                        });
-
-                        // update W & H in Operations -> Resize
-                        group.on('click',function(){
-                            var image = group.find('.image')[0];
-
-                            App.vent.trigger("showCurrentLayerSize", {
-                                "currentLayerWidth": image.getWidth(),
-                                "currentLayerHeight" : image.getHeight()
-                            });
-                        });
-
-                        layer.add(group);
-                        stage.add(layer);
-
-                        var img = new Kinetic.Image({
-                            x: 0,
-                            y: 0,
-                            image: images[key],
-                            name: 'image'
-                        });
-
-                        group.add(img);
-                    }
-                });
-                stage.add(layer);
-            }
-
-            loadImages(this.sources, initStage);
+            //
         }
     });
 });

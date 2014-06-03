@@ -213,9 +213,13 @@
 	height: 455px;
     background: #f9f9f9;
     text-align: center;
-    vertical-align: middle;
-    line-height: 455px;
+    /*vertical-align: middle;*/
+    /*line-height: 455px;*/
     font-size:100px;
+}
+
+img {
+    vertical-align: top;
 }
 
 .md-browser .md-border-element {

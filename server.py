@@ -250,8 +250,8 @@ def patch_asset(asset_id):
             version = r.table('versions').get(version_id).update({\
                                                         'time_stamp': timestamp,\
                                                         'name': file_name,\
-                                                        'version_width': version_w,\
-                                                        'version_height': version_h,\
+                                                        'width': version_w,\
+                                                        'height': version_h,\
                                                         }).run(g.rdb_conn)
             version_type = versions[0]['type']
         else:
@@ -261,8 +261,8 @@ def patch_asset(asset_id):
                                                'type': asset_type,\
                                                'display_width': display_w,\
                                                'display_height': display_h,\
-                                               'version_width': version_w,\
-                                               'version_height': version_h,\
+                                               'width': version_w,\
+                                               'height': version_h,\
                                                'ppi': ""\
                                                }).run(g.rdb_conn)
             version_id = inserted['generated_keys'][0]
@@ -290,10 +290,11 @@ def encode(filename, config):
     layers = coder.Coder().encode(img, config)
     i = 0
     #layers2 = []
+    asset_id = filename.rsplit('.', 1)[0]
     for layer in layers:
         i += 1
         #file.save(os.path.join(app.config['UPLOAD_FOLDER'],\layer_id + layer_extension))
-        layerFileName = filename + "_layer" + str(i) + ".webp"
+        layerFileName = asset_id + "_layer" + str(i) + ".webp"
         layer[0].save(layerFileName, "WEBP", quality=95)
         #layer[0].save(layerFileName+".png", "PNG", quality=95)
         # TODO: Run ssim test to see that the image we got is correct
@@ -310,7 +311,8 @@ def render_asset(asset_id):
     config = []
     for version in versions:
         #print version['version_width']
-        config.append({"imgwidth": int(version['version_width'])})
+        print version
+        config.append({"imgwidth": int(version['width'])})
     print config
     filename = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + versions[0]['type'])
     encode(filename, config)
@@ -520,11 +522,11 @@ def get_all_layers_for_asset(asset_id):
     return json.dumps(layers)
 
 """
-### Retrieving all versions of asset_id
+### Retrieving all versions of asset_id ordered first by width, second by height
 """
 @app.route("/versionsOfAsset/<string:asset_id>", methods=['GET'])
 def get_all_versions_for_asset(asset_id):
-    versions = list(r.table('versions').filter({'asset_id': asset_id}).order_by(r.asc('time_stamp')).run(g.rdb_conn))
+    versions = list(r.table('versions').filter({'asset_id': asset_id}).order_by(r.asc('width')).order_by(r.asc('height')).run(g.rdb_conn))
     return json.dumps(versions)
 
 """
