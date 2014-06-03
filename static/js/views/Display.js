@@ -5,17 +5,14 @@ define(['jquery', 'jqueryUI', 'app', 'marionette', 'vent', 'templates', 'kinetic
 
     return Marionette.Layout.extend({
         template : templates.display,
-
         tagName: 'div',
 
         initialize: function () {
-
             this.asset = this.model.toJSON();
 
             this.sources = {};
             this.sources['0'] = {id: '0', path: "../files/" + this.model.toJSON().resolutions + ".png", timestamp: this.model.toJSON()['timestamp']};
-            console.log(this.asset.id);
-
+            //console.log(this.asset.id);
 
             this.versions = {};
             var self = this;
@@ -47,22 +44,32 @@ define(['jquery', 'jqueryUI', 'app', 'marionette', 'vent', 'templates', 'kinetic
             this.model.set('versions', this.versions);
         },
 
-        changings: function () {
-            console.log("change");
-        },
-
         onShow: function () {
-
             var self = this;
-            console.log(self.versions[0].version_w + "-" + self.versions[0].version_h);
-            console.log(self.versions);
+            //console.log(self.versions[0].version_w + "-" + self.versions[0].version_h);
+            //console.log(self.versions);
             this.$('#resizable').resizable({
                 alsoResize:  '#resizable .md-device .display',
                 minHeight: self.versions[0].version_h,
                 minWidth: self.versions[0].version_w,
-                aspectRatio: true
+                aspectRatio: true,
+
+                resize: function(e, ui) {
+                    if (ui.size.width - 60 < self.versions[0].version_w || ui.size.height - 60 < self.versions[0].version_h) {
+                        //console.log("here");
+                        if (self.$('#md-image').length > 0) {
+                            self.$('#md-image').remove();
+                        }
+                    } else {
+                        if (self.$('#md-image').length <= 0) {
+
+                            self.$('#container').append('<img id="md-image" src="../files/' + self.asset.id + '_layer1.webp">');
+
+
+                        }
+                    }
+                }
             });
-            //console.log("here");
         },
 
         onRender: function () {
