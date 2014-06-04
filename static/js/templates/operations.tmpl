@@ -1,58 +1,52 @@
-<div class="container">
-    <div class="row">
-        <div class="col-sm-3 col-md-3">
-            <div class="panel-group" id="accordion">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                                Layer
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapseOne" class="panel-collapse collapse in">
-                        <div class="accordion-inner">
-                            <% if (current_layer !== "") { %>
-                            <div class="btn-group btn-group-justified">
-                                <a class="btn btn-primary" id="btnHideLayer" data-id="<%= current_layer %>" role="button">
-                                    <i class="fa fa-eye fa-lg"></i> Hide
-                                </a>
-                                <a class="btn btn-danger" id="btnDeleteLayer" data-id="<%= current_layer %>" role="button">
-                                    <i class="fa fa-trash-o fa-lg"></i> Delete
-                                </a>
-                            </div>
-                            <% } %>
+<div class="panel panel-default">
+    <div class="panel-heading">Header</div>
+    <div class="panel-body">
+        <select class="selectpicker" id="chooseShape" title='Shape'>
+            <option>None</option>
+            <option>Freeform</option>
+            <option>Square</option>
+            <option>Triangle</option>
+        </select>
 
-                            <div class="form-inline">
-                                <input class="form-control" id="resizeInputWidth" type="number" min=1 max="<%= initial_width %>" step=1 value="<%= current_width %>">
-                                <i class="fa fa-times fa-lg"></i>
-                                <input class="form-control" id="resizeInputHeight" type="number" min=1 max="<%= initial_height %>" step=1 value="<%= current_height %>">
-                            </div>
+        <select class="selectpicker" id="chooseGradient" title='Gradient'>
+            <option>None</option>
+            <option>Mustard</option>
+            <option>Ketchup</option>
+            <option>Barbecue</option>
+        </select>
 
-                            <div class="checkbox">
-                                <label>
-                                    <input id="keepratio" type="checkbox"> Keep Ratio
-                                </label>
-                            </div>
+        <select class="selectpicker" id="chooseBlending" title='Blending'>
+            <option>None</option>
+            <option>Mustard</option>
+            <option>Ketchup</option>
+            <option>Barbecue</option>
+        </select>
 
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
-                                Smart Shape
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapseFour" class="panel-collapse collapse">
-                        <div class="accordion-inner">
-                            rotate inner
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <% if (current_layer !== "") { %>
+        <div class="form-inline">
+            <a class="btn btn-primary" id="btnHideLayer" data-id="<%= current_layer %>" role="button">
+                Hide
+            </a>
+            <a class="btn btn-danger" id="btnDeleteLayer" data-id="<%= current_layer %>" role="button">
+                Delete
+            </a>
+            <a class="btn btn-danger" id="openSmartShape" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
+                Smart Shape
+            </a>
+        </div>
+        <% } %>
+
+        <div class="form-inline">
+            <input class="form-control" id="resizeInputWidth" type="number" min=1 max="<%= initial_width %>" step=1 value="<%= current_width %>">
+            <i class="fa fa-times fa-lg"></i>
+            <input class="form-control" id="resizeInputHeight" type="number" min=1 max="<%= initial_height %>" step=1 value="<%= current_height %>">
+        </div>
+
+        <div class="checkbox">
+            <label>
+                <input id="keepratio" type="checkbox"> Keep Ratio
+            </label>
         </div>
     </div>
+    <div class="panel-footer">Panel footer</div>
 </div>

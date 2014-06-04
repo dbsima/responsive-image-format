@@ -122,7 +122,8 @@ define(['app',
                     success: function (asset) {
                         app.body.show(new EditFileView({
                             operations: new OperationsView({
-                                model: layerModel
+                                model: layerModel,
+                                asset_id: self.model.id
                             }),
                             image: new ImageView({
                                 model: self.model,

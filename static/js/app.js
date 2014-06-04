@@ -17,7 +17,5 @@ define(['marionette', 'backbone', 'templates', 'vent', 'views/Header', 'views/Bo
         app.addInitializer(function () {
         });
 
-        //console.log("testing from app.js");
-
         return app;
     });

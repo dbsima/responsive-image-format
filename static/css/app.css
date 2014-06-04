@@ -18,6 +18,10 @@ ul {
     list-style: none;
 }
 
+.show-on-hover:hover > ul.dropdown-menu {
+    display: block;
+}
+
 .kineticjs-content {
     outline: 1px solid grey;
 }

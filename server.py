@@ -176,18 +176,26 @@ def explore():
 """
 @app.route("/layers", methods=['POST'])
 def add_layer():
-    file = request.files['file']
     asset_id = request.form['asset_id']
+    if request.files:
+        file = request.files['file']
+        if file and asset_id and allowed_file(file.filename):
+            time_stamp = time.time()
+            layer_name, layer_extension = os.path.splitext(file.filename)
+            layer = r.table('layers').insert({'name': layer_name, 'type': layer_extension, 'asset_id': asset_id, 'time_stamp': time_stamp}).run(g.rdb_conn)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], layer['generated_keys'][0] + layer_extension))
+            # update the layers of the asset by appending the new layer
+            asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
+            # Return updated asset as request response
+            return jsonify(asset)
 
-    if file and asset_id and allowed_file(file.filename):
+    smart_layer = request.form['smart_layer']
+    if smart_layer and asset_id:
+        print asset_id
         time_stamp = time.time()
-        layer_name, layer_extension = os.path.splitext(file.filename)
-        layer = r.table('layers').insert({'name': layer_name, 'type': layer_extension, 'asset_id': asset_id, 'time_stamp': time_stamp}).run(g.rdb_conn)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], layer['generated_keys'][0] + layer_extension))
-
+        layer = r.table('layers').insert({'name': '', 'type': 'smart', 'asset_id': asset_id, 'time_stamp': time_stamp}).run(g.rdb_conn)
         # update the layers of the asset by appending the new layer
         asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
-        # Return updated asset as request response
         return jsonify(asset)
     return "error"
 
@@ -336,7 +344,8 @@ def delete_asset(asset_id):
     os.remove(os.path.join(app.config['UPLOAD_FOLDER'], asset_id))
     #delete all layer_id files
     for layer in layers:
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['type']))
+        if layer['type'] != 'smart':
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['type']))
     # delete all versions of asset_id from versions
     deleted_versions = r.table('versions').filter({'asset_id': file_name}).delete().run(g.rdb_conn)
     #delete all version_id files
@@ -356,7 +365,8 @@ def delete_layer(layer_id):
         print layer_id
         # remove file layer_id
         layer = r.table('layers').get(layer_id).run(g.rdb_conn)
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['type']))
+        if layer['type'] != 'smart':
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['type']))
         # remove layer_id from layers
         deleted_layer = r.table('layers').get(layer_id).delete().run(g.rdb_conn)
         # add a new time_stamp to asset_id

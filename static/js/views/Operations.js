@@ -1,6 +1,6 @@
 /*global define*/
 
-define(['app', 'marionette', 'vent', 'templates', 'bootstrap', 'models/Layer'], function (App, Marionette, vent, templates, bootstrap, LayerModel) {
+define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models/Layer', 'select'], function ($, App, Marionette, vent, templates, bootstrap, LayerModel, Select) {
     "use strict";
 
     return Marionette.Layout.extend({
@@ -14,12 +14,22 @@ define(['app', 'marionette', 'vent', 'templates', 'bootstrap', 'models/Layer'], 
             'click #openSmartShape': 'initSmartShape'
         },
 
-        initialize: function () {
+        initialize: function (options) {
             this.listenTo(this.model, "change", this.render);
             this.listenTo(App.vent, "showInitialLayerSize", this.onLayerInit);
             this.listenTo(App.vent, "showCurrentLayerSize", this.onLayerSizeChange);
+            this.asset_id = options.asset_id;
+            this.isShapeOpen = false;
 
-            this.is_shape_open = false;
+            $(window).on('load', function () {
+                console.log("windoew");
+                $('.selectpicker').selectpicker({
+                    'selectedText': 'cat'
+                });
+            });
+            $('.selectpicker').selectpicker({
+                'selectedText': 'cat'
+            });
         },
 
         hideLayer : function () {
@@ -28,25 +38,39 @@ define(['app', 'marionette', 'vent', 'templates', 'bootstrap', 'models/Layer'], 
         },
 
         initSmartShape : function () {
+            //console.log("here");
             //var layer_id = document.getElementById('btnHideLayer').getAttribute('data-id');
-            if (!this.is_shape_open) {
-                this.is_shape_open = true;
-                console.log("initSmartShape");
 
+            var form_data = new FormData();
+            form_data.append("asset_id", this.asset_id);
+            form_data.append("smart_layer", 'cacamaca');
+            var self = this;
+            $.ajax({
+                async: false,
+                url: "/layers",
+                dataType: 'text',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                success: function (response) {
+                    console.log("success POST on /layers");
+                    // success adding smart layer =>
 
-
-            } else {
-                this.opened_shape = false;
-            }
-
-
+                },
+                error: function (response) {
+                    console.log("error POST on /layers");
+                    //console.log(response);
+                }
+            });
         },
 
         deleteLayer : function () {
             var layerModel = new LayerModel({path: this.model.get('current_layer')});
 
-            console.log("delete layer " + this.model.get('current_layer'));
-            console.log("delete asset " + this.model.get('current_asset'));
+            //console.log("delete layer " + this.model.get('current_layer'));
+            // console.log("delete asset " + this.model.get('current_asset'));
             var self = this;
             $.ajax({
                 async: false,
@@ -92,6 +116,13 @@ define(['app', 'marionette', 'vent', 'templates', 'bootstrap', 'models/Layer'], 
                 this.model.set('current_layer', options.current_layer);
                 this.model.set('current_asset', options.current_asset);
             }
+        },
+
+        onShow: function (options) {
+            console.log('here4');
+            $('.selectpicker').selectpicker({
+                'selectedText': 'cat'
+            });
         }
     });
 });

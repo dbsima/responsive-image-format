@@ -33,7 +33,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         console.log("layer id " + layers[i].id + layers[i].type);
                         this.sources[i] = {
                             id: String(layers[i].id),
-                            path: "../files/" + layers[i].id + layers[i].type
+                            path: "../files/" + layers[i].id + layers[i].type,
+                            type: layers[i].type
                         };
                     }
                 }.bind(this),
@@ -113,7 +114,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             // Appending parameter named file with properties of file_field to form_data
             form_data.append("file", file_data);
             // Appending parameter named asset_id with current asset_id
-            var assetID = document.getElementById('btnAddLayer').getAttribute('data-id');
+            var assetID = document.getElementById('btnApply').getAttribute('data-id');
 
             if (file_data) {
                 //console.log("asdadsa"+ assetID);
@@ -140,7 +141,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 console.log("success fetching layer");
                             }
                         });
-
                     },
                     error: function (response) {
                         console.log("error POST on /layers");
@@ -167,7 +167,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     handleBL = group.find('.handleBL')[0],
                     handleML = group.find('.handleML')[0],
                     handleR = group.find('.handleR')[0],
-                    image = group.find('.image')[0],
+                    shape = group.find('.image')[0],
 
                     anchorX = activeAnchor.x(),
                     anchorY = activeAnchor.y();
@@ -255,7 +255,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     break;
                 }
                 // update the position of the image
-                image.position({x: handleTL.x(), y: handleTL.y()});
+                shape.position({x: handleTL.x(), y: handleTL.y()});
 
                 // compute the new width and height of the image
                 var width = handleTR.x() - handleTL.x(),
@@ -263,13 +263,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                 // update the weight and height of the image
                 if (width && height) {
-                    image.size({width: width, height: height});
-
+                    shape.size({width: width, height: height});
+                    console.log(shape);
                     App.vent.trigger("showCurrentLayerSize", {
                         "current_width": width,
                         "current_height": height,
-                        "current_layer": image.name,
-                        "current_asset" : document.getElementById('btnAddLayer').getAttribute('data-id')
+                        "current_layer": shape.attrs.id,
+                        "current_asset" : document.getElementById('btnApply').getAttribute('data-id')
                     });
                 }
             }
@@ -351,15 +351,15 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             }
             //
             function loadImages(sources, callback) {
-                console.log("here3")
-                console.log(sources);
+                //console.log("here3")
+                //console.log(sources);
                 var images = {},
                     loadedImages = 0,
                     numImages = 0;
 
                 // count the number of images to load
                 _.each(sources, function (val, key) {
-                    if (val) {
+                    if (val && val.type !== "smart") {
                         numImages = numImages + 1;
                     }
                 });
@@ -368,24 +368,28 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     if (val) {
                         //console.log(val.path + " - " + val.id);
                         var id = key;
-
+                        console.log(val.type);
                         images[id] = new Image();
-                        images[id].onload = function () {
-                            // initStage only after all images are loaded
-                            if (++loadedImages >= numImages) {
-                                console.log(images);
-                                callback(images);
-                            }
-                        };
-                        //console.log(val.path);
-                        images[id].src = val.path;
+                        if (val.type !== "smart") {
+                            images[id].onload = function () {
+                                // initStage only after all images are loaded
+                                if (++loadedImages >= numImages) {
+                                    console.log(images);
+                                    callback(images);
+                                }
+                            };
+                            //console.log(val.path);
+                            images[id].src = val.path;
+                        }
+                        images[id].type = val.type;
                         images[id].name = val.id;
+                        images[id].id = val.id;
                     }
                 });
             }
             //
             function initStage(images) {
-
+                console.log(images);
                 var stage_width, stage_height;
                 if (images[0].width < $('#container').width() && images[0].height < $('#container').height()) {
                     stage_width = images[0].width;
@@ -394,8 +398,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     stage_width = $('#container').width();
                     stage_height = $('#container').height();
                 }
-
-                //console.log("here" + stage_width + "-" + $('#container').height());
 
                 var stage = new Kinetic.Stage({
                     container: 'container',
@@ -433,38 +435,52 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         });
                         // update W & H in Operations -> Resize
                         group.on('click', function () {
-                            var image = group.find('.image')[0];
+                            var shape = group.find('.image')[0];
 
-                            //console.log();
                             App.vent.trigger("showCurrentLayerSize", {
-                                "current_width": image.getWidth(),
-                                "current_height" : image.getHeight(),
-                                "current_layer": image.getId(),
+                                "current_width": shape.getWidth(),
+                                "current_height" : shape.getHeight(),
+                                "current_layer": shape.getId(),
                                 "current_asset": document.getElementById('btnAddLayer').getAttribute('data-id')
                             });
                         });
 
                         layer.add(group);
-                        //console.log(images[key].name);
-                        var img = new Kinetic.Image({
-                            x: 0,
-                            y: 0,
-                            image: images[key],
-                            name: 'image',
-                            id: images[key].name
-                        });
 
-                        group.add(img);
+                        var shape;
+                        if (val.type === 'smart') {
+                            shape = new Kinetic.Rect({
+                                width: 100,
+                                height: 100,
+                                fill : '',
+                                name: 'image',
+                                stroke: 'grey',
+                                strokeWidth: 1,
+                                id: images[key].name,
+                                x: 0,
+                                y: 0
+                            });
+                        } else {
+                            shape = new Kinetic.Image({
+                                x: 0,
+                                y: 0,
+                                image: images[key],
+                                name: 'image',
+                                id: images[key].name
+                            });
+                        }
+
+                        group.add(shape);
                         addAnchor(group, 0, 0, 'handleTL');
-                        addAnchor(group, img.getWidth() / 2, 0, 'handleTC');
-                        addAnchor(group, img.getWidth(), 0, 'handleTR');
-                        addAnchor(group, img.getWidth(), img.getHeight() / 2, 'handleMR');
-                        addAnchor(group, img.getWidth(), img.getHeight(), 'handleBR');
-                        addAnchor(group, img.getWidth() / 2, img.getHeight(), 'handleBC');
-                        addAnchor(group, 0, img.getHeight(), 'handleBL');
-                        addAnchor(group, 0, img.getHeight() / 2, 'handleML');
+                        addAnchor(group, shape.getWidth() / 2, 0, 'handleTC');
+                        addAnchor(group, shape.getWidth(), 0, 'handleTR');
+                        addAnchor(group, shape.getWidth(), shape.getHeight() / 2, 'handleMR');
+                        addAnchor(group, shape.getWidth(), shape.getHeight(), 'handleBR');
+                        addAnchor(group, shape.getWidth() / 2, shape.getHeight(), 'handleBC');
+                        addAnchor(group, 0, shape.getHeight(), 'handleBL');
+                        addAnchor(group, 0, shape.getHeight() / 2, 'handleML');
 
-                        addAnchor(group, img.getWidth() / 2, img.getHeight() + 50, 'handleR');
+                        addAnchor(group, shape.getWidth() / 2, shape.getHeight() + 50, 'handleR');
 
                         group.on('dragstart', function () {
                             this.moveToTop();
