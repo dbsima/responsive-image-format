@@ -37,35 +37,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             console.log("hide layer" + layer_id);
         },
 
-        initSmartShape : function () {
-            //console.log("here");
-            //var layer_id = document.getElementById('btnHideLayer').getAttribute('data-id');
-
-            var form_data = new FormData();
-            form_data.append("asset_id", this.asset_id);
-            form_data.append("smart_layer", 'cacamaca');
-            var self = this;
-            $.ajax({
-                async: false,
-                url: "/layers",
-                dataType: 'text',
-                cache: false,
-                contentType: false,
-                processData: false,
-                data: form_data,
-                type: 'post',
-                success: function (response) {
-                    console.log("success POST on /layers");
-                    // success adding smart layer =>
-
-                },
-                error: function (response) {
-                    console.log("error POST on /layers");
-                    //console.log(response);
-                }
-            });
-        },
-
         deleteLayer : function () {
             var layerModel = new LayerModel({path: this.model.get('current_layer')});
 

@@ -7,7 +7,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         template : templates.image,
 
         initialize: function () {
-            console.log("initialize");
+            //console.log("initialize");
             this.listenTo(App.vent, "initStage", this.onInitStage);
             this.listenTo(App.vent, "updateStage", this.onUpdateStage);
 
@@ -51,11 +51,37 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         events : {
             'click #btnApply' : 'applyOperation',
             'click #btnSelect' : 'selectDisplay',
-            'click #btnAddLayer' : 'addLayer'
+            'click #openSmartShape': 'initSmartShape'
+        },
+
+        initSmartShape : function () {
+            var form_data = new FormData();
+            form_data.append("asset_id", this.assetID);
+            form_data.append("smart_layer", 'cacamaca');
+            var self = this;
+            $.ajax({
+                async: false,
+                url: "/layers",
+                dataType: 'text',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                success: function (response) {
+                    // rerender stage after new smart shape added
+                    self.initialize();
+                    self.render();
+                },
+                error: function (response) {
+                    console.log("error POST on /layers");
+                    //console.log(response);
+                }
+            });
         },
 
         onLayerDeleted: function (options) {
-            console.log("layer deleted");
+            //console.log("layer deleted");
         },
 
         onUpdateStage: function (options) {
@@ -70,12 +96,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 contentType: 'application/json;charset=UTF-8',
                 data: JSON.stringify({"composed_image": dataUrl}, null, '\t'),
                 success: function (response) {
-                    console.log("success POST on /assets/:assetID");
-                    console.log(response);
+                    //console.log("success POST on /assets/:assetID");
+                    //console.log(response);
 
                 },
                 error: function (response) {
-                    console.log("error POST on /assets/:assetID");
+                    //console.log("error POST on /assets/:assetID");
                     //console.log(response);
                 }
             });
@@ -109,68 +135,21 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             //console.log("select");
         },
 
-        addLayer: function () {
-            console.log("addLayer");
-            // Getting the properties of file from file field
-            var file_data = $("#layer").prop("files")[0];
-            // Creating object of FormData class
-            var form_data = new FormData();
-            // Appending parameter named file with properties of file_field to form_data
-            form_data.append("file", file_data);
-            // Appending parameter named asset_id with current asset_id
-            var assetID = document.getElementById('btnApply').getAttribute('data-id');
-
-            if (file_data) {
-                //console.log("asdadsa"+ assetID);
-                form_data.append("asset_id", assetID);
-                var self = this;
-                $.ajax({
-                    async: false,
-                    url: "/layers",
-                    dataType: 'text',
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    data: form_data,
-                    type: 'post',
-                    success: function (response) {
-                        console.log("success POST on /layers");
-                        //console.log(response);
-                        var that = self;
-                        self.model.fetch({
-                            success: function (layer) {
-                                // lot of hacking in here
-                                that.initialize();
-                                that.render();
-                                console.log("success fetching layer");
-                            }
-                        });
-                    },
-                    error: function (response) {
-                        console.log("error POST on /layers");
-                        //console.log(response);
-                    }
-                });
-            } else {
-                console.log("no file uploaded");
-            }
-        },
-
         onRender : function () {
             //console.log(this.sources);
             // function for updating the stage when an anchor is dragged
             function update(activeAnchor) {
                 var group = activeAnchor.getParent(),
 
-                    handleTL = group.find('.handleTL')[0],
-                    handleTC = group.find('.handleTC')[0],
-                    handleTR = group.find('.handleTR')[0],
-                    handleMR = group.find('.handleMR')[0],
-                    handleBR = group.find('.handleBR')[0],
-                    handleBC = group.find('.handleBC')[0],
-                    handleBL = group.find('.handleBL')[0],
-                    handleML = group.find('.handleML')[0],
-                    handleR = group.find('.handleR')[0],
+                    gripTL = group.find('.gripTL')[0],
+                    gripTC = group.find('.gripTC')[0],
+                    gripTR = group.find('.gripTR')[0],
+                    gripMR = group.find('.gripMR')[0],
+                    gripBR = group.find('.gripBR')[0],
+                    gripBC = group.find('.gripBC')[0],
+                    gripBL = group.find('.gripBL')[0],
+                    gripML = group.find('.gripML')[0],
+                    gripR = group.find('.gripR')[0],
                     shape = group.find('.image')[0],
 
                     anchorX = activeAnchor.x(),
@@ -178,93 +157,93 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                 // update anchor positions
                 switch (activeAnchor.name()) {
-                case 'handleTL':
-                    handleTR.y(anchorY);
-                    handleTC.y(anchorY);
-                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
-                    handleBL.x(anchorX);
-                    handleML.x(anchorX);
-                    handleML.y((handleTL.y() + handleBL.y()) / 2);
-                    handleMR.y((handleTR.y() + handleBR.y()) / 2);
-                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
-                    handleR.x((handleBL.x() + handleBR.x()) / 2);
+                case 'gripTL':
+                    gripTR.y(anchorY);
+                    gripTC.y(anchorY);
+                    gripTC.x((gripTL.x() + gripTR.x()) / 2);
+                    gripBL.x(anchorX);
+                    gripML.x(anchorX);
+                    gripML.y((gripTL.y() + gripBL.y()) / 2);
+                    gripMR.y((gripTR.y() + gripBR.y()) / 2);
+                    gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                    gripR.x((gripBL.x() + gripBR.x()) / 2);
                     break;
 
-                case 'handleTC':
-                    handleTR.y(anchorY);
-                    handleTL.y(anchorY);
-                    handleML.y((handleTL.y() + handleBL.y()) / 2);
-                    handleMR.y((handleTR.y() + handleBR.y()) / 2);
+                case 'gripTC':
+                    gripTR.y(anchorY);
+                    gripTL.y(anchorY);
+                    gripML.y((gripTL.y() + gripBL.y()) / 2);
+                    gripMR.y((gripTR.y() + gripBR.y()) / 2);
                     break;
 
-                case 'handleTR':
-                    handleTL.y(anchorY);
-                    handleTC.y(anchorY);
-                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
-                    handleBR.x(anchorX);
-                    handleMR.x(anchorX);
-                    handleMR.y((handleTL.y() + handleBR.y()) / 2);
-                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
-                    handleR.x((handleBL.x() + handleBR.x()) / 2);
-                    handleML.y((handleTL.y() + handleBL.y()) / 2);
+                case 'gripTR':
+                    gripTL.y(anchorY);
+                    gripTC.y(anchorY);
+                    gripTC.x((gripTL.x() + gripTR.x()) / 2);
+                    gripBR.x(anchorX);
+                    gripMR.x(anchorX);
+                    gripMR.y((gripTL.y() + gripBR.y()) / 2);
+                    gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                    gripR.x((gripBL.x() + gripBR.x()) / 2);
+                    gripML.y((gripTL.y() + gripBL.y()) / 2);
                     break;
 
-                case 'handleMR':
-                    handleTR.x(anchorX);
-                    handleBR.x(anchorX);
-                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
-                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
-                    handleR.x((handleBL.x() + handleBR.x()) / 2);
+                case 'gripMR':
+                    gripTR.x(anchorX);
+                    gripBR.x(anchorX);
+                    gripTC.x((gripTL.x() + gripTR.x()) / 2);
+                    gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                    gripR.x((gripBL.x() + gripBR.x()) / 2);
                     break;
 
-                case 'handleBR':
-                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
-                    handleBL.y(anchorY);
-                    handleML.y((handleTL.y() + handleBL.y()) / 2);
-                    handleBC.y(anchorY);
-                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
-                    handleR.y(anchorY + 50);
-                    handleR.x((handleBL.x() + handleBR.x()) / 2);
-                    handleTR.x(anchorX);
-                    handleMR.x(anchorX);
-                    handleMR.y((handleTR.y() + handleBR.y()) / 2);
+                case 'gripBR':
+                    gripTC.x((gripTL.x() + gripTR.x()) / 2);
+                    gripBL.y(anchorY);
+                    gripML.y((gripTL.y() + gripBL.y()) / 2);
+                    gripBC.y(anchorY);
+                    gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                    gripR.y(anchorY + 50);
+                    gripR.x((gripBL.x() + gripBR.x()) / 2);
+                    gripTR.x(anchorX);
+                    gripMR.x(anchorX);
+                    gripMR.y((gripTR.y() + gripBR.y()) / 2);
                     break;
 
-                case 'handleBC':
-                    handleBR.y(anchorY);
-                    handleBL.y(anchorY);
-                    handleML.y((handleTL.y() + handleBL.y()) / 2);
-                    handleMR.y((handleTR.y() + handleBR.y()) / 2);
+                case 'gripBC':
+                    gripBR.y(anchorY);
+                    gripBL.y(anchorY);
+                    gripML.y((gripTL.y() + gripBL.y()) / 2);
+                    gripMR.y((gripTR.y() + gripBR.y()) / 2);
                     break;
 
-                case 'handleBL':
-                    handleBR.y(anchorY);
-                    handleTL.x(anchorX);
-                    handleML.x(anchorX);
-                    handleML.y((handleTL.y() + handleBL.y()) / 2);
-                    handleBC.y(anchorY);
-                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
-                    handleR.y(anchorY + 50);
-                    handleR.x((handleBL.x() + handleBR.x()) / 2);
-                    handleMR.y((handleTR.y() + handleBR.y()) / 2);
-                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
+                case 'gripBL':
+                    gripBR.y(anchorY);
+                    gripTL.x(anchorX);
+                    gripML.x(anchorX);
+                    gripML.y((gripTL.y() + gripBL.y()) / 2);
+                    gripBC.y(anchorY);
+                    gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                    gripR.y(anchorY + 50);
+                    gripR.x((gripBL.x() + gripBR.x()) / 2);
+                    gripMR.y((gripTR.y() + gripBR.y()) / 2);
+                    gripTC.x((gripTL.x() + gripTR.x()) / 2);
                     break;
 
-                case 'handleML':
-                    handleTL.x(anchorX);
-                    handleBL.x(anchorX);
-                    handleTC.x((handleTL.x() + handleTR.x()) / 2);
-                    handleBC.x((handleBL.x() + handleBR.x()) / 2);
-                    handleR.x((handleBL.x() + handleBR.x()) / 2);
+                case 'gripML':
+                    gripTL.x(anchorX);
+                    gripBL.x(anchorX);
+                    gripTC.x((gripTL.x() + gripTR.x()) / 2);
+                    gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                    gripR.x((gripBL.x() + gripBR.x()) / 2);
                     break;
                 }
                 // update the position of the image
-                //console.log(handleTL.x() + "+" +  handleTL.y());
-                shape.position({x: handleTL.x(), y: handleTL.y()});
+                //console.log(gripTL.x() + "+" +  gripTL.y());
+                shape.position({x: gripTL.x(), y: gripTL.y()});
 
                 // compute the new width and height of the image
-                var width = handleTR.x() - handleTL.x(),
-                    height = handleBL.y() - handleTL.y();
+                var width = gripTR.x() - gripTL.x(),
+                    height = gripBL.y() - gripTL.y();
 
                 // update the weight and height of the image
                 if (width && height) {
@@ -313,13 +292,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 anchor.on('mouseover', function () {
                     var layer = this.getLayer();
 
-                    if (anchor.name() === 'handleTC' || anchor.name() === 'handleBC') {
+                    if (anchor.name() === 'gripTC' || anchor.name() === 'gripBC') {
                         document.body.style.cursor = 'ns-resize';
-                    } else if (anchor.name() === 'handleML' || anchor.name() === 'handleMR') {
+                    } else if (anchor.name() === 'gripML' || anchor.name() === 'gripMR') {
                         document.body.style.cursor = 'ew-resize';
-                    } else if (anchor.name() === 'handleTL' || anchor.name() === 'handleBR') {
+                    } else if (anchor.name() === 'gripTL' || anchor.name() === 'gripBR') {
                         document.body.style.cursor = 'nwse-resize';
-                    } else if (anchor.name() === 'handleTR' || anchor.name() === 'handleBL') {
+                    } else if (anchor.name() === 'gripTR' || anchor.name() === 'gripBL') {
                         document.body.style.cursor = 'nesw-resize';
                     }
                     this.setStrokeWidth(4);
@@ -333,8 +312,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     layer.draw();
                 });
 
-                // set anchors handleTC and handleBC to move only on vertical
-                if (anchor.name() === 'handleTC' || anchor.name() === 'handleBC') {
+                // set anchors gripTC and gripBC to move only on vertical
+                if (anchor.name() === 'gripTC' || anchor.name() === 'gripBC') {
                     anchor.dragBoundFunc(function (pos) {
                         return {
                             x: this.getAbsolutePosition().x,
@@ -342,8 +321,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         }
                     });
                 }
-                // set anchors handleML and handleMR to move only on horizontal
-                if (anchor.name() === 'handleML' || anchor.name() === 'handleMR') {
+                // set anchors gripML and gripMR to move only on horizontal
+                if (anchor.name() === 'gripML' || anchor.name() === 'gripMR') {
                     anchor.dragBoundFunc(function (pos) {
                         return {
                             x: pos.x,
@@ -373,8 +352,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     if (val) {
                         //console.log(val.path + " - " + val.id);
                         var id = key;
-                        console.log('here10');
-                        console.log(val.x + "-" + val.y);
+                        //console.log('here10');
+                        //console.log("[" + val.x + ", " + val.y + "]");
                         images[id] = new Image();
                         if (val.type !== "smart") {
                             images[id].onload = function () {
@@ -393,7 +372,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         images[id].X = val.x;
                         images[id].Y = val.y;
 
-                        console.log(images[id].X);
+                        //console.log(images[id].X);
                         images[id].height = val.height;
                         images[id].width = val.width;
                     }
@@ -413,6 +392,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     width: stage_width,
                     height: stage_height
                 });
+                console.log(stage.getX() + "-" + stage.getY());
 
                 // send initial width and size
                 App.vent.trigger("showInitialLayerSize", {
@@ -420,15 +400,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     "initial_height" : stage.getHeight()
                 });
 
-                var layer = new Kinetic.Layer(),
-                    bg = new Kinetic.Rect({
-                        width: stage.getWidth(),
-                        height: stage.getHeight(),
-                        fill : '',
-                        x: 0,
-                        y: 0
-                    });
-                layer.add(bg);
+                var layer = new Kinetic.Layer();
 
                 layer.on('mousedown', function (e) {
                     var node = e.target;
@@ -448,7 +420,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                             App.vent.trigger("showCurrentLayerSize", {
                                 "current_width": shape.getWidth(),
-                                "current_height" : shape.getHeight(),
+                                "current_height": shape.getHeight(),
                                 "current_layer": shape.getId(),
                                 "current_asset": document.getElementById('btnApply').getAttribute('data-id')
                             });
@@ -457,7 +429,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         layer.add(group);
 
                         var shape;
-                        console.log(val.X + "-" + val.Y + " - " + val.width + "-" + val.height);
+                        console.log("[" + val.X + ", " + val.Y + " ] - [" + val.width + ", " + val.height + "]");
                         if (val.type === 'smart') {
                             shape = new Kinetic.Rect({
                                 x: val.X,
@@ -468,7 +440,11 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 name: 'image',
                                 stroke: 'grey',
                                 strokeWidth: 1,
-                                id: images[key].name
+                                id: images[key].name,
+
+                                //fillLinearGradientStartPoint: {x: val.X, y: val.Y},
+                                //fillLinearGradientEndPoint: {x: val.X + val.width, y: val.Y + val.height},
+                                //fillLinearGradientColorStops: [0, 'red', 1, 'yellow']
                             });
                         } else {
                             shape = new Kinetic.Image({
@@ -481,18 +457,18 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 id: images[key].name
                             });
                         }
-                        console.log(val.X + ' - ' + val.Y + " : " + shape.getWidth() + " - " +  shape.getHeight())
+                        //console.log(val.X + ' - ' + val.Y + " : " + shape.getWidth() + " - " +  shape.getHeight())
                         group.add(shape);
-                        addAnchor(group, val.X, val.Y, 'handleTL');
-                        addAnchor(group, val.X + shape.getWidth() / 2, val.Y, 'handleTC');
-                        addAnchor(group, val.X + shape.getWidth(), val.Y, 'handleTR');
-                        addAnchor(group, val.X + shape.getWidth(), val.Y + shape.getHeight() / 2, 'handleMR');
-                        addAnchor(group, val.X + shape.getWidth(), val.Y + shape.getHeight(), 'handleBR');
-                        addAnchor(group, val.X + shape.getWidth() / 2, val.Y + shape.getHeight(), 'handleBC');
-                        addAnchor(group, val.X, val.Y + shape.getHeight(), 'handleBL');
-                        addAnchor(group, val.X, val.Y + shape.getHeight() / 2, 'handleML');
-                        // Rotate handle
-                        addAnchor(group, val.X + shape.getWidth() / 2, val.Y + shape.getHeight() + 50, 'handleR');
+                        addAnchor(group, val.X, val.Y, 'gripTL');
+                        addAnchor(group, val.X + shape.getWidth() / 2, val.Y, 'gripTC');
+                        addAnchor(group, val.X + shape.getWidth(), val.Y, 'gripTR');
+                        addAnchor(group, val.X + shape.getWidth(), val.Y + shape.getHeight() / 2, 'gripMR');
+                        addAnchor(group, val.X + shape.getWidth(), val.Y + shape.getHeight(), 'gripBR');
+                        addAnchor(group, val.X + shape.getWidth() / 2, val.Y + shape.getHeight(), 'gripBC');
+                        addAnchor(group, val.X, val.Y + shape.getHeight(), 'gripBL');
+                        addAnchor(group, val.X, val.Y + shape.getHeight() / 2, 'gripML');
+                        // Rotate grip
+                        addAnchor(group, val.X + shape.getWidth() / 2, val.Y + shape.getHeight() + 50, 'gripR');
 
                         group.on('dragstart', function () {
                             this.moveToTop();
@@ -502,15 +478,15 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             App.vent.trigger("updateStage", {stage: stage});
                             //console.log(shape);
                             //console.log(group.find('.image')[0].getId());
-                            console.log(group.getPosition().x + "-" + group.getPosition().y);
-                            ///console.log(group.find('.image')[0].getSize().width + " - " + group.find('.image')[0].getSize().height);
-                            //var shape = 2222;
+                            console.log("[" + this.getAbsolutePosition().x + ", " + this.getAbsolutePosition().y + " ] - [" + group.find('.image')[0].getSize().width + ", " + group.find('.image')[0].getSize().height + "]");
+                            console.log(this.getStage().getPosition());
+                            console.log(this.getAbsolutePosition());
+
                             var self = this;
-                            //console.log(self.getPosition());
                             $.ajax({
                                 url: "/layers/" + self.find('.image')[0].getId(),
                                 contentType: 'application/json;charset=UTF-8',
-                                data: JSON.stringify({"position": self.getPosition(), "size": self.find('.image')[0].getSize()}),
+                                data: JSON.stringify({"position": self.getAbsolutePosition(), "size": self.find('.image')[0].getSize()}),
                                 type: 'PATCH',
                                 success: function (response) {
                                     console.log("success PATCH on /layers");
@@ -533,15 +509,15 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     if (node.parent.nodeType = 'Kinetic.Group') {
                         var i, children = node.parent.children;
                         for (i = 1; i < children.length; i = i + 1) {
-                            if (children[i].getName() === 'handleTL' ||
-                                    children[i].getName() === 'handleTC' ||
-                                    children[i].getName() === 'handleTR' ||
-                                    children[i].getName() === 'handleMR' ||
-                                    children[i].getName() === 'handleBR' ||
-                                    children[i].getName() === 'handleBC' ||
-                                    children[i].getName() === 'handleBL' ||
-                                    children[i].getName() === 'handleML' ||
-                                    children[i].getName() === 'handleR') {
+                            if (children[i].getName() === 'gripTL' ||
+                                    children[i].getName() === 'gripTC' ||
+                                    children[i].getName() === 'gripTR' ||
+                                    children[i].getName() === 'gripMR' ||
+                                    children[i].getName() === 'gripBR' ||
+                                    children[i].getName() === 'gripBC' ||
+                                    children[i].getName() === 'gripBL' ||
+                                    children[i].getName() === 'gripML' ||
+                                    children[i].getName() === 'gripR') {
                                 children[i].show();
                             }
                         }
@@ -556,17 +532,17 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                         if (grandChildren) {
                             for (j = 1; j < grandChildren.length; j = j + 1) {
-                                if (grandChildren[j].getName() === 'handleTL' ||
-                                        grandChildren[j].getName() === 'handleTC' ||
-                                        grandChildren[j].getName() === 'handleTR' ||
-                                        grandChildren[j].getName() === 'handleMR' ||
-                                        grandChildren[j].getName() === 'handleBR' ||
-                                        grandChildren[j].getName() === 'handleBC' ||
-                                        grandChildren[j].getName() === 'handleBL' ||
-                                        grandChildren[j].getName() === 'handleML' ||
-                                        grandChildren[j].getName() === 'handleR') {
-                                    grandChildren[j].hide();
-                                    layer.draw();
+                                if (grandChildren[j].getName() === 'gripTL' ||
+                                    grandChildren[j].getName() === 'gripTC' ||
+                                    grandChildren[j].getName() === 'gripTR' ||
+                                    grandChildren[j].getName() === 'gripMR' ||
+                                    grandChildren[j].getName() === 'gripBR' ||
+                                    grandChildren[j].getName() === 'gripBC' ||
+                                    grandChildren[j].getName() === 'gripBL' ||
+                                    grandChildren[j].getName() === 'gripML' ||
+                                    grandChildren[j].getName() === 'gripR') {
+                                        grandChildren[j].hide();
+                                        layer.draw();
                                 }
                             }
                         }
