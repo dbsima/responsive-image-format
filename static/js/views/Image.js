@@ -34,7 +34,11 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         this.sources[i] = {
                             id: String(layers[i].id),
                             path: "../files/" + layers[i].id + layers[i].type,
-                            type: layers[i].type
+                            type: layers[i].type,
+                            x: layers[i].position.x,
+                            y: layers[i].position.y,
+                            width: layers[i].size.width,
+                            height: layers[i].size.height
                         };
                     }
                 }.bind(this),
@@ -90,7 +94,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         },
 
         applyOperation: function () {
-            console.log("apply");
+            //console.log("apply");
 
             var self = this;
             self.stage.toDataURL({
@@ -255,6 +259,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     break;
                 }
                 // update the position of the image
+                //console.log(handleTL.x() + "+" +  handleTL.y());
                 shape.position({x: handleTL.x(), y: handleTL.y()});
 
                 // compute the new width and height of the image
@@ -264,7 +269,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 // update the weight and height of the image
                 if (width && height) {
                     shape.size({width: width, height: height});
-                    console.log(shape);
+                    //console.log(shape);
                     App.vent.trigger("showCurrentLayerSize", {
                         "current_width": width,
                         "current_height": height,
@@ -368,7 +373,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     if (val) {
                         //console.log(val.path + " - " + val.id);
                         var id = key;
-                        console.log(val.type);
+                        console.log('here10');
+                        console.log(val.x + "-" + val.y);
                         images[id] = new Image();
                         if (val.type !== "smart") {
                             images[id].onload = function () {
@@ -379,30 +385,33 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 }
                             };
                             //console.log(val.path);
-                            images[id].src = val.path;
+                            images[id].src = val.path + "?"+(new Date()).getTime();
                         }
                         images[id].type = val.type;
                         images[id].name = val.id;
                         images[id].id = val.id;
+                        images[id].X = val.x;
+                        images[id].Y = val.y;
+
+                        console.log(images[id].X);
+                        images[id].height = val.height;
+                        images[id].width = val.width;
                     }
                 });
             }
             //
             function initStage(images) {
-                console.log(images);
-                var stage_width, stage_height;
-                if (images[0].width < $('#container').width() && images[0].height < $('#container').height()) {
-                    stage_width = images[0].width;
-                    stage_height = images[0].height;
-                } else {
+                var stage_width = document.getElementById('btnApply').getAttribute('data-width'),
+                    stage_height = document.getElementById('btnApply').getAttribute('data-height');
+                if (stage_width >= $('#container').width() && stage_height >= $('#container').height()) {
                     stage_width = $('#container').width();
                     stage_height = $('#container').height();
                 }
 
                 var stage = new Kinetic.Stage({
                     container: 'container',
-                    width: images[0].width,
-                    height: images[0].height
+                    width: stage_width,
+                    height: stage_height
                 });
 
                 // send initial width and size
@@ -441,46 +450,49 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 "current_width": shape.getWidth(),
                                 "current_height" : shape.getHeight(),
                                 "current_layer": shape.getId(),
-                                "current_asset": document.getElementById('btnAddLayer').getAttribute('data-id')
+                                "current_asset": document.getElementById('btnApply').getAttribute('data-id')
                             });
                         });
 
                         layer.add(group);
 
                         var shape;
+                        console.log(val.X + "-" + val.Y + " - " + val.width + "-" + val.height);
                         if (val.type === 'smart') {
                             shape = new Kinetic.Rect({
-                                width: 100,
-                                height: 100,
+                                x: val.X,
+                                y: val.Y,
+                                width: val.width,
+                                height: val.height,
                                 fill : '',
                                 name: 'image',
                                 stroke: 'grey',
                                 strokeWidth: 1,
-                                id: images[key].name,
-                                x: 0,
-                                y: 0
+                                id: images[key].name
                             });
                         } else {
                             shape = new Kinetic.Image({
-                                x: 0,
-                                y: 0,
+                                x: val.X,
+                                y: val.Y,
+                                width: val.width,
+                                height: val.height,
                                 image: images[key],
                                 name: 'image',
                                 id: images[key].name
                             });
                         }
-
+                        console.log(val.X + ' - ' + val.Y + " : " + shape.getWidth() + " - " +  shape.getHeight())
                         group.add(shape);
-                        addAnchor(group, 0, 0, 'handleTL');
-                        addAnchor(group, shape.getWidth() / 2, 0, 'handleTC');
-                        addAnchor(group, shape.getWidth(), 0, 'handleTR');
-                        addAnchor(group, shape.getWidth(), shape.getHeight() / 2, 'handleMR');
-                        addAnchor(group, shape.getWidth(), shape.getHeight(), 'handleBR');
-                        addAnchor(group, shape.getWidth() / 2, shape.getHeight(), 'handleBC');
-                        addAnchor(group, 0, shape.getHeight(), 'handleBL');
-                        addAnchor(group, 0, shape.getHeight() / 2, 'handleML');
-
-                        addAnchor(group, shape.getWidth() / 2, shape.getHeight() + 50, 'handleR');
+                        addAnchor(group, val.X, val.Y, 'handleTL');
+                        addAnchor(group, val.X + shape.getWidth() / 2, val.Y, 'handleTC');
+                        addAnchor(group, val.X + shape.getWidth(), val.Y, 'handleTR');
+                        addAnchor(group, val.X + shape.getWidth(), val.Y + shape.getHeight() / 2, 'handleMR');
+                        addAnchor(group, val.X + shape.getWidth(), val.Y + shape.getHeight(), 'handleBR');
+                        addAnchor(group, val.X + shape.getWidth() / 2, val.Y + shape.getHeight(), 'handleBC');
+                        addAnchor(group, val.X, val.Y + shape.getHeight(), 'handleBL');
+                        addAnchor(group, val.X, val.Y + shape.getHeight() / 2, 'handleML');
+                        // Rotate handle
+                        addAnchor(group, val.X + shape.getWidth() / 2, val.Y + shape.getHeight() + 50, 'handleR');
 
                         group.on('dragstart', function () {
                             this.moveToTop();
@@ -488,7 +500,25 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                         group.on('dragend', function () {
                             App.vent.trigger("updateStage", {stage: stage});
-                            console.log(group.getPosition());
+                            //console.log(shape);
+                            //console.log(group.find('.image')[0].getId());
+                            console.log(group.getPosition().x + "-" + group.getPosition().y);
+                            ///console.log(group.find('.image')[0].getSize().width + " - " + group.find('.image')[0].getSize().height);
+                            //var shape = 2222;
+                            var self = this;
+                            //console.log(self.getPosition());
+                            $.ajax({
+                                url: "/layers/" + self.find('.image')[0].getId(),
+                                contentType: 'application/json;charset=UTF-8',
+                                data: JSON.stringify({"position": self.getPosition(), "size": self.find('.image')[0].getSize()}),
+                                type: 'PATCH',
+                                success: function (response) {
+                                    console.log("success PATCH on /layers");
+                                },
+                                error: function (response) {
+                                    console.log("error PATCH on /layers");
+                                }
+                            });
                         });
                     }
                     stage.add(layer);

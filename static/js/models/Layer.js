@@ -5,14 +5,16 @@ define(["jquery", "backbone"],
             initialize: function (options) {
                 //console.log(options);
             },
-            
+
             defaults: {
                 id: "",
                 name: "",
                 type: "",
                 time_stamp: "",
                 asset_id: "",
-            
+                position: "",
+                size: "",
+
                 initial_width: "",
                 initial_height: "",
                 current_width: "",
@@ -20,13 +22,13 @@ define(["jquery", "backbone"],
                 current_layer: "",
                 curret_asset: ""
             },
-            
+
             url: function () {
                 var path = this.get("path");
                 //console.log(path);
                 return "/layers/" + path;
             },
-            
+
             toJSON: function (options) {
                 var result = Backbone.Model.prototype.toJSON.apply(this, arguments);
                 result.filters = this.get("filters") ? this.get("filters").toJSON(options) : {};

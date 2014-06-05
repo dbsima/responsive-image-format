@@ -17,6 +17,7 @@ define(["jquery", "backbone"],
                 device: "md-device-1",
                 display_w: "1920",
                 display_h: "1080",
+                size: "",
 
                 desktop_w: "1920",
                 desktop_h: "1080",

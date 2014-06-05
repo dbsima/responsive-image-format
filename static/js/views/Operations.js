@@ -107,7 +107,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
         onLayerSizeChange: function (options) {
             options = options || {};
             this.options = options;
-            console.log(options);
+            //console.log(options);
             //console.log(options);
             if (options.current_width && options.current_height && options.current_layer) {
                 //console.log(options.currentLayerWidth + " - " + options.currentLayerHeight);

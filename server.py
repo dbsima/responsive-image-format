@@ -1,7 +1,7 @@
 from flask import Flask, url_for, json, jsonify, g, request, Response, render_template, make_response, send_from_directory, abort, session, flash, redirect
 from werkzeug.utils import secure_filename
 
-import argparse, os, string, shutil, time
+import argparse, os, string, shutil, time, re
 
 import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError, RqlDriverError
@@ -151,7 +151,8 @@ def explore():
                                                'type': layer_extension,\
                                                'resolutions': "",\
                                                'shared': 'false',\
-                                               'user_id': ''\
+                                               'user_id': '',\
+                                               'size': {}\
                                                }).run(g.rdb_conn)
             asset_id = asset['generated_keys'][0]
 
@@ -159,11 +160,26 @@ def explore():
             layer = r.table('layers').insert({'asset_id': asset_id,\
                                                'name': layer_name,\
                                                'type': layer_extension,\
-                                               'time_stamp': time_stamp\
+                                               'time_stamp': time_stamp,\
+                                               'position': {"x" : 0, "y": 0},\
+                                               'size': {}\
                                                }).run(g.rdb_conn)
             layer_id = layer['generated_keys'][0]
+
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'],\
+                                    layer_id + layer_extension)
+
             file.save(os.path.join(app.config['UPLOAD_FOLDER'],\
-                                   layer_id + layer_extension))
+                                    layer_id + layer_extension))
+            # get the size of the image and update the layer
+            im = Image.open(file_path)
+            (width, height) = im.size
+            updated_layer = r.table('layers').get(layer_id).update({\
+                                                                "size": {"width": width, "height": height}\
+                                                                }).run(g.rdb_conn)
+            updated_asset = r.table('assets').get(asset_id).update({\
+                                                                "size": {"width": width, "height": height}\
+                                                                }).run(g.rdb_conn)
 
             src = os.path.join(app.config['UPLOAD_FOLDER'], layer_id + layer_extension)
             dst = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + layer_extension)
@@ -177,23 +193,17 @@ def explore():
 @app.route("/layers", methods=['POST'])
 def add_layer():
     asset_id = request.form['asset_id']
-    if request.files:
-        file = request.files['file']
-        if file and asset_id and allowed_file(file.filename):
-            time_stamp = time.time()
-            layer_name, layer_extension = os.path.splitext(file.filename)
-            layer = r.table('layers').insert({'name': layer_name, 'type': layer_extension, 'asset_id': asset_id, 'time_stamp': time_stamp}).run(g.rdb_conn)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], layer['generated_keys'][0] + layer_extension))
-            # update the layers of the asset by appending the new layer
-            asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
-            # Return updated asset as request response
-            return jsonify(asset)
-
     smart_layer = request.form['smart_layer']
     if smart_layer and asset_id:
         print asset_id
         time_stamp = time.time()
-        layer = r.table('layers').insert({'name': '', 'type': 'smart', 'asset_id': asset_id, 'time_stamp': time_stamp}).run(g.rdb_conn)
+        layer = r.table('layers').insert({'name': '',\
+                                          'type': 'smart',\
+                                          'asset_id': asset_id,\
+                                          'time_stamp': time_stamp,
+                                          'position': {"x" : 0, "y": 0},\
+                                          'size': {"width": 100, "height": 100}\
+                                          }).run(g.rdb_conn)
         # update the layers of the asset by appending the new layer
         asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
         return jsonify(asset)
@@ -362,7 +372,7 @@ def delete_asset(asset_id):
 def delete_layer(layer_id):
     if "asset_id" in request.json:
         asset_id = request.json['asset_id']
-        print layer_id
+        #print layer_id
         # remove file layer_id
         layer = r.table('layers').get(layer_id).run(g.rdb_conn)
         if layer['type'] != 'smart':
@@ -374,6 +384,23 @@ def delete_layer(layer_id):
         asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
         # return deleted_layer
         return json.dumps(deleted_layer)
+    return "error: asset_id not present in json"
+
+"""
+### Update layer
+"""
+@app.route('/layers/<string:layer_id>', methods=['PATCH'])
+def update_layer(layer_id):
+    if 'position' in request.json and 'size' in request.json:
+        position = request.json['position']
+        size = request.json['size']
+
+        time_stamp = time.time()
+        updated_layer = r.table('layers').get(layer_id).update({"time_stamp": time_stamp,\
+                                                                "position": position,\
+                                                                "size": size\
+                                                                }).run(g.rdb_conn)
+        print json.dumps(updated_layer)
     return "error: asset_id not present in json"
 
 """
@@ -484,12 +511,12 @@ def sign_out():
     return "Success"
 
 """
-### Retrieve a single layer
+### Retrieving a single layer
 """
-@app.route("/layers/<string:asset_id>", methods=['GET'])
-def get_layer(asset_id):
-    layers = list(r.table('layers').filter({'asset_id': asset_id}).order_by(r.asc('time_stamp')).run(g.rdb_conn))
-    return json.dumps(layers)
+@app.route("/layers/<string:layer_id>", methods=['GET'])
+def get_layer(layer_id):
+    layer = r.table('layers').get(layer_id).run(g.rdb_conn)
+    return json.dumps(layer)
 
 """
 ### Listing existing layers
