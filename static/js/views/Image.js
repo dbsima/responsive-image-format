@@ -137,7 +137,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             //console.log(this.sources);
             // function for updating the stage when an anchor is dragged
             function update(activeAnchor) {
-                var group = activeAnchor.getParent(),
+                var activeGrip = activeAnchor,
+                    activeGripName = activeGrip.name(),
+                    group = activeAnchor.getParent(),
 
                     gripTL = group.find('.gripTL')[0],
                     gripTC = group.find('.gripTC')[0],
@@ -151,11 +153,18 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     shape = group.find('.image')[0],
 
                     anchorX = activeAnchor.x(),
-                    anchorY = activeAnchor.y();
+                    anchorY = activeAnchor.y(),
+
+                    newWidth, newHeight,
+                    minWidth, minHeight,
+                    oldX, oldY,
+                    imageX, imageY;
 
                 // update anchor positions
                 switch (activeAnchor.name()) {
                 case 'gripTL':
+                    oldY = gripTR.y();
+                    oldX = gripBL.x();
                     gripTR.y(anchorY);
                     gripTC.y(anchorY);
                     gripTC.x((gripTL.x() + gripTR.x()) / 2);
@@ -168,6 +177,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     break;
 
                 case 'gripTC':
+                    oldY = gripTL.y();
+                    oldX = gripBC.x();
                     gripTR.y(anchorY);
                     gripTL.y(anchorY);
                     gripML.y((gripTL.y() + gripBL.y()) / 2);
@@ -175,6 +186,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     break;
 
                 case 'gripTR':
+                    oldY = gripTL.y();
+                    oldX = gripBR.x();
                     gripTL.y(anchorY);
                     gripTC.y(anchorY);
                     gripTC.x((gripTL.x() + gripTR.x()) / 2);
@@ -187,6 +200,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     break;
 
                 case 'gripMR':
+                    oldY = gripML.y();
+                    oldX = gripTR.x();
                     gripTR.x(anchorX);
                     gripBR.x(anchorX);
                     gripTC.x((gripTL.x() + gripTR.x()) / 2);
@@ -195,6 +210,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     break;
 
                 case 'gripBR':
+                    oldY = gripBL.y();
+                    oldX = gripTR.x();
                     gripTC.x((gripTL.x() + gripTR.x()) / 2);
                     gripBL.y(anchorY);
                     gripML.y((gripTL.y() + gripBL.y()) / 2);
@@ -208,6 +225,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     break;
 
                 case 'gripBC':
+                    oldY = gripBR.y();
+                    oldX = gripTC.x();
                     gripBR.y(anchorY);
                     gripBL.y(anchorY);
                     gripML.y((gripTL.y() + gripBL.y()) / 2);
@@ -215,6 +234,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     break;
 
                 case 'gripBL':
+                    oldY = gripBR.y();
+                    oldX = gripTL.x();
                     gripBR.y(anchorY);
                     gripTL.x(anchorX);
                     gripML.x(anchorX);
@@ -228,6 +249,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     break;
 
                 case 'gripML':
+                    oldY = gripMR.y();
+                    oldX = gripTL.x();
                     gripTL.x(anchorX);
                     gripBL.x(anchorX);
                     gripTC.x((gripTL.x() + gripTR.x()) / 2);
@@ -235,6 +258,126 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     gripR.x((gripBL.x() + gripBR.x()) / 2);
                     break;
                 }
+
+                newHeight = gripBL.y() - gripTL.y();
+                newWidth = shape.width() * newHeight / shape.height();
+                /*
+                // If the new resolution is lower than 1x1 or greater than the
+                // original resolution of the image, move the cursor back
+                if (newWidth < minWidth || newHeight < minHeight) {
+                    activeGrip.y(oldY);
+                    activeGrip.x(oldX);
+                    switch (activeAnchor.name()) {
+                    case 'gripTL':
+                        gripTR.y(oldY);
+                        gripTC.y(oldY);
+                        gripTC.x((oldX + gripTR.x()) / 2);
+                        gripBL.x(oldX);
+                        gripML.x(oldX);
+                        gripML.y((oldY + gripBL.y()) / 2);
+                        gripMR.y((gripTR.y() + gripBR.y()) / 2);
+                        gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                        gripR.x((gripBL.x() + gripBR.x()) / 2);
+                        break;
+                    case 'gripTC':
+                        gripTR.y(oldY);
+                        gripTL.y(oldY);
+                        gripML.y((gripTL.y() + gripBL.y()) / 2);
+                        gripMR.y((gripTR.y() + gripBR.y()) / 2);
+                        break;
+                    case 'gripTR':
+                        gripTL.y(oldY);
+                        gripTC.y(oldY);
+                        gripTC.x((gripTL.x() + gripTR.x()) / 2);
+                        gripBR.x(oldX);
+                        gripMR.x(oldX);
+                        gripMR.y((gripTL.y() + gripBR.y()) / 2);
+                        gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                        gripR.x((gripBL.x() + gripBR.x()) / 2);
+                        gripML.y((gripTL.y() + gripBL.y()) / 2);
+                        break;
+                    case 'gripMR':
+                        gripTR.x(oldX);
+                        gripBR.x(oldX);
+                        gripTC.x((gripTL.x() + gripTR.x()) / 2);
+                        gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                        gripR.x((gripBL.x() + gripBR.x()) / 2);
+                        break;
+                    case 'gripBR':
+                        gripTC.x((gripTL.x() + gripTR.x()) / 2);
+                        gripBL.y(oldY);
+                        gripML.y((gripTL.y() + gripBL.y()) / 2);
+                        gripBC.y(oldY);
+                        gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                        gripR.y(oldY + 50);
+                        gripR.x((gripBL.x() + gripBR.x()) / 2);
+                        gripTR.x(oldX);
+                        gripMR.x(oldX);
+                        gripMR.y((gripTR.y() + gripBR.y()) / 2);
+                        break;
+                    case 'gripBC':
+                        gripBR.y(oldY);
+                        gripBL.y(oldY);
+                        gripML.y((gripTL.y() + gripBL.y()) / 2);
+                        gripMR.y((gripTR.y() + gripBR.y()) / 2);
+                        break;
+                    case 'gripBL':
+                        gripBR.y(oldY);
+                        gripTL.x(oldX);
+                        gripML.x(oldX);
+                        gripML.y((gripTL.y() + gripBL.y()) / 2);
+                        gripBC.y(oldY);
+                        gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                        gripR.y(oldY + 50);
+                        gripR.x((gripBL.x() + gripBR.x()) / 2);
+                        gripMR.y((gripTR.y() + gripBR.y()) / 2);
+                        gripTC.x((gripTL.x() + gripTR.x()) / 2);
+                        break;
+                    case 'gripML':
+                        gripTL.x(oldX);
+                        gripBL.x(oldX);
+                        gripTC.x((gripTL.x() + gripTR.x()) / 2);
+                        gripBC.x((gripBL.x() + gripBR.x()) / 2);
+                        gripR.x((gripBL.x() + gripBR.x()) / 2);
+                        break;
+                    }
+                }
+
+                newHeight = gripBL.y() - gripTL.y();
+                newWidth = shape.width() * newHeight / shape.height();
+
+                // Move the image to adjust for the new dimensions.
+                // The position calculation changes depending on where it is anchored.
+                // ie. When dragging on the right, it is anchored to the top left,
+                //     when dragging on the left, it is anchored to the top right.
+                if (activeGripName === "gripTR" || activeGripName === "gripBR") {
+                    shape.position({x: gripTL.x(), y: gripTL.y()});
+                } else if (activeGripName === "gripTL" || activeGripName === "gripBL") {
+                    shape.position({x: gripTR.x() - newWidth, y: gripTR.y()});
+                }
+
+                imageX = shape.x();
+                imageY = shape.y();
+                //console.log(image.getPosition());
+
+                // Update grip positions to reflect new image dimensions
+                gripTL.position({x: imageX, y: imageY});
+                gripTR.position({x: imageX + newWidth, y: imageY});
+                gripBR.position({x: imageX + newWidth, y: imageY + newHeight});
+                gripBL.position({x: imageX, y: imageY + newHeight});
+
+                // Set the image's size to the newly calculated dimensions
+                if (newWidth && newHeight) {
+                    shape.size({width: newWidth, height: newHeight});
+
+                    App.vent.trigger("showCurrentImageSize", {
+                        "currentImageWidth": newWidth,
+                        "currentImageHeight" : newHeight,
+                        "current_layer": shape.attrs.id,
+                        "current_asset" : document.getElementById('btnApply').getAttribute('data-id')
+                    });
+                }
+                */
                 // update the position of the image
                 //console.log(gripTL.x() + "+" +  gripTL.y());
                 shape.position({x: gripTL.x(), y: gripTL.y()});

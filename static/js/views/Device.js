@@ -200,106 +200,106 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
         onRender : function () {
             //console.log("on render in select");
             function update(activeAnchor) {
-                var activeHandle = activeAnchor;
-                var group = activeHandle.getParent();
+                var activeGrip = activeAnchor;
+                var group = activeGrip.getParent();
 
-                var handleTL = group.find(".handleTL")[0],
-                    handleTR = group.find(".handleTR")[0],
-                    handleBR = group.find(".handleBR")[0],
-                    handleBL = group.find(".handleBL")[0],
+                var gripTL = group.find(".gripTL")[0],
+                    gripTR = group.find(".gripTR")[0],
+                    gripBR = group.find(".gripBR")[0],
+                    gripBL = group.find(".gripBL")[0],
                     image = group.find(".image")[0],
-                    activeHandleName = activeHandle.name(),
+                    activeGripName = activeGrip.name(),
                     newWidth,
                     newHeight,
-                    minWidth = 1,
-                    minHeight = 1,
+                    minWidth = 10,
+                    minHeight = 10,
                     oldX,
                     oldY,
                     imageX,
                     imageY;
 
-                // Update the positions of handles during drag.
+                // Update the positions of grips during drag.
                 // This needs to happen so the dimension calculation can use the
-                // handle positions to determine the new width/height.
-                switch (activeHandleName) {
-                case "handleTL":
-                    oldY = handleTR.y();
-                    oldX = handleBL.x();
-                    handleTR.y(activeHandle.y());
-                    handleBL.x(activeHandle.x());
+                // grip positions to determine the new width/height.
+                switch (activeGripName) {
+                case "gripTL":
+                    oldY = gripTR.y();
+                    oldX = gripBL.x();
+                    gripTR.y(activeGrip.y());
+                    gripBL.x(activeGrip.x());
                     break;
-                case "handleTR":
-                    oldY = handleTL.y();
-                    oldX = handleBR.x();
-                    handleTL.y(activeHandle.y());
-                    handleBR.x(activeHandle.x());
+                case "gripTR":
+                    oldY = gripTL.y();
+                    oldX = gripBR.x();
+                    gripTL.y(activeGrip.y());
+                    gripBR.x(activeGrip.x());
                     break;
-                case "handleBR":
-                    oldY = handleBL.y();
-                    oldX = handleTR.x();
-                    handleBL.y(activeHandle.y());
-                    handleTR.x(activeHandle.x());
+                case "gripBR":
+                    oldY = gripBL.y();
+                    oldX = gripTR.x();
+                    gripBL.y(activeGrip.y());
+                    gripTR.x(activeGrip.x());
                     break;
-                case "handleBL":
-                    oldY = handleBR.y();
-                    oldX = handleTL.x();
-                    handleBR.y(activeHandle.y());
-                    handleTL.x(activeHandle.x());
+                case "gripBL":
+                    oldY = gripBR.y();
+                    oldX = gripTL.x();
+                    gripBR.y(activeGrip.y());
+                    gripTL.x(activeGrip.x());
                     break;
                 }
 
-                // Calculate new dimensions. Height is simply the dy of the handles.
+                // Calculate new dimensions. Height is simply the dy of the grips.
                 // Width is increased/decreased by a factor of how much the height changed.
-                newHeight = handleBL.y() - handleTL.y();
+                newHeight = gripBL.y() - gripTL.y();
                 newWidth = image.width() * newHeight / image.height();
 
                 // If the new resolution is lower than 1x1 or greater than the
                 // original resolution of the image, move the cursor back
                 if (newWidth < minWidth || newHeight < minHeight /*|| newWidth > image.width() || newHeight > image.height()*/) {
-                    activeHandle.y(oldY);
-                    activeHandle.x(oldX);
-                    switch (activeHandleName) {
-                    case "handleTL":
-                        handleTR.y(oldY);
-                        handleBL.x(oldX);
+                    activeGrip.y(oldY);
+                    activeGrip.x(oldX);
+                    switch (activeGripName) {
+                    case "gripTL":
+                        gripTR.y(oldY);
+                        gripBL.x(oldX);
                         break;
-                    case "handleTR":
-                        handleTL.y(oldY);
-                        handleBR.x(oldX);
+                    case "gripTR":
+                        gripTL.y(oldY);
+                        gripBR.x(oldX);
                         break;
-                    case "handleBR":
-                        handleBL.y(oldY);
-                        handleTR.x(oldX);
+                    case "gripBR":
+                        gripBL.y(oldY);
+                        gripTR.x(oldX);
                         break;
-                    case "handleBL":
-                        handleBR.y(oldY);
-                        handleTL.x(oldX);
+                    case "gripBL":
+                        gripBR.y(oldY);
+                        gripTL.x(oldX);
                         break;
                     }
                 }
 
-                newHeight = handleBL.y() - handleTL.y();
+                newHeight = gripBL.y() - gripTL.y();
                 newWidth = image.width() * newHeight / image.height();//for restricted resizing
 
                 // Move the image to adjust for the new dimensions.
                 // The position calculation changes depending on where it is anchored.
                 // ie. When dragging on the right, it is anchored to the top left,
                 //     when dragging on the left, it is anchored to the top right.
-                if (activeHandleName === "handleTR" || activeHandleName === "handleBR") {
-                    image.position({x: handleTL.x(), y: handleTL.y()});
-                } else if (activeHandleName === "handleTL" || activeHandleName === "handleBL") {
-                    image.position({x: handleTR.x() - newWidth, y: handleTR.y()});
+                if (activeGripName === "gripTR" || activeGripName === "gripBR") {
+                    image.position({x: gripTL.x(), y: gripTL.y()});
+                } else if (activeGripName === "gripTL" || activeGripName === "gripBL") {
+                    image.position({x: gripTR.x() - newWidth, y: gripTR.y()});
                 }
 
                 imageX = image.x();
                 imageY = image.y();
                 //console.log(image.getPosition());
 
-                // Update handle positions to reflect new image dimensions
-                handleTL.position({x: imageX, y: imageY});
-                handleTR.position({x: imageX + newWidth, y: imageY});
-                handleBR.position({x: imageX + newWidth, y: imageY + newHeight});
-                handleBL.position({x: imageX, y: imageY + newHeight});
+                // Update grip positions to reflect new image dimensions
+                gripTL.position({x: imageX, y: imageY});
+                gripTR.position({x: imageX + newWidth, y: imageY});
+                gripBR.position({x: imageX + newWidth, y: imageY + newHeight});
+                gripBL.position({x: imageX, y: imageY + newHeight});
 
                 // Set the image's size to the newly calculated dimensions
                 if (newWidth && newHeight) {
@@ -348,9 +348,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 anchor.on('mouseover', function () {
                     var layer = this.getLayer();
 
-                    if (anchor.name() === 'handleTL' || anchor.name() === 'handleBR') {
+                    if (anchor.name() === 'gripTL' || anchor.name() === 'gripBR') {
                         document.body.style.cursor = 'nwse-resize';
-                    } else if (anchor.name() === 'handleTR' || anchor.name() === 'handleBL') {
+                    } else if (anchor.name() === 'gripTR' || anchor.name() === 'gripBL') {
                         document.body.style.cursor = 'nesw-resize';
                     }
                     this.setStrokeWidth(4);
@@ -472,10 +472,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         });
 
                         group.add(img);
-                        addAnchor(group, 0, 0, 'handleTL');
-                        addAnchor(group, img.getWidth(), 0, 'handleTR');
-                        addAnchor(group, img.getWidth(), img.getHeight(), 'handleBR');
-                        addAnchor(group, 0, img.getHeight(), 'handleBL');
+                        addAnchor(group, 0, 0, 'gripTL');
+                        addAnchor(group, img.getWidth(), 0, 'gripTR');
+                        addAnchor(group, img.getWidth(), img.getHeight(), 'gripBR');
+                        addAnchor(group, 0, img.getHeight(), 'gripBL');
 
                         group.on('dragstart', function () {
                             this.moveToTop();
@@ -497,10 +497,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     if (node.parent.nodeType = 'Kinetic.Group') {
                         var i, children = node.parent.children;
                         for (i = 1; i < children.length; i = i + 1) {
-                            if (children[i].getName() === 'handleTL' ||
-                                    children[i].getName() === 'handleTR' ||
-                                    children[i].getName() === 'handleBR' ||
-                                    children[i].getName() === 'handleBL') {
+                            if (children[i].getName() === 'gripTL' ||
+                                    children[i].getName() === 'gripTR' ||
+                                    children[i].getName() === 'gripBR' ||
+                                    children[i].getName() === 'gripBL') {
                                 children[i].show();
                             }
                         }
@@ -515,10 +515,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                         if (grandChildren) {
                             for (j = 1; j < grandChildren.length; j = j + 1) {
-                                if (grandChildren[j].getName() === 'handleTL' ||
-                                        grandChildren[j].getName() === 'handleTR' ||
-                                        grandChildren[j].getName() === 'handleBR' ||
-                                        grandChildren[j].getName() === 'handleBL') {
+                                if (grandChildren[j].getName() === 'gripTL' ||
+                                        grandChildren[j].getName() === 'gripTR' ||
+                                        grandChildren[j].getName() === 'gripBR' ||
+                                        grandChildren[j].getName() === 'gripBL') {
                                     grandChildren[j].hide();
                                     layer.draw();
                                 }

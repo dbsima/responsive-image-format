@@ -1,5 +1,5 @@
 <div class="panel panel-default">
-    <div class="panel-heading">Header</div>
+    <div class="panel-heading">Layer Properties</div>
     <div class="panel-body">
         <select class="selectpicker" id="chooseShape" title='Shape'>
             <option>None</option>
@@ -22,17 +22,6 @@
             <option>Barbecue</option>
         </select>
 
-        <% if (current_layer !== "") { %>
-        <div class="form-inline">
-            <a class="btn btn-primary" id="btnHideLayer" data-id="<%= current_layer %>" role="button">
-                Hide
-            </a>
-            <a class="btn btn-danger" id="btnDeleteLayer" data-id="<%= current_layer %>" role="button">
-                Delete
-            </a>
-        </div>
-        <% } %>
-
         <div class="form-inline">
             <input class="form-control" id="resizeInputWidth" type="number" min=1 max="<%= initial_width %>" step=1 value="<%= current_width %>">
             <i class="fa fa-times fa-lg"></i>
@@ -44,6 +33,16 @@
                 <input id="keepratio" type="checkbox"> Keep Ratio
             </label>
         </div>
+
+        <% if (current_layer !== "") { %>
+        <div class="form-inline">
+            <a class="btn btn-primary" id="btnHideLayer" data-id="<%= current_layer %>" role="button">
+                Hide
+            </a>
+            <a class="btn btn-danger" id="btnDeleteLayer" data-id="<%= current_layer %>" role="button">
+                Delete
+            </a>
+        </div>
+        <% } %>
     </div>
-    <div class="panel-footer">Panel footer</div>
 </div>
