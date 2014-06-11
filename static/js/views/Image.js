@@ -80,10 +80,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             });
         },
 
-        onLayerDeleted: function (options) {
-            //console.log("layer deleted");
-        },
-
         onUpdateStage: function (options) {
             this.stage = options.stage;
         },

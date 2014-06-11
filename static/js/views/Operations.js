@@ -11,7 +11,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
         events : {
             'click #btnHideLayer' : 'hideLayer',
             'click #btnDeleteLayer' : 'deleteLayer',
-            'click #openSmartShape': 'initSmartShape'
+            'click #openSmartShape': 'initSmartShape',
+            'change #chooseShape': 'changeShape',
+            'change #chooseGradient': 'changeGradient',
+            'change #chooseBlending': 'changeBlending',
         },
 
         initialize: function (options) {
@@ -30,6 +33,33 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             $('.selectpicker').selectpicker({
                 'selectedText': 'cat'
             });
+        },
+
+        changeShape: function (options) {
+            console.log("change shape");
+
+            var elt = document.getElementById('chooseShape');
+            if (elt.selectedIndex != -1) {
+                console.log(elt.options[elt.selectedIndex].value);
+            }
+        },
+
+        changeGradient: function (options) {
+            console.log("change gradient");
+
+            var elt = document.getElementById('chooseGradient');
+            if (elt.selectedIndex != -1) {
+                console.log(elt.options[elt.selectedIndex].value);
+            }
+        },
+
+        changeBlending: function (options) {
+            console.log("change blending");
+
+            var elt = document.getElementById('chooseBlending');
+            if (elt.selectedIndex != -1) {
+                console.log(elt.options[elt.selectedIndex].value);
+            }
         },
 
         hideLayer : function () {
