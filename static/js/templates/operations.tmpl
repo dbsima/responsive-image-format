@@ -1,28 +1,6 @@
 <div class="panel panel-default">
     <div class="panel-heading">Layer Properties</div>
     <div class="panel-body">
-
-        <select class="selectpicker" id="chooseShape" title='Shape'>
-            <option value="none">Choose Shape</option>
-            <option value="rectangle">Rectangle</option>
-            <option value="square">Square</option>
-            <option value="triangle">Triangle</option>
-        </select>
-
-        <select class="selectpicker" id="chooseGradient" title='Gradient'>
-            <option value="none">Choose Gradient</option>
-            <option value="rectangle">Rectangle</option>
-            <option value="square">Square</option>
-            <option value="triangle">Triangle</option>
-        </select>
-
-        <select class="selectpicker" id="chooseBlending" title='Blending'>
-            <option value="none">Choose Blending</option>
-            <option value="rectangle">Rectangle</option>
-            <option value="square">Square</option>
-            <option value="triangle">Triangle</option>
-        </select>
-
         <div class="form-inline">
             <input class="form-control" id="resizeInputWidth" type="number" min=1 max="<%= initial_width %>" step=1 value="<%= current_width %>">
             <i class="fa fa-times fa-lg"></i>
@@ -44,6 +22,26 @@
                 Delete
             </a>
         </div>
+        <select class="selectpicker" id="chooseShape" title='Shape'>
+            <option value="none">Choose Shape</option>
+            <option value="rectangle">Rectangle</option>
+            <option value="square">Square</option>
+            <option value="triangle">Triangle</option>
+        </select>
+
+        <select class="selectpicker" id="chooseGradient" title='Gradient'>
+            <option value="none">Choose Gradient</option>
+            <option value="gradient1">Gradient1</option>
+            <option value="gradient2">gradient2</option>
+            <option value="gradient3">gradient3</option>
+        </select>
+
+        <select class="selectpicker" id="chooseBlending" title='Blending'>
+            <option value="none">Choose Blending</option>
+            <option value="blending1">blending1</option>
+            <option value="blending2">blending2</option>
+            <option value="blending3">blending3</option>
+        </select>
         <% } %>
     </div>
 </div>

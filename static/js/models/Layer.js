@@ -15,6 +15,11 @@ define(["jquery", "backbone"],
                 position: "",
                 size: "",
 
+                shape: "",
+                gradient: "",
+                blending: "",
+                opacity: "",
+
                 initial_width: "",
                 initial_height: "",
                 current_width: "",

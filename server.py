@@ -202,7 +202,11 @@ def add_layer():
                                           'asset_id': asset_id,\
                                           'time_stamp': time_stamp,
                                           'position': {"x" : 0, "y": 0},\
-                                          'size': {"width": 100, "height": 100}\
+                                          'size': {"width": 100, "height": 100},\
+                                          'shape' : "",\
+                                          'opacity': "",\
+                                          'gradient': "",\
+                                          'blending': ""\
                                           }).run(g.rdb_conn)
         # update the layers of the asset by appending the new layer
         asset = r.table('assets').get(asset_id).update({"time_stamp": time_stamp}).run(g.rdb_conn)
@@ -391,6 +395,7 @@ def delete_layer(layer_id):
 """
 @app.route('/layers/<string:layer_id>', methods=['PATCH'])
 def update_layer(layer_id):
+    # update position and size
     if 'position' in request.json and 'size' in request.json:
         position = request.json['position']
         size = request.json['size']
@@ -400,7 +405,45 @@ def update_layer(layer_id):
                                                                 "position": position,\
                                                                 "size": size\
                                                                 }).run(g.rdb_conn)
-        print json.dumps(updated_layer)
+        return json.dumps(updated_layer)
+    # update shape
+    if 'shape' in request.json:
+        shape = request.json['shape']
+        print shape
+        print layer_id
+        time_stamp = time.time()
+        updated_layer = r.table('layers').get(layer_id).update({"time_stamp": time_stamp,\
+                                                                "shape": shape\
+                                                                }).run(g.rdb_conn)
+        return json.dumps(updated_layer)
+    # update opacity
+    if 'opacity' in request.json:
+        opacity = request.json['opacity']
+
+        time_stamp = time.time()
+        updated_layer = r.table('layers').get(layer_id).update({"time_stamp": time_stamp,\
+                                                                "opacity": opacity\
+                                                                }).run(g.rdb_conn)
+        return json.dumps(updated_layer)
+    # update gradient
+    if 'gradient' in request.json:
+        gradient = request.json['gradient']
+
+        time_stamp = time.time()
+        updated_layer = r.table('layers').get(layer_id).update({"time_stamp": time_stamp,\
+                                                                "gradient": gradient\
+                                                                }).run(g.rdb_conn)
+        return json.dumps(updated_layer)
+    # update blending mode
+    if 'blending' in request.json:
+        blending = request.json['blending']
+
+        time_stamp = time.time()
+        updated_layer = r.table('layers').get(layer_id).update({"time_stamp": time_stamp,\
+                                                                "blending": blending\
+                                                                }).run(g.rdb_conn)
+        return json.dumps(updated_layer)
+
     return "error: asset_id not present in json"
 
 """

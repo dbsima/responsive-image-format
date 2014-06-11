@@ -40,7 +40,24 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
 
             var elt = document.getElementById('chooseShape');
             if (elt.selectedIndex != -1) {
-                console.log(elt.options[elt.selectedIndex].value);
+                //console.log(elt.options[elt.selectedIndex].value);
+                //this.model.set('shape', elt.options[elt.selectedIndex].value);
+                this.selectedShape = elt.options[elt.selectedIndex].value;
+                var self = this;
+                console.log(self);
+                $.ajax({
+                    url: "/layers/" + self.model.get('current_layer'),
+                    contentType: 'application/json;charset=UTF-8',
+                    data: JSON.stringify({"shape": self.selectedShape}),
+                    type: 'PATCH',
+                    success: function (response) {
+                        console.log("success PATCH on /layers");
+                        App.vent.trigger("afterLayerChanged", {"shape": "changed"});
+                    },
+                    error: function (response) {
+                        console.log("error PATCH on /layers");
+                    }
+                });
             }
         },
 
@@ -49,7 +66,23 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
 
             var elt = document.getElementById('chooseGradient');
             if (elt.selectedIndex != -1) {
-                console.log(elt.options[elt.selectedIndex].value);
+                //this.model.set('gradient', elt.options[elt.selectedIndex].value);
+                //console.log(elt.options[elt.selectedIndex].value);
+                this.selectedGradient = elt.options[elt.selectedIndex].value;
+                var self = this;
+                $.ajax({
+                    url: "/layers/" + self.model.get('current_layer'),
+                    contentType: 'application/json;charset=UTF-8',
+                    data: JSON.stringify({"gradient": self.selectedGradient}),
+                    type: 'PATCH',
+                    success: function (response) {
+                        console.log("success PATCH on /layers");
+                        App.vent.trigger("afterLayerChanged", {"gradient": "changed"});
+                    },
+                    error: function (response) {
+                        console.log("error PATCH on /layers");
+                    }
+                });
             }
         },
 
@@ -58,7 +91,23 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
 
             var elt = document.getElementById('chooseBlending');
             if (elt.selectedIndex != -1) {
-                console.log(elt.options[elt.selectedIndex].value);
+                //this.model.set('blending', elt.options[elt.selectedIndex].value);
+                //console.log(elt.options[elt.selectedIndex].value);
+                this.selectedBlending = elt.options[elt.selectedIndex].value;
+                var self = this;
+                $.ajax({
+                    url: "/layers/" + self.model.get('current_layer'),
+                    contentType: 'application/json;charset=UTF-8',
+                    data: JSON.stringify({"blending": self.selectedBlending}),
+                    type: 'PATCH',
+                    success: function (response) {
+                        console.log("success PATCH on /layers");
+                        App.vent.trigger("afterLayerChanged", {"blending": "changed"});
+                    },
+                    error: function (response) {
+                        console.log("error PATCH on /layers");
+                    }
+                });
             }
         },
 
@@ -83,7 +132,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
                     console.log("success POST on /layers");
                     console.log(response);
                     //console.log(response);
-                    App.vent.trigger("afterLayerDeleted", {"layer": "deleted"});
+                    App.vent.trigger("afterLayerChanged", {"layer": "deleted"});
                 },
                 error: function (response) {
                     console.log("error POST on /layers");

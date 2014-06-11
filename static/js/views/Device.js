@@ -437,6 +437,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                 layer.on('mousedown', function (e) {
                     var node = e.target;
+                    console.log(node);
                     select(node);
                 });
 

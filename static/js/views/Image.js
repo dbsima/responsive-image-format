@@ -11,7 +11,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.listenTo(App.vent, "initStage", this.onInitStage);
             this.listenTo(App.vent, "updateStage", this.onUpdateStage);
 
-            this.listenTo(App.vent, "afterLayerDeleted", this.onLayerDeleted);
+            this.listenTo(App.vent, "afterLayerChanged", this.onLayerChange);
 
             var i, asset = this.model.toJSON();
             this.assetID = asset.id;
@@ -52,6 +52,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             'click #btnApply' : 'applyOperation',
             'click #btnSelect' : 'selectDisplay',
             'click #openSmartShape': 'initSmartShape'
+        },
+
+        onLayerChange : function(options) {
+            console.log(options);
+            //this.initialize();
+            //this.render();
         },
 
         initSmartShape : function () {
@@ -533,10 +539,19 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     "initial_height" : stage.getHeight()
                 });
 
-                var layer = new Kinetic.Layer();
+                var layer = new Kinetic.Layer(),
+                    bg = new Kinetic.Rect({
+                        width: stage.getWidth(),
+                        height: stage.getHeight(),
+                        fill : '',
+                        x: 0,
+                        y: 0
+                    });
+                layer.add(bg);
 
                 layer.on('mousedown', function (e) {
                     var node = e.target;
+                    console.log(node);
                     select(node);
                 });
                 // For each layer create a group and add anchors
