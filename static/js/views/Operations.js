@@ -1,6 +1,6 @@
 /*global define*/
 
-define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models/Layer', 'select'], function ($, App, Marionette, vent, templates, bootstrap, LayerModel, Select) {
+define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models/Layer', 'select', 'slider'], function ($, App, Marionette, vent, templates, bootstrap, LayerModel, Select, Slider) {
     "use strict";
 
     return Marionette.Layout.extend({
@@ -15,6 +15,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             'change #chooseShape': 'changeShape',
             'change #chooseGradient': 'changeGradient',
             'change #chooseBlending': 'changeBlending',
+            'change #chooseOpacity': 'changeOpacity'
         },
 
         initialize: function (options) {
@@ -24,6 +25,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             this.asset_id = options.asset_id;
             this.isShapeOpen = false;
 
+            console.log(this.model);
+
             $(window).on('load', function () {
                 console.log("windoew");
                 $('.selectpicker').selectpicker({
@@ -32,6 +35,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             });
             $('.selectpicker').selectpicker({
                 'selectedText': 'cat'
+            });
+
+            $('#ex1').slider({
+                formater: function(value) {
+                    return 'Current value: ' + value;
+                }
             });
         },
 
@@ -59,6 +68,29 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
                     }
                 });
             }
+        },
+
+        changeOpacity: function (options) {
+            console.log("change opacity");
+
+            this.selectedOpacity = document.getElementById('chooseOpacity').value;
+            console.log('opacity is ' + this.selectedOpacity/10);
+
+            var self = this;
+            //console.log(self);
+            $.ajax({
+                url: "/layers/" + self.model.get('current_layer'),
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({"opacity": self.selectedOpacity/10}),
+                type: 'PATCH',
+                success: function (response) {
+                    console.log("success PATCH on /layers");
+                    App.vent.trigger("afterLayerChanged", {"opacity": "changed"});
+                },
+                error: function (response) {
+                    console.log("error PATCH on /layers");
+                }
+            });
         },
 
         changeGradient: function (options) {
@@ -157,14 +189,17 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
         onLayerSizeChange: function (options) {
             options = options || {};
             this.options = options;
-            //console.log(options);
-            //console.log(options);
+            //console.log(this.model);
             if (options.current_width && options.current_height && options.current_layer) {
-                //console.log(options.currentLayerWidth + " - " + options.currentLayerHeight);
                 this.model.set('current_width', options.current_width);
                 this.model.set('current_height', options.current_height);
                 this.model.set('current_layer', options.current_layer);
                 this.model.set('current_asset', options.current_asset);
+                this.model.set('shape', options.shape);
+                this.model.set('opacity', options.opacity);
+                this.model.set('gradient', options.gradient);
+                this.model.set('blending', options.blending);
+                this.model.set('type', options.type);
             }
         },
 

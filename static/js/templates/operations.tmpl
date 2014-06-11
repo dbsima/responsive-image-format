@@ -22,26 +22,34 @@
                 Delete
             </a>
         </div>
-        <select class="selectpicker" id="chooseShape" title='Shape'>
-            <option value="none">Choose Shape</option>
-            <option value="rectangle">Rectangle</option>
-            <option value="square">Square</option>
-            <option value="triangle">Triangle</option>
-        </select>
-
-        <select class="selectpicker" id="chooseGradient" title='Gradient'>
-            <option value="none">Choose Gradient</option>
-            <option value="gradient1">Gradient1</option>
-            <option value="gradient2">gradient2</option>
-            <option value="gradient3">gradient3</option>
-        </select>
-
-        <select class="selectpicker" id="chooseBlending" title='Blending'>
-            <option value="none">Choose Blending</option>
-            <option value="blending1">blending1</option>
-            <option value="blending2">blending2</option>
-            <option value="blending3">blending3</option>
-        </select>
+        <% if (type === "smart") { %>
+        <div>
+            <select class="selectpicker" id="chooseShape" title='Shape'>
+                <option value="none" <% if (shape === "none") { %> selected <% } %>>Choose Shape</option>
+                <option value="rectangle" <% if (shape === "rectangle") { %> selected <% } %>>Rectangle</option>
+                <option value="square" <% if (shape === "square") { %> selected <% } %>>Square</option>
+                <option value="triangle" <% if (shape === "triangle") { %> selected <% } %>>Triangle</option>
+            </select>
+        </div>
+        <div>
+            <select class="selectpicker" id="chooseGradient" title='Gradient'>
+                <option value="none" <% if (gradient === "none") { %> selected <% } %>>Choose Gradient</option>
+                <option value="linear" <% if (gradient === "linear") { %> selected <% } %>>Linear Gradient</option>
+                <option value="radial" <% if (gradient === "radial") { %> selected <% } %>>Radial Gradient</option>
+            </select>
+        </div>
+        <div>
+            <select class="selectpicker" id="chooseBlending" title='Blending'>
+                <option value="none">Choose Blending</option>
+                <option value="blending1">blending1</option>
+                <option value="blending2">blending2</option>
+                <option value="blending3">blending3</option>
+            </select>
+        </div>
+        <div>
+            Opacity: 0<input type="range" id="chooseOpacity" min="0" max="10" value="<%= opacity*10 %>">1
+        </div>
+        <% } %>
         <% } %>
     </div>
 </div>

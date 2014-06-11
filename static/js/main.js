@@ -8,6 +8,7 @@ require.config({
         //jqueryUI    :   'lib/jquery-ui-1.10.4.min',
         jqueryUI    :   'lib/jquery-ui-1.10.4.custom',
         select      :   'lib/bootstrap-select.min',
+        slider      : 'lib/bootstrap-slider',
         bootstrap   :   'lib/bootstrap.min',
         tpl         :   'lib/tpl',
         prettify    :   'lib/prettify.min',

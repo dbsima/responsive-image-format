@@ -204,7 +204,7 @@ def add_layer():
                                           'position': {"x" : 0, "y": 0},\
                                           'size': {"width": 100, "height": 100},\
                                           'shape' : "",\
-                                          'opacity': "",\
+                                          'opacity': 1,\
                                           'gradient': "",\
                                           'blending': ""\
                                           }).run(g.rdb_conn)

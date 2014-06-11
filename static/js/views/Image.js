@@ -40,6 +40,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             width: layers[i].size.width,
                             height: layers[i].size.height
                         };
+                        if (layers[i].type === 'smart') {
+                            this.sources[i]['shape'] = layers[i].shape;
+                            this.sources[i]['opacity'] = layers[i].opacity;
+                            this.sources[i]['gradient'] = layers[i].gradient;
+                            this.sources[i]['blending'] = layers[i].blending;
+                        }
                     }
                 }.bind(this),
                 error: function (response) {
@@ -504,6 +510,11 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             };
                             //console.log(val.path);
                             images[id].src = val.path + "?"+(new Date()).getTime();
+                        } else {
+                            images[id].opacity = val.opacity;
+                            images[id].gradient = val.gradient;
+                            images[id].shape = val.shape;
+                            images[id].blending = val.blending;
                         }
                         images[id].type = val.type;
                         images[id].name = val.id;
@@ -551,7 +562,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                 layer.on('mousedown', function (e) {
                     var node = e.target;
-                    console.log(node);
+                    //console.log(node);
                     select(node);
                 });
                 // For each layer create a group and add anchors
@@ -566,11 +577,19 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                         group.on('click', function () {
                             var shape = group.find('.image')[0];
 
+                            //console.log('here10');
+                            //console.log(val);
+
                             App.vent.trigger("showCurrentLayerSize", {
                                 "current_width": shape.getWidth(),
                                 "current_height": shape.getHeight(),
                                 "current_layer": shape.getId(),
-                                "current_asset": document.getElementById('btnApply').getAttribute('data-id')
+                                "current_asset": document.getElementById('btnApply').getAttribute('data-id'),
+                                "opacity": val.opacity,
+                                "gradient": val.gradient,
+                                "blending": val.blending,
+                                "shape": val.shape,
+                                "type": val.type
                             });
                         });
 
@@ -588,13 +607,28 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 name: 'image',
                                 stroke: 'grey',
                                 strokeWidth: 1,
-                                id: images[key].name,
-
-                                opacity: 0.5,
-                                fillLinearGradientStartPoint: {x: 0, y: 0},
-                                fillLinearGradientEndPoint: {x: val.width, y: val.height},
-                                fillLinearGradientColorStops: [0, 'white', 1, 'grey']
+                                id: images[key].name
                             });
+                            // add gradient if set
+                            if (val.gradient === 'linear') {
+                                console.log('linear');
+                                shape.fillLinearGradientStartPoint({x: 0, y: 0});
+                                shape.fillLinearGradientEndPoint({x: val.width, y: val.height});
+                                shape.fillLinearGradientColorStops([0, 'white', 1, 'grey']);
+                            } else if (val.gradient === 'radial') {
+                                // radial
+                                console.log('radial');
+                                shape.fillLinearGradientStartPoint({x: 0, y: 0});
+                                shape.fillLinearGradientEndPoint({x: val.width, y: val.height});
+                                shape.fillLinearGradientColorStops([0, 'white', 1, 'grey']);
+                            } else {
+                                shape.fill('');
+                            }
+                            // add opacity if set
+                            if (val.opacity) {
+                                console.log('opacity');
+                                shape.opacity(val.opacity);
+                            }
                         } else {
                             shape = new Kinetic.Image({
                                 x: 0,
@@ -653,7 +687,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 App.vent.trigger("initStage", {stage: stage});
 
                 function select(node) {
-                    console.log(node);
+                    //console.log(node);
                     deselect();
 
                     if (node.parent.nodeType = 'Kinetic.Group') {
@@ -699,6 +733,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     }
                 }
             }
+            console.log(this.sources);
             // call function to load layers
             loadImages(this.sources, initStage);
         }
