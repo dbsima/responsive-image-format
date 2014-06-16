@@ -6,6 +6,7 @@ require.config({
         marionette  :   'lib/backbone.marionette',
         jquery      :   'lib/jquery.min',
         //jqueryUI    :   'lib/jquery-ui-1.10.4.min',
+        fileInput   : 'lib/bootstrap.file-input',
         jqueryUI    :   'lib/jquery-ui-1.10.4.custom',
         select      :   'lib/bootstrap-select.min',
         slider      : 'lib/bootstrap-slider',

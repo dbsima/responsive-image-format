@@ -15,11 +15,8 @@
 
         <% if (current_layer !== "") { %>
         <div class="form-inline">
-            <a class="btn btn-primary" id="btnHideLayer" data-id="<%= current_layer %>" role="button">
-                Hide
-            </a>
             <a class="btn btn-danger" id="btnDeleteLayer" data-id="<%= current_layer %>" role="button">
-                Delete
+                Delete Layer
             </a>
         </div>
         <% if (type === "smart") { %>
@@ -49,7 +46,14 @@
         <div>
             Opacity: 0<input type="range" id="chooseOpacity" min="0" max="10" value="<%= opacity*10 %>">1
         </div>
+        <div>
+            <input type="file" class="file-inputs" id="imageToCompose" data-filename-placement="inside" title="Upload image">
+        </div>
         <% } %>
         <% } %>
     </div>
 </div>
+
+<script>
+    $(document).ready(function(){$('input[type=file]').bootstrapFileInput();});
+</script>

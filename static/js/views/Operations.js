@@ -1,6 +1,6 @@
 /*global define*/
 
-define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models/Layer', 'select', 'slider'], function ($, App, Marionette, vent, templates, bootstrap, LayerModel, Select, Slider) {
+define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models/Layer', 'select', 'slider', 'fileInput'], function ($, App, Marionette, vent, templates, bootstrap, LayerModel, Select, Slider, FileInput) {
     "use strict";
 
     return Marionette.Layout.extend({
@@ -15,7 +15,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             'change #chooseShape': 'changeShape',
             'change #chooseGradient': 'changeGradient',
             'change #chooseBlending': 'changeBlending',
-            'change #chooseOpacity': 'changeOpacity'
+            'change #chooseOpacity': 'changeOpacity',
+            'change #imageToCompose': 'changeImage'
         },
 
         initialize: function (options) {
@@ -26,6 +27,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             this.isShapeOpen = false;
 
             console.log(this.model);
+
+            $('input[type=file]').bootstrapFileInput();
+            $('.file-inputs').bootstrapFileInput();
 
             $(window).on('load', function () {
                 console.log("windoew");
@@ -42,6 +46,37 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
                     return 'Current value: ' + value;
                 }
             });
+        },
+
+        changeImage: function(options) {
+            var isSelected = document.getElementById('imageToCompose').value;
+
+            if (isSelected) {
+                console.log("selecte");
+                var form_data = new FormData();
+                form_data.append("asset_id", this.assetID);
+                form_data.append("smart_layer", 'cacamaca');
+                var self = this;
+                $.ajax({
+                    async: false,
+                    url: "/layers",
+                    dataType: 'text',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
+                    type: 'post',
+                    success: function (response) {
+                        // rerender stage after new smart shape added
+                        self.initialize();
+                        self.render();
+                    },
+                    error: function (response) {
+                        console.log("error POST on /layers");
+                        //console.log(response);
+                    }
+                });
+            }
         },
 
         changeShape: function (options) {
