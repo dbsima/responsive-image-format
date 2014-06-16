@@ -142,6 +142,8 @@ def explore():
     if request.method == 'POST':
         file = request.files['file']
 
+        #print file
+
         if file and allowed_file(file.filename):
             layer_name, layer_extension = os.path.splitext(file.filename)
 
@@ -395,6 +397,7 @@ def delete_layer(layer_id):
 """
 @app.route('/layers/<string:layer_id>', methods=['PATCH'])
 def update_layer(layer_id):
+    print request
     # update position and size
     if 'image' in request.form:
         file = request.files['file']
@@ -404,15 +407,10 @@ def update_layer(layer_id):
 
             time_stamp = time.time()
 
-            # first layer is the original image
-            layer = r.table('layers').insert({'asset_id': asset_id,\
-                                               'name': layer_name,\
-                                               'type': layer_extension,\
-                                               'time_stamp': time_stamp,\
-                                               'position': {"x" : 0, "y": 0},\
-                                               'size': {}\
-                                               }).run(g.rdb_conn)
-            layer_id = layer['generated_keys'][0]
+            updated_layer = r.table('layers').get(layer_id).update({"time_stamp": time_stamp,\
+                                                                'name': layer_name,\
+                                                                'type': layer_extension,\
+                                                                }).run(g.rdb_conn)
 
             file_path = os.path.join(app.config['UPLOAD_FOLDER'],\
                                     layer_id + layer_extension)
@@ -420,30 +418,15 @@ def update_layer(layer_id):
             file.save(os.path.join(app.config['UPLOAD_FOLDER'],\
                                     layer_id + layer_extension))
             # get the size of the image and update the layer
-            im = Image.open(file_path)
-            (width, height) = im.size
-            updated_layer = r.table('layers').get(layer_id).update({\
-                                                                "size": {"width": width, "height": height}\
-                                                                }).run(g.rdb_conn)
-            updated_asset = r.table('assets').get(asset_id).update({\
-                                                                "size": {"width": width, "height": height}\
-                                                                }).run(g.rdb_conn)
+            #im = Image.open(file_path)
+            #(width, height) = im.size
+            #updated_layer = r.table('layers').get(layer_id).update({\
+            #                                                    "size": {"width": width, "height": height}\
+            #                                                    }).run(g.rdb_conn)
 
-            src = os.path.join(app.config['UPLOAD_FOLDER'], layer_id + layer_extension)
-            dst = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + layer_extension)
-
-            shutil.copy(src, dst)
-
-
-        position = request.form['position']
-        size = request.json['size']
-
-        time_stamp = time.time()
-        updated_layer = r.table('layers').get(layer_id).update({"time_stamp": time_stamp,\
-                                                                "position": position,\
-                                                                "size": size\
-                                                                }).run(g.rdb_conn)
-        return json.dumps(updated_layer)
+            return json.dumps(updated_layer)
+        else:
+            return 'no file or file type not allowed'
 
     # update position and size
     if 'position' in request.json and 'size' in request.json:

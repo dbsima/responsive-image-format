@@ -19,7 +19,6 @@
                 Delete Layer
             </a>
         </div>
-        <% if (type === "smart") { %>
         <div>
             <select class="selectpicker" id="chooseShape" title='Shape'>
                 <option value="none" <% if (shape === "none") { %> selected <% } %>>Choose Shape</option>
@@ -49,7 +48,6 @@
         <div>
             <input type="file" class="file-inputs" id="imageToCompose" data-filename-placement="inside" title="Upload image">
         </div>
-        <% } %>
         <% } %>
     </div>
 </div>

@@ -52,24 +52,24 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             var isSelected = document.getElementById('imageToCompose').value;
 
             if (isSelected) {
-                console.log("selecte");
+                console.log($('#imageToCompose')[0].files[0]);
                 var form_data = new FormData();
-                form_data.append("asset_id", this.assetID);
-                form_data.append("smart_layer", 'cacamaca');
+                form_data.append("image", "bla");
+                form_data.append('file', $('#imageToCompose')[0].files[0] );
                 var self = this;
                 $.ajax({
-                    async: false,
-                    url: "/layers",
+                    url: "/layers/" + self.model.get('current_layer'),
                     dataType: 'text',
                     cache: false,
                     contentType: false,
                     processData: false,
                     data: form_data,
-                    type: 'post',
+                    type: 'PATCH',
                     success: function (response) {
+                        $('#myModal').modal('show');
                         // rerender stage after new smart shape added
-                        self.initialize();
-                        self.render();
+                        //self.initialize();
+                        //self.render();
                     },
                     error: function (response) {
                         console.log("error POST on /layers");
