@@ -9,7 +9,7 @@ define(["jquery", "backbone"],
             defaults: {
                 id: "",
                 name: "",
-                type: "",
+                ext: "",
                 time_stamp: "",
                 asset_id: "",
                 position: "",

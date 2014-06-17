@@ -234,7 +234,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
                 this.model.set('opacity', options.opacity);
                 this.model.set('gradient', options.gradient);
                 this.model.set('blending', options.blending);
-                this.model.set('type', options.type);
+                this.model.set('ext', options.ext);
             }
         },
 

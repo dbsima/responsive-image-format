@@ -1,13 +1,13 @@
 <div class="col-sm-6 col-md-4">
     <div class="thumbnail">
-        <img src="../files/<%= id %><%= type %>?<%= time_stamp %>" alt="<%= id %>" width=150 height=auto>
+        <img src="../files/<%= id %><%= ext %>?<%= time_stamp %>" alt="<%= id %>" width=150 height=auto>
         <div class="caption">
-            <h5><%= id %><%= type %></h5>
+            <h5><%= id %><%= ext %></h5>
             <p>
-                <a href="/edit/<%= id %>" class="btn btn-primary" id="btnEditFile" data-id="<%= id %><%= type %>" role="button">
+                <a href="/edit/<%= id %>" class="btn btn-primary" id="btnEditFile" data-id="<%= id %><%= ext %>" role="button">
                     <i class="fa fa-edit fa-lg"></i> Edit
                 </a>
-                <a href="#" class="btn btn-danger" id="btnDeleteFile" data-id="<%= id %><%= type %>" role="button">
+                <a href="#" class="btn btn-danger" id="btnDeleteFile" data-id="<%= id %><%= ext %>" role="button">
                     <i class="fa fa-trash-o fa-lg"></i> Delete
                 </a>
             </p>

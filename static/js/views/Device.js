@@ -44,12 +44,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     //console.log(layers);
                     var i;
                     for (i = 0; i < versions.length; i = i + 1) {
-                        console.log("versions id " + versions[i].id + versions[i].type);
+                        console.log("versions id " + versions[i].id + versions[i].ext);
                         this.versions[i] = {
                             id: String(versions[i].id),
                             display_w: versions[i].display_width,
                             display_h: versions[i].display_height,
-                            path: "../files/" + versions[i].id + versions[i].type
+                            path: "../files/" + versions[i].id + versions[i].ext
                         };
                     }
                 }.bind(this),

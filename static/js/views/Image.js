@@ -30,17 +30,17 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     //console.log(layers);
                     var i;
                     for (i = 0; i < layers.length; i = i + 1) {
-                        console.log("layer id " + layers[i].id + layers[i].type);
+                        console.log("layer id " + layers[i].id + layers[i].ext);
                         this.sources[i] = {
                             id: String(layers[i].id),
-                            path: "../files/" + layers[i].id + layers[i].type,
-                            type: layers[i].type,
+                            path: "../files/" + layers[i].id + layers[i].ext,
+                            ext: layers[i].ext,
                             x: layers[i].position.x,
                             y: layers[i].position.y,
                             width: layers[i].size.width,
                             height: layers[i].size.height
                         };
-                        if (layers[i].type === 'smart') {
+                        if (layers[i].ext === 'smart') {
                             this.sources[i]['shape'] = layers[i].shape;
                             this.sources[i]['opacity'] = layers[i].opacity;
                             this.sources[i]['gradient'] = layers[i].gradient;
@@ -500,7 +500,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     if (val) {
                         loadedImages++;
                         images[id] = new Image();
-                        if (val.type !== "smart") {
+                        if (val.ext !== "smart") {
                             images[id].onload = function () {
                                 // initStage only after all images are loaded
                                 if (loadedImages >= numImages) {
@@ -516,7 +516,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             images[id].shape = val.shape;
                             images[id].blending = val.blending;
                         }
-                        images[id].type = val.type;
+                        images[id].ext = val.ext;
                         images[id].name = val.id;
                         images[id].id = val.id;
                         images[id].X = val.x;
@@ -589,13 +589,16 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 "gradient": val.gradient,
                                 "blending": val.blending,
                                 "shape": val.shape,
-                                "type": val.type
+                                "ext": val.ext
                             });
                         });
 
                         layer.add(group);
 
-                        var shape = new Kinetic.Image({
+                        var shape;
+                        //console.log("[" + val.X + ", " + val.Y + " ] - [" + val.width + ", " + val.height + "]");
+                        if (val.ext === 'smart') {
+                            shape = new Kinetic.Rect({
                                 x: 0,
                                 y: 0,
                                 width: val.width,
@@ -608,8 +611,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 //fillPatternScale: {x:0.5, y:0.5},
                                 //fillPatternRepeat: 'no-repeat'
                             });
-                        //console.log("[" + val.X + ", " + val.Y + " ] - [" + val.width + ", " + val.height + "]");
-                        if (val.type === 'smart') {
                             shape.stroke('grey');
                             shape.strokeWidth(1);
                             // add gradient if set
@@ -633,6 +634,19 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 shape.opacity(val.opacity);
                             }
                         } else {
+                            shape = new Kinetic.Image({
+                                x: 0,
+                                y: 0,
+                                width: val.width,
+                                height: val.height,
+                                fill : '',
+                                name: 'image',
+                                id: images[key].name,
+                                //fillPatternImage: images[key-1],
+                                //fillPatternOffset: {x:-220, y:70},
+                                //fillPatternScale: {x:0.5, y:0.5},
+                                //fillPatternRepeat: 'no-repeat'
+                            });
                             shape.image(images[key]);
                         }
                         //console.log(val.X + ' - ' + val.Y + " : " + shape.getWidth() + " - " +  shape.getHeight())

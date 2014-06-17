@@ -150,7 +150,7 @@ def explore():
             time_stamp = time.time()
             asset = r.table('assets').insert({'time_stamp': time_stamp,\
                                                'name': layer_name,\
-                                               'type': layer_extension,\
+                                               'ext': layer_extension,\
                                                'resolutions': "",\
                                                'shared': 'false',\
                                                'user_id': '',\
@@ -161,7 +161,7 @@ def explore():
             # first layer is the original image
             layer = r.table('layers').insert({'asset_id': asset_id,\
                                                'name': layer_name,\
-                                               'type': layer_extension,\
+                                               'ext': layer_extension,\
                                                'time_stamp': time_stamp,\
                                                'position': {"x" : 0, "y": 0},\
                                                'size': {}\
@@ -200,7 +200,7 @@ def add_layer():
         print asset_id
         time_stamp = time.time()
         layer = r.table('layers').insert({'name': '',\
-                                          'type': 'smart',\
+                                          'ext': 'smart',\
                                           'asset_id': asset_id,\
                                           'time_stamp': time_stamp,
                                           'position': {"x" : 0, "y": 0},\
@@ -228,7 +228,7 @@ def edit_asset(asset_id):
 @app.route("/assets/<string:asset_id>", methods=['POST'])
 def patch_asset(asset_id):
     asset = r.table('assets').get(asset_id).run(g.rdb_conn)
-    asset_type = asset['type']
+    asset_type = asset['ext']
     if 'composed_image' in request.json:
         # Get only the encoded data
         _, b64data = request.json['composed_image'].split(',')
@@ -277,12 +277,12 @@ def patch_asset(asset_id):
                                                         'width': version_w,\
                                                         'height': version_h,\
                                                         }).run(g.rdb_conn)
-            version_type = versions[0]['type']
+            version_type = versions[0]['ext']
         else:
             inserted = r.table('versions').insert({'time_stamp': timestamp,\
                                                 'asset_id': asset_id,\
                                                'name': file_name,\
-                                               'type': asset_type,\
+                                               'ext': asset_type,\
                                                'display_width': display_w,\
                                                'display_height': display_h,\
                                                'width': version_w,\
@@ -338,7 +338,7 @@ def render_asset(asset_id):
         print version
         config.append({"imgwidth": int(version['width'])})
     print config
-    filename = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + versions[0]['type'])
+    filename = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + versions[0]['ext'])
     encode(filename, config)
     return render_template('explore.html')
 
@@ -360,13 +360,13 @@ def delete_asset(asset_id):
     os.remove(os.path.join(app.config['UPLOAD_FOLDER'], asset_id))
     #delete all layer_id files
     for layer in layers:
-        if layer['type'] != 'smart':
-            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['type']))
+        if layer['ext'] != 'smart':
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['ext']))
     # delete all versions of asset_id from versions
     deleted_versions = r.table('versions').filter({'asset_id': file_name}).delete().run(g.rdb_conn)
     #delete all version_id files
     for version in versions:
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], version['id'] + version['type']))
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], version['id'] + version['ext']))
         # TODO remove webp layers
     # return deleted asset
     return json.dumps(deleted_asset)
@@ -381,8 +381,8 @@ def delete_layer(layer_id):
         #print layer_id
         # remove file layer_id
         layer = r.table('layers').get(layer_id).run(g.rdb_conn)
-        if layer['type'] != 'smart':
-            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['type']))
+        if layer['ext'] != 'smart':
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['ext']))
         # remove layer_id from layers
         deleted_layer = r.table('layers').get(layer_id).delete().run(g.rdb_conn)
         # add a new time_stamp to asset_id
@@ -409,7 +409,7 @@ def update_layer(layer_id):
 
             updated_layer = r.table('layers').get(layer_id).update({"time_stamp": time_stamp,\
                                                                 'name': layer_name,\
-                                                                'type': layer_extension,\
+                                                                'ext': layer_extension,\
                                                                 }).run(g.rdb_conn)
 
             file_path = os.path.join(app.config['UPLOAD_FOLDER'],\
@@ -486,10 +486,9 @@ def update_layer(layer_id):
 def delete_version(version_id):
     if "asset_id" in request.json:
         asset_id = request.json['asset_id']
-        print version_id
         # remove file version_id
         version = r.table('versions').get(version_id).run(g.rdb_conn)
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], version['id'] + version['type']))
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], version['id'] + version['ext']))
         # remove version_id from version
         deleted_version = r.table('versions').get(version_id).delete().run(g.rdb_conn)
         # add a new time_stamp to asset_id
