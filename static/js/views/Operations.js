@@ -16,7 +16,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             'change #chooseGradient': 'changeGradient',
             'change #chooseBlending': 'changeBlending',
             'change #chooseOpacity': 'changeOpacity',
-            'change #imageToCompose': 'changeImage'
+            'change #imageToCompose': 'changeImage',
+            'click #btnOpenModal': 'onOpenModal',
         },
 
         initialize: function (options) {
@@ -26,26 +27,12 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             this.asset_id = options.asset_id;
             this.isShapeOpen = false;
 
-            console.log(this.model);
+            //console.log(this.model);
+        },
 
-            $('input[type=file]').bootstrapFileInput();
-            $('.file-inputs').bootstrapFileInput();
-
-            $(window).on('load', function () {
-                console.log("windoew");
-                $('.selectpicker').selectpicker({
-                    'selectedText': 'cat'
-                });
-            });
-            $('.selectpicker').selectpicker({
-                'selectedText': 'cat'
-            });
-
-            $('#ex1').slider({
-                formater: function(value) {
-                    return 'Current value: ' + value;
-                }
-            });
+        onOpenModal : function() {
+            console.log("on open modal");
+            $('#myModal').modal('show');
         },
 
         changeImage: function(options) {

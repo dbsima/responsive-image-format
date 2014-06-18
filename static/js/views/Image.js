@@ -642,8 +642,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             if (val.ext !== 'smart') {
                                 //console.log('image to smart');
                                 shape.fillPatternImage(images[key]);
-                                shape.fillPatternOffset({x:-220, y:70});
-                                shape.fillPatternScale({x:0.5, y:0.5});
                                 shape.fillPatternRepeat('no-repeat');
                             }
                         } else {
