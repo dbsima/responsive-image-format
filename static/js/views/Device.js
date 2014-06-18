@@ -58,7 +58,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 }
             });
             this.model.set('versions', this.versions);
-            console.log(this.versions);
+            //console.log(this.versions);
         },
 
         onShowCurrentImageSize: function (options) {
