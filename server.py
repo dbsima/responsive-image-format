@@ -127,11 +127,15 @@ def edit():
 def select():
     return render_template('explore.html')
 
+@app.route("/explore")
+def explore():
+    return render_template('explore.html')
+
 """
 ###
 """
-@app.route('/explore', methods=['GET', 'POST'])
-def explore():
+@app.route('/assets', methods=['POST'])
+def create_asset():
     if not session.get('logged_in'):
         abort(401)
     if not session.get('email'):
@@ -139,55 +143,58 @@ def explore():
 
     session_email = session.get('email')
 
-    if request.method == 'POST':
-        file = request.files['file']
+    file = request.files['file']
+    if file and allowed_file(file.filename):
+        layer_name, layer_extension = os.path.splitext(file.filename)
 
-        #print file
+        time_stamp = time.time()
+        asset = r.table('assets').insert({'time_stamp': time_stamp,\
+                                           'name': layer_name,\
+                                           'ext': layer_extension,\
+                                           'resolutions': "",\
+                                           'shared': 'false',\
+                                           'user_id': '',\
+                                           'size': {}\
+                                           }).run(g.rdb_conn)
+        asset_id = asset['generated_keys'][0]
 
-        if file and allowed_file(file.filename):
-            layer_name, layer_extension = os.path.splitext(file.filename)
+        # first layer is the original image
+        layer = r.table('layers').insert({'asset_id': asset_id,\
+                                           'name': layer_name,\
+                                           'ext': layer_extension,\
+                                           'type': layer_extension,\
+                                           'time_stamp': time_stamp,\
+                                           'position': {"x" : 0, "y": 0},\
+                                           'size': {},\
+                                           'shape' : "",\
+                                          'opacity': 1,\
+                                          'gradient': "",\
+                                          'blending': ""\
+                                           }).run(g.rdb_conn)
+        layer_id = layer['generated_keys'][0]
 
-            time_stamp = time.time()
-            asset = r.table('assets').insert({'time_stamp': time_stamp,\
-                                               'name': layer_name,\
-                                               'ext': layer_extension,\
-                                               'resolutions': "",\
-                                               'shared': 'false',\
-                                               'user_id': '',\
-                                               'size': {}\
-                                               }).run(g.rdb_conn)
-            asset_id = asset['generated_keys'][0]
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'],\
+                                layer_id + layer_extension)
 
-            # first layer is the original image
-            layer = r.table('layers').insert({'asset_id': asset_id,\
-                                               'name': layer_name,\
-                                               'ext': layer_extension,\
-                                               'time_stamp': time_stamp,\
-                                               'position': {"x" : 0, "y": 0},\
-                                               'size': {}\
-                                               }).run(g.rdb_conn)
-            layer_id = layer['generated_keys'][0]
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'],\
+                                layer_id + layer_extension))
+        # get the size of the image and update the layer
+        im = Image.open(file_path)
+        (width, height) = im.size
+        updated_layer = r.table('layers').get(layer_id).update({\
+                                                            "size": {"width": width, "height": height}\
+                                                            }).run(g.rdb_conn)
+        updated_asset = r.table('assets').get(asset_id).update({\
+                                                            "size": {"width": width, "height": height}\
+                                                            }).run(g.rdb_conn)
 
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'],\
-                                    layer_id + layer_extension)
+        src = os.path.join(app.config['UPLOAD_FOLDER'], layer_id + layer_extension)
+        dst = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + layer_extension)
 
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'],\
-                                    layer_id + layer_extension))
-            # get the size of the image and update the layer
-            im = Image.open(file_path)
-            (width, height) = im.size
-            updated_layer = r.table('layers').get(layer_id).update({\
-                                                                "size": {"width": width, "height": height}\
-                                                                }).run(g.rdb_conn)
-            updated_asset = r.table('assets').get(asset_id).update({\
-                                                                "size": {"width": width, "height": height}\
-                                                                }).run(g.rdb_conn)
+        shutil.copy(src, dst)
 
-            src = os.path.join(app.config['UPLOAD_FOLDER'], layer_id + layer_extension)
-            dst = os.path.join(app.config['UPLOAD_FOLDER'], asset_id + layer_extension)
-
-            shutil.copy(src, dst)
-    return render_template('explore.html', email=session_email)
+        return jsonify(updated_asset)
+    return "file not present or not allowed"
 
 """
 ###
@@ -200,6 +207,7 @@ def add_layer():
         print asset_id
         time_stamp = time.time()
         layer = r.table('layers').insert({'name': '',\
+                                          'type': 'smart',\
                                           'ext': 'smart',\
                                           'asset_id': asset_id,\
                                           'time_stamp': time_stamp,
@@ -360,7 +368,7 @@ def delete_asset(asset_id):
     os.remove(os.path.join(app.config['UPLOAD_FOLDER'], asset_id))
     #delete all layer_id files
     for layer in layers:
-        if layer['ext'] != 'smart':
+        if layer['type'] != 'smart':
             os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['ext']))
     # delete all versions of asset_id from versions
     deleted_versions = r.table('versions').filter({'asset_id': file_name}).delete().run(g.rdb_conn)
@@ -381,7 +389,7 @@ def delete_layer(layer_id):
         #print layer_id
         # remove file layer_id
         layer = r.table('layers').get(layer_id).run(g.rdb_conn)
-        if layer['ext'] != 'smart':
+        if layer['type'] != 'smart' or (layer['type'] == 'smart' and layer['ext'] != 'smart'):
             os.remove(os.path.join(app.config['UPLOAD_FOLDER'], layer['id'] + layer['ext']))
         # remove layer_id from layers
         deleted_layer = r.table('layers').get(layer_id).delete().run(g.rdb_conn)

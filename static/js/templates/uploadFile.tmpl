@@ -1,4 +1,6 @@
-<form action="" method=post enctype=multipart/form-data>
-    <input type="file" id="file" name="file" accept="image/*">
-    <input class="btn btn-default btn-file" type="submit" id="btnUploadFile" name="upload" value="Upload">
-</form>
+<div>
+    <input type="file" accept="image/*" class="file-inputs" id="uploadImage" name="file" data-filename-placement="inside" title="Upload image">
+</div>
+<script>
+    $(document).ready(function(){$('input[type=file]').bootstrapFileInput();});
+</script>

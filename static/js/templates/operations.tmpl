@@ -15,7 +15,7 @@
 
         <% if (current_layer !== "") { %>
         <div class="form-inline">
-            <a class="btn btn-danger" id="btnDeleteLayer" data-id="<%= current_layer %>" role="button">
+            <a class="btn btn-danger btn-sm" id="btnDeleteLayer" data-id="<%= current_layer %>" role="button">
                 Delete Layer
             </a>
         </div>
@@ -45,9 +45,14 @@
         <div>
             Opacity: 0<input type="range" id="chooseOpacity" min="0" max="10" value="<%= opacity*10 %>">1
         </div>
-        <div>
-            <input type="file" class="file-inputs" id="imageToCompose" data-filename-placement="inside" title="Upload image">
+        <% if (type === "smart") { %>
+        <div class="form-inline">
+            <input type="file" class="file-inputs btn-sm" id="imageToCompose" data-filename-placement="inside" title="Upload image">
+            <% if (ext !== "smart") { %>
+            <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">Adjust image</button>
+            <% } %>
         </div>
+        <% } %>
         <% } %>
     </div>
 </div>

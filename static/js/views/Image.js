@@ -30,22 +30,23 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     //console.log(layers);
                     var i;
                     for (i = 0; i < layers.length; i = i + 1) {
-                        console.log("layer id " + layers[i].id + layers[i].ext);
+                        //console.log("layer id " + layers[i].id + layers[i].ext);
                         this.sources[i] = {
                             id: String(layers[i].id),
                             path: "../files/" + layers[i].id + layers[i].ext,
                             ext: layers[i].ext,
+                            type: layers[i].type,
                             x: layers[i].position.x,
                             y: layers[i].position.y,
                             width: layers[i].size.width,
                             height: layers[i].size.height
                         };
-                        if (layers[i].ext === 'smart') {
-                            this.sources[i]['shape'] = layers[i].shape;
-                            this.sources[i]['opacity'] = layers[i].opacity;
-                            this.sources[i]['gradient'] = layers[i].gradient;
-                            this.sources[i]['blending'] = layers[i].blending;
-                        }
+
+                        this.sources[i]['shape'] = layers[i].shape;
+                        this.sources[i]['opacity'] = layers[i].opacity;
+                        this.sources[i]['gradient'] = layers[i].gradient;
+                        this.sources[i]['blending'] = layers[i].blending;
+
                     }
                 }.bind(this),
                 error: function (response) {
@@ -500,23 +501,24 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     if (val) {
                         loadedImages++;
                         images[id] = new Image();
-                        if (val.ext !== "smart") {
+                        if (val.type !== "smart" || (val.type === "smart" && val.ext !== "smart")) {
                             images[id].onload = function () {
                                 // initStage only after all images are loaded
                                 if (loadedImages >= numImages) {
-                                    console.log(images);
+                                    //console.log(images);
                                     callback(images);
                                 }
                             };
                             //console.log(val.path);
                             images[id].src = val.path + "?"+(new Date()).getTime();
-                        } else {
-                            images[id].opacity = val.opacity;
-                            images[id].gradient = val.gradient;
-                            images[id].shape = val.shape;
-                            images[id].blending = val.blending;
                         }
+                        images[id].opacity = val.opacity;
+                        images[id].gradient = val.gradient;
+                        images[id].shape = val.shape;
+                        images[id].blending = val.blending;
+
                         images[id].ext = val.ext;
+                        images[id].type = val.type;
                         images[id].name = val.id;
                         images[id].id = val.id;
                         images[id].X = val.x;
@@ -542,7 +544,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     width: stage_width,
                     height: stage_height
                 });
-                console.log(stage.getX() + "-" + stage.getY());
+                //console.log(stage.getX() + "-" + stage.getY());
 
                 // send initial width and size
                 App.vent.trigger("showInitialLayerSize", {
@@ -589,7 +591,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                                 "gradient": val.gradient,
                                 "blending": val.blending,
                                 "shape": val.shape,
-                                "ext": val.ext
+                                "ext": val.ext,
+                                "type": val.type
                             });
                         });
 
@@ -597,7 +600,10 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                         var shape;
                         //console.log("[" + val.X + ", " + val.Y + " ] - [" + val.width + ", " + val.height + "]");
-                        if (val.ext === 'smart') {
+
+                        if (val.type === 'smart') {
+                            //console.log('smart');
+                            //console.log(images[key]);
                             shape = new Kinetic.Rect({
                                 x: 0,
                                 y: 0,
@@ -615,13 +621,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             shape.strokeWidth(1);
                             // add gradient if set
                             if (val.gradient === 'linear') {
-                                console.log('linear');
+                                //console.log('linear');
                                 shape.fillLinearGradientStartPoint({x: 0, y: 0});
                                 shape.fillLinearGradientEndPoint({x: val.width, y: val.height});
                                 shape.fillLinearGradientColorStops([0, 'white', 1, 'grey']);
                             } else if (val.gradient === 'radial') {
                                 // radial
-                                console.log('radial');
+                                //console.log('radial');
                                 shape.fillLinearGradientStartPoint({x: 0, y: 0});
                                 shape.fillLinearGradientEndPoint({x: val.width, y: val.height});
                                 shape.fillLinearGradientColorStops([0, 'white', 1, 'grey']);
@@ -630,8 +636,15 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                             }
                             // add opacity if set
                             if (val.opacity) {
-                                console.log('opacity');
+                                //console.log('opacity');
                                 shape.opacity(val.opacity);
+                            }
+                            if (val.ext !== 'smart') {
+                                //console.log('image to smart');
+                                shape.fillPatternImage(images[key]);
+                                shape.fillPatternOffset({x:-220, y:70});
+                                shape.fillPatternScale({x:0.5, y:0.5});
+                                shape.fillPatternRepeat('no-repeat');
                             }
                         } else {
                             shape = new Kinetic.Image({
@@ -691,7 +704,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
                 stage.add(layer);
 
-                console.log(stage);
+                //console.log(stage);
                 App.vent.trigger("initStage", {stage: stage});
 
                 function select(node) {
@@ -741,7 +754,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                     }
                 }
             }
-            console.log(this.sources);
+            //console.log(this.sources);
             // call function to load layers
             loadImages(this.sources, initStage);
         }
