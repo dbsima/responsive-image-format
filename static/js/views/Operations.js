@@ -18,9 +18,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             'change #chooseOpacity': 'changeOpacity',
             'change #imageToCompose': 'changeImage',
             'click #btnOpenModal': 'onOpenModal',
+            'click #btnSaveImage' : 'onSaveImage',
         },
 
         initialize: function (options) {
+            this.stage = "";
+            this.listenTo(App.vent, "updateImage", this.onUpdateImage);
+
             this.listenTo(this.model, "change", this.render);
             this.listenTo(App.vent, "showInitialLayerSize", this.onLayerInit);
             this.listenTo(App.vent, "showCurrentLayerSize", this.onLayerSizeChange);
@@ -32,9 +36,9 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
         },
 
         onOpenModal : function() {
-            console.log("on open modal");
+            //console.log("on open modal");
 
-            console.log(this.model);
+            //console.log(this.model);
 
             this.sources['0'] = {
                 id: '0',
@@ -46,6 +50,47 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             this.onTest();
             // show modal
             $('#myModal').modal('show');
+        },
+
+        onSaveImage: function() {
+            //
+            console.log('save image');
+            var self = this;
+            self.stage.toDataURL({
+                callback: function (dataUrl) {
+                    var layerId = self.model.get('current_layer');
+                    var layerExt = self.model.get('ext');
+                    var assetId = self.model.get('current_asset');
+                    console.log(layerId + " - " + layerExt + " - " + assetId);
+
+                    self.postStage(layerId, layerExt, assetId, dataUrl);
+                }
+            });
+        },
+
+        postStage: function (layerId, layerExt, assetId, dataUrl) {
+            //console.log('post stage ------');
+            $.ajax({
+                async: false,
+                type: "PATCH",
+                url: "/layers/" + layerId,
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({"data_url": dataUrl,
+                                     "asset_id": assetId,
+                                     "layer_ext": layerExt}, null, '\t'),
+                success: function (response) {
+                    console.log("success POST on /assets/:assetID");
+                    //console.log(response);
+                },
+                error: function (response) {
+                    console.log("error POST on /assets/:assetID");
+                    //console.log(response);
+                }
+            });
+        },
+
+        onUpdateImage: function (options) {
+            this.stage = options.stage;
         },
 
         changeImage: function(options) {
@@ -528,14 +573,14 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
                         });
 
                         group.on('dragend', function () {
-                            //App.vent.trigger("updateStage", {stage: stage});
+                            App.vent.trigger("updateImage", {stage: stage});
                             //console.log(group.getPosition());
                         });
                     }
                 });
 
                 stage.add(layer);
-                //App.vent.trigger("initStage", {stage: stage});
+                App.vent.trigger("updateImage", {stage: stage});
 
                 function select(node) {
                     deselect();

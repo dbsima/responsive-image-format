@@ -260,12 +260,13 @@ def patch_asset(asset_id):
         version_w = str(request.json['version_w'])
         version_h = str(request.json['version_h'])
 
-        print version_w + "-"+version_h
+        #print version_w + "-"+version_h
 
         #
         file_name = asset_id + "_" + version_w + "x" + version_h
         path_to_file = os.path.join(app.config['UPLOAD_FOLDER'], file_name + asset_type)
 
+        # Get only the encoded data
         # Get only the encoded data
         _, b64data = data_url.split(',')
 
@@ -276,7 +277,10 @@ def patch_asset(asset_id):
                                                         }).run(g.rdb_conn)
         # If the pair (display_width, display_height) exists, just update it,
         # otherwise insert a new version
-        versions = list(r.table('versions').filter({'asset_id': asset_id, 'display_width': display_w, 'display_height': display_h}).run(g.rdb_conn))
+        versions = list(r.table('versions').filter({'asset_id': asset_id,\
+                                                    'display_width': display_w,\
+                                                    'display_height': display_h\
+                                                    }).run(g.rdb_conn))
         if versions:
             version_id = versions[0]['id']
             version = r.table('versions').get(version_id).update({\
@@ -405,7 +409,29 @@ def delete_layer(layer_id):
 """
 @app.route('/layers/<string:layer_id>', methods=['PATCH'])
 def update_layer(layer_id):
-    print request
+
+    #print request
+    if request.json:
+        #print request.json['asset_id']
+        if 'data_url' in request.json and 'asset_id' in request.json and 'layer_ext' in request.json:
+            layer_ext = request.json['layer_ext']
+            asset_id = request.json['asset_id']
+
+            # Get only the encoded data
+            _, b64data = request.json['data_url'].split(',')
+
+            # Write data into a file named <asset_id>.png
+            image = open(os.path.join(app.config['UPLOAD_FOLDER'], layer_id + layer_ext), "wb")
+            image.write(b64data.decode('base64'))
+            image.close()
+
+            # Insert a timestamp in the asset (meaning something changed)
+            time_stamp = time.time()
+            asset = r.table('assets').get(asset_id).update({'time_stamp': time_stamp\
+                                                            }).run(g.rdb_conn)
+            # Return updated asset as request response
+            return jsonify(asset)
+
     # update position and size
     if 'image' in request.form:
         file = request.files['file']

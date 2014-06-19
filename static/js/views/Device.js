@@ -16,7 +16,6 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
 
         initialize: function () {
             this.stage = "";
-            this.listenTo(App.vent, "initStage", this.onInitStage);
             this.listenTo(App.vent, "updateStage", this.onUpdateStage);
 
             this.listenTo(App.vent, "showCurrentImageSize", this.onShowCurrentImageSize);
@@ -162,23 +161,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             });
         },
 
-        onInitStage: function (options) {
-            this.stage = options.stage;
-            var self = this;
-
-            self.stage.toDataURL({
-                callback: function (dataUrl) {
-                    var assetID = document.getElementById('btnSave').getAttribute('data-id');
-                    //console.log(assetID);
-
-                    //self.postStage(assetID, dataUrl);
-                }
-            });
-        },
-
         saveResolution: function () {
-            //console.log("save res");
-
             var self = this;
             self.stage.toDataURL({
                 callback: function (dataUrl) {
@@ -490,7 +473,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
                 });
 
                 stage.add(layer);
-                App.vent.trigger("initStage", {stage: stage});
+                App.vent.trigger("updateStage", {stage: stage});
 
                 function select(node) {
                     deselect();
