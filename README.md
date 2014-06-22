@@ -32,12 +32,13 @@ Clone the RethinkDB repository:
 git clone --depth 1 -b v1.13.x https://github.com/rethinkdb/rethinkdb.git
 ```
 #### Build RethinkDB
-Kick off the build process:
+Kick off the build process (it may take a while!):
 ```shell
 cd rethinkdb
 ./configure npm=/usr/local/bin/npm --allow-fetch
 make
 ```
+You will find the rethinkdb binary in the build/release/ subfolder.
 
 ### Clone & install Python drivers (2.x)
 ```shell
@@ -54,11 +55,30 @@ sudo pip install rethinkdb
 * libwebp
 * PIL
 
-#### libwebp
+#### libwebp (on Mac)
 ```shell
 sudo port selfupdate
 sudo port install webp
 ```
+#### libwebp (on Ubuntu 12.04)
+Install the libjpeg, libpng, libtiff and libgif packages, needed to convert between JPEG, PNG, TIFF, GIF and WebP image formats.
+```shell
+sudo apt-get install libjpeg-dev libpng-dev libtiff-dev libgif-dev
+```
+Download libwebp-0.4.0.tar.gz from https://code.google.com/p/webp/downloads/list
+Untar or unzip the package. This creates a directory named libwebp-0.4.0/:
+```shell
+ tar xvzf libwebp-0.4.0.tar.gz
+ ```
+ Build WebP encoder cwebp and decoder dwebp:
+ ```shell
+ cd libwebp-0.4.0
+ ./configure
+ make
+ sudo make install
+ sudo ln -s /usr/local/lib/libwebp.* /usr/lib/
+ ```
+
 ##### Test libwebp
 * png to webp
 ```shell
