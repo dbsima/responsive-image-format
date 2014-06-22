@@ -6,13 +6,39 @@
 * python
 * python-flask
 
-## Installation (Mac OS X >= 10.7)
-
-### Install RethinkDB
+## Install RethinkDB
+### Installation (Mac OS X >= 10.7)
 v1.12.4 - The Wizard of Oz (Make sure you have Homebrew installed)
 ```shell
 brew update && brew install rethinkdb
 ```
+
+### Compile from source on Ubuntu 12.04
+#### Get the build dependencies
+Install the main dependencies:
+```shell
+sudo apt-get install git-core g++ nodejs npm libprotobuf-dev libgoogle-perftools-dev \
+    libncurses5-dev libboost-all-dev
+```
+Then install a more recent version of node with n.
+```shell
+sudo npm install -g n
+sudo apt-get install curl
+sudo n stable
+```
+#### Get the source code
+Clone the RethinkDB repository:
+```shell
+git clone --depth 1 -b v1.13.x https://github.com/rethinkdb/rethinkdb.git
+```
+#### Build RethinkDB
+Kick off the build process:
+```shell
+cd rethinkdb
+./configure npm=/usr/local/bin/npm --allow-fetch
+make
+```
+
 ### Clone & install Python drivers (2.x)
 ```shell
 git clone git@git.corp.adobe.com:sdragos/responsive-image-format.git
