@@ -22,6 +22,9 @@ RDB_HOST =  os.environ.get('RDB_HOST') or 'localhost'
 RDB_PORT = os.environ.get('RDB_PORT') or 28015
 MY_DB = 'mydb'
 
+print RDB_HOST
+print RDB_PORT
+
 # Where will the uploaded files be stored
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/files')
@@ -724,4 +727,4 @@ if __name__ == '__main__':
     if args.run_setup:
         dbSetup()
     else:
-        app.run(debug=True, port=6003, host='0.0.0.0')
+        app.run(debug=True,  host='0.0.0.0')
