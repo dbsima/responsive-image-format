@@ -242,3 +242,21 @@
 2014-06-16T12:52:01.951921000 0.569449s info: To fully expose RethinkDB on the network, bind to all addresses
 2014-06-16T12:52:01.951922000 0.569450s info: by running rethinkdb with the `--bind all` command line option.
 2014-06-16T12:52:01.951930000 0.569458s info: Server ready
+2014-06-23T17:46:48.091297000 349268.994909s info: Server got SIGINT from pid 3519, uid 501; shutting down...
+2014-06-23T17:46:48.099043000 349269.002655s info: Shutting down client connections...
+2014-06-23T17:46:48.104984000 349269.008595s info: All client connections closed.
+2014-06-23T17:46:48.105001000 349269.008612s info: Shutting down storage engine... (This may take a while if you had a lot of unflushed data in the writeback cache.)
+2014-06-23T17:46:48.224541000 349269.128152s info: Storage engine shut down.
+2014-06-26T17:12:58.811538000 0.005231s info: Running rethinkdb 1.12.4 (CLANG 5.1 (clang-503.0.40))...
+2014-06-26T17:12:58.816788000 0.010482s info: Running on Darwin 13.2.0 x86_64
+2014-06-26T17:12:58.816858000 0.010551s info: Using cache size of 100 MB
+2014-06-26T17:12:58.816899000 0.010592s warn: Cache size does not leave much memory for server and query overhead (available memory: 643 MB).
+2014-06-26T17:12:58.816929000 0.010622s warn: Cache size is very low and may impact performance.
+2014-06-26T17:12:58.816949000 0.010642s info: Loading data from directory /Users/sdragos/responsive-image-format/rethinkdb_data
+2014-06-26T17:12:58.843682000 0.037376s info: Listening for intracluster connections on port 29015
+2014-06-26T17:12:58.845327000 0.039020s info: Listening for client driver connections on port 28015
+2014-06-26T17:12:58.845445000 0.039138s info: Listening for administrative HTTP connections on port 8080
+2014-06-26T17:12:58.845447000 0.039140s info: Listening on addresses: 127.0.0.1, ::1
+2014-06-26T17:12:58.845457000 0.039150s info: To fully expose RethinkDB on the network, bind to all addresses
+2014-06-26T17:12:58.845458000 0.039151s info: by running rethinkdb with the `--bind all` command line option.
+2014-06-26T17:12:58.845465000 0.039158s info: Server ready

@@ -45,7 +45,9 @@ def dbSetup():
     finally:
         connection.close()
 
-app = Flask(__name__)
+
+tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static/templates')
+app = Flask(__name__, template_folder=tmpl_dir)
 # set maximum allowed payload to 16 megabytes
 #app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
