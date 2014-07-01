@@ -11,6 +11,7 @@ require.config({
         slider      :   'lib/bootstrap-slider',
         bootstrap   :   'lib/bootstrap.min',
         tpl         :   'lib/tpl',
+        glfx        :   'lib/glfx',
         prettify    :   'lib/prettify.min',
         wreqr       :   'lib/backbone.wreqr',
         kinetic     :   'lib/kinetic-v5.1.0',

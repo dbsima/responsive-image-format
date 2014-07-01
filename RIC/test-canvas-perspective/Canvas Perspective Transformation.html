@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Canvas Perspective Transformation</title>
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<script type="text/javascript" src="http://yui.yahooapis.com/3.1.0/build/yui/yui-min.js"></script>
+<script type="text/javascript" src="perspective.js"></script>
+
+
+<style type="text/css">
+hr {
+	margin: 10px;
+}
+body {
+	font-family: Verdana, sans-serif;
+	background: silver;
+}
+div.handle {
+	border: 1px solid black;
+	height: 5px;
+	width: 5px;
+	z-index: 5;
+	position: absolute;
+	cursor: pointer;		
+	background: orange;
+	opacity: 0.6;
+}
+
+</style>
+</head>
+<body onload="perspective();" id="theBody">
+
+<canvas width="1" height="1" id="source" style="display: none;"></canvas>
+
+<h3>Interactive perspective image warping using a &lt;canvas&gt; element.</h3>
+<p>According to the specifications, the &lt;canvas&gt; element does only support affine transformations, which allows only rotations, scaling and shearing. Real 3D perspective projections are not possible.<br />
+	Unlike other approaches using vertical stripe drawing or triangle subdivision, this implementation uses transformation matrixes. Unfortunately, doing the whole math in javascript slows everything down, but it makes it most flexible.</p>
+<p>The first demo allows you to warp the image by dragging its corners.</p>
+<p>The second demo lets you set the vanishing points of the image, which is transformed using the reference point setting.<br />
+	Vanishing points near the image result in large distortions while the warped image looks natural when the points are far away.</p>
+<p>The <em>interpolation method</em> lets you choose how to interpolate the transformed image. Nearest-neighbour is fast but there is no anti-aliasing. Bilinear is slower but leads to acceptable results.</p>
+<p>If <em>Live warping</em> is enabled, the image is transformed while you are dragging a handle.</p>
+	
+<div style="margin:100px; width:4000px;height:4000px">
+	<hr style="clear:both;"/>
+	Interpolation method: <select size="1" id="interpolationMethod" onchange="initTransform();initTransformVP();"><option value="nn">Nearest-neighbour</option><option value="bl">Bilinear</option></select><br />
+	<label for="liveWarping">Live warping <input type="checkbox" id="liveWarping"/></label>
+	<hr style="clear:both;"/>
+	
+	
+	<div style="border: 1px dashed red; display:inline-block; float:left;">
+		<canvas width="1" height="1" id="perspectiveDemo"></canvas>
+	</div>
+	<!--
+	<table style="float:left;" id="matrixdump" width="200" border="1">
+		<caption>Transformation Matrix</caption>
+		<tr>
+			<td width="33%"></td>
+			<td width="33%"></td>
+			<td width="33%"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+	-->
+	<div id="transformResults"></div>
+
+
+	<hr style="clear:both;"/>
+
+	<div style="border: 1px dashed red; display:inline-block; float:left;">
+		<canvas width="1" height="1" id="perspectiveDemoVP"></canvas>
+	</div>
+	<!--
+	<table style="float:left;" id="matrixdump2" width="200" border="1">
+		<caption>Transformation Matrix</caption>
+		<tr>
+			<td width="33%"></td>
+			<td width="33%"></td>
+			<td width="33%"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+	-->
+	Reference Point: <select size="1" id="vpReferencePoint" onchange="initTransformVP();"> 
+		<option value="auto">Auto</option>
+		<option value="tl">Top left (tl)</option>
+		<option value="bl">Bottom left (bl)</option>
+		<option value="br">Bottom right (br)</option>
+		<option value="tr">Top right (tr)</option>
+	</select>
+	<div>Used Ref. Point: <span id="vpSelectedReferencePoint"></span></div>
+</div>
+</body>
+</html>

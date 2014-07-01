@@ -1,6 +1,6 @@
 /*global define, console*/
 
-define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/Layer'], function ($, App, Marionette, vent, templates, Kinetic, LayerModel) {
+define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/Layer', 'glfx'], function ($, App, Marionette, vent, templates, Kinetic, LayerModel, Glfx) {
     "use strict";
 
     return Marionette.Layout.extend({
@@ -12,6 +12,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             this.listenTo(App.vent, "updateStage", this.onUpdateStage);
 
             this.listenTo(App.vent, "afterLayerChanged", this.onLayerChange);
+            this.listenTo(App.vent, "addPerspective", this.addPerspective);
 
             var i, asset = this.model.toJSON();
             this.assetID = asset.id;
@@ -61,8 +62,8 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'kinetic', 'models/L
             'click #openSmartShape': 'initSmartShape'
         },
 
-        onLayerChange : function(options) {
-            console.log(options);
+        addPerspective : function(options) {
+            console.log("add pespective");
             //this.initialize();
             //this.render();
         },

@@ -19,6 +19,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             'change #imageToCompose': 'changeImage',
             'click #btnOpenModal': 'onOpenModal',
             'click #btnSaveImage' : 'onSaveImage',
+            'click #btnAddPerspective' : 'onAddPerspective'
         },
 
         initialize: function (options) {
@@ -32,14 +33,13 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
             this.isShapeOpen = false;
 
             this.sources = {};
-            //console.log(this.model);
+        },
+
+        onAddPerspective: function() {
+            App.vent.trigger("addPerspective", {"perspective": "true"});
         },
 
         onOpenModal : function() {
-            //console.log("on open modal");
-
-            //console.log(this.model);
-
             this.sources['0'] = {
                 id: '0',
                 path: "../files/" + this.model.get('current_layer') + this.model.get('ext'),
@@ -53,8 +53,7 @@ define(['jquery', 'app', 'marionette', 'vent', 'templates', 'bootstrap', 'models
         },
 
         onSaveImage: function() {
-            //
-            console.log('save image');
+            //console.log('save image');
             var self = this;
             self.stage.toDataURL({
                 callback: function (dataUrl) {
